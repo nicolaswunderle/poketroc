@@ -18,7 +18,7 @@ const dresseurSchema = new Schema({
         type: String,
         required: [true, "Le pseudo du dresseur est obligatoire."],
         minlength: [3, "Le pseudo ne doit être plus court que 3 caractères."],
-        maxlength: [50, "Le pseudo ne doit pas dépasser 50 caractères."],
+        maxlength: [40, "Le pseudo ne doit pas dépasser 40 caractères."],
         unique: true
     },
     email: {
