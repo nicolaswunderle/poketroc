@@ -1,0 +1,13 @@
+{
+"watch": [
+    ".env",
+    "messaging.js",
+    "app.js",
+    "config.js",
+    "openapi.json",
+    "bin/start.js",
+    "routes/**/*",
+    "models/**/*",
+    "spec/**/*"
+  ]
+}

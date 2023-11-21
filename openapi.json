@@ -1,0 +1,8 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Pokétroc",
+    "version": "1.0.0",
+    "description": "API pour échanger des cartes Pokémon"
+  }
+}
