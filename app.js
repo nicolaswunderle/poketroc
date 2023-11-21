@@ -9,7 +9,6 @@ import { databaseUrl } from './config.js';
 //Router
 import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
-import loginRouter from "./routes/login.js";
 import thingsRouter from "./routes/things.js";
 
 // Connect to the database (can be overriden from environment)
@@ -30,7 +29,6 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
 app.use("/dresseurs", dresseursRouter);
-app.use("/login", loginRouter);
 app.use("/things", thingsRouter);
 
 
@@ -40,15 +38,25 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
+app.use('/dresseurs', function (err, req, res, next) {
+  if (err.code === 11000) {
+    const rep = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
+    res.status(409).send(rep);
+  }
+});
+
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // Send the error status
-  res.status(err.status || 500);
-  res.send(err.message);
+  if (err.code === 11000) {
+    res.status(409).send('Email already registered.');
+  } else {
+    // Send the error status
+    res.status(err.status || 500);
+    res.send(err.message);
+  }
 });
 
 export default app;
