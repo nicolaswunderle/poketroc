@@ -4,7 +4,7 @@ import logger from "morgan";
 import mongoose from "mongoose";
 import swaggerUi from 'swagger-ui-express';
 
-import openApiDocument from './openapi.json' /* assert { type: "json" } */;
+import openApiDocument from './openapi.json' assert { type: "json" };
 import { databaseUrl } from './config.js';
 //Router
 import indexRouter from "./routes/index.js";
