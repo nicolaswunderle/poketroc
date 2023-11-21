@@ -34,5 +34,8 @@
     "setupFilesAfterEnv": [
       "jest-extended/all"
     ]
+  },
+  "engines": {
+    "node": "^20.8.0"
   }
 }
