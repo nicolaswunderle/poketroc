@@ -54,5 +54,10 @@ router.post("/connexion", function (req, res, next) {
       .catch(next);
 });
 
+// Permet de se déconnecter
+router.post("/deconnexion", function (req, res, next) {
+  // si le jwt existe alors on le supprime
+  // si le jwt n'existe pas on renvoie une erreur qui dit que le jwt n'existe pas
+});
 
 export default router;
