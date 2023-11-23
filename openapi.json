@@ -59,6 +59,105 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/CartePasTrouvee"
+          }
+        }
+      },
+      "post": {
+        "summary": "Echanger carte-----------------------------------------------",
+        "tags":[
+          "carte"
+        ],
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/CarteData"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "201": {
+                "description": "Echange réussi",
+                "content": {
+                  "application/json":{
+                    "schema":{
+                      "$ref": "#/components/schemas/Carte"
+                    }
+                  }
+                }
+            },
+            "422": {
+              "$ref": "#/components/responses/CarteValidationErreur"
+            }
+        }
+      },
+      "patch": {
+        "summary": "Modifier carte du dresseur en partie---------------------------------------",
+        "tags":[
+          "carte"
+        ],
+        "parameters": [
+          {
+            "name": "carteId",
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/CarteDataPartiel"
+              }
+            }
+          }
+        },
+        "responses":{
+          "200":{
+            "description":"",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/CartePasTrouvee"
+          }
+        }
+      },
+      "delete":{
+        "summary":"Supprimer carte-------------------------------------------------------------",
+        "tags":[
+          "carte"
+        ],
+        "parameters":[
+          {
+            "name": "carteId",
+            "in":"path",
+            "description":"Identifiant de la carte",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"La carte a été correctement supprimée"
+          },
+          "404": {
+            "$ref": "#/components/responses/CartePasTrouvee"
           }
         }
       }
@@ -511,6 +610,112 @@
           "type",
           "quantite",
           "possedee_par"
+        ]
+      },
+      "CarteDataPartial": {
+        "type":"object",
+        "properties":{
+          "id":{
+            "type": "string",
+            "description":"",
+            "example":"7fe91a9a41bc839033eedf0f"
+          },
+          "num_carte":{
+            "type":"number",
+            "description":"",
+            "example": 111
+          },
+          "etat":{
+            "type": "string",
+            "description":"",
+            "enum":[
+              "neuf",
+              "occasion",
+              "abimée"
+            ],
+            "example": "neuf"
+          },
+          "descr_etat":{
+            "type": "string",
+            "description": "",
+            "exemple": "Très bon état. Aucune éraflure"
+          },
+          "type":{
+            "type":"string",
+            "description":"",
+            "enum":[
+              ""
+            ]
+          },
+          "possedee_par":{
+            "type": "string",
+            "description":"",
+            "example": "7fe91a9a41bc839033eedf0f"
+          }
+        },
+        "required":[
+          "id",
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "type",
+          "possedee_par"
+        ]
+      },
+      "CarteEchange": {
+        "type":"object",
+        "properties":{
+          "id":{
+            "type": "string",
+            "description":"",
+            "example":"7fe91a9a41bc839033eedf0f"
+          },
+          "num_carte":{
+            "type":"number",
+            "description":"",
+            "example": 111
+          },
+          "etat":{
+            "type": "string",
+            "description":"",
+            "enum":[
+              "neuf",
+              "occasion",
+              "abimée"
+            ],
+            "example": "neuf"
+          },
+          "descr_etat":{
+            "type": "string",
+            "description": "",
+            "exemple": "Très bon état. Aucune éraflure"
+          },
+          "type":{
+            "type":"string",
+            "description":"",
+            "enum":[
+              ""
+            ]
+          },
+          "possedee_par":{
+            "type": "string",
+            "description":"",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "ville":{
+            "type": "string",
+            "description":"",
+            "example": "Genève"
+          }
+        },
+        "required":[
+          "id",
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "type",
+          "possedee_par",
+          "ville"
         ]
       }
     }
