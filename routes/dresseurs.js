@@ -34,19 +34,21 @@ router.post("/connexion", function (req, res, next) {
       .exec()
       .then(dresseur => {
           if (!dresseur) return res.sendStatus(401); // Unauthorized
+          if (!req.body.mot_de_passe) return res.sendStatus(401); // Unauthorized
           return bcrypt.compare(req.body.mot_de_passe, dresseur.mot_de_passe)
               .then(valid => {
-              
-                  if (!valid) return res.sendStatus(401); // Unauthorized
-                  // Login is valid...
+                if (!valid) return res.sendStatus(401); // Unauthorized
+                // Login is valid...
+                // Create the payload for the JWT including the user ID and expiration
+                const payload = {
+                  sub: dresseur._id.toString(),
                   // UNIX timstamp representing a date in 7 days.
-                  const exp = Math.floor(Date.now() / 1000) + 7 * 24 * 3600;
-                  // Create the payload for the JWT including the user ID and expiration
-                  const payload = { sub: dresseur._id.toString(), exp: exp };
-                  // Create and sign a token.
-                  signJwt(payload, jwtSecret).then(token => {
-                      res.send({ token });
-                  });
+                  exp: Math.floor(Date.now() / 1000) + 7 * 24 * 3600,
+                };
+                // Create and sign a token.
+                signJwt(payload, jwtSecret).then(token => {
+                    res.send({ token });
+                });
                   
 
               });
@@ -55,7 +57,7 @@ router.post("/connexion", function (req, res, next) {
 });
 
 // Permet de se déconnecter
-router.post("/deconnexion", function (req, res, next) {
+router.delete("/connexion", function (req, res, next) {
   // si le jwt existe alors on le supprime
   // si le jwt n'existe pas on renvoie une erreur qui dit que le jwt n'existe pas
 });

@@ -7,35 +7,43 @@ const dresseurSchema = new Schema({
     prenom: {
         type: String,
         required: [true, "Le prénom du dresseur est obligatoire."],
-        maxlength: [30, "Le prénom ne doit pas dépasser 30 caractères."]
+        minlength: [1, "Le prénom du dresseur doit être plus long que 1 caractère."],
+        maxlength: [40, "Le prénom du dresseur doit être plus court que 40 caractères."]
     },
     nom: {
         type: String,
         required: [true, "Le nom du dresseur est obligatoire."],
-        maxlength: [30, "Le nom ne doit pas dépasser 30 caractères."]
+        minlength: [1, "Le nom du dresseur doit être plus long que 1 caractère."],
+        maxlength: [40, "Le nom du dresseur doit être plus court que 40 caractères."]
     },
     pseudo: {
         type: String,
         required: [true, "Le pseudo du dresseur est obligatoire."],
-        minlength: [3, "Le pseudo ne doit être plus court que 3 caractères."],
-        maxlength: [40, "Le pseudo ne doit pas dépasser 40 caractères."],
-        unique: true
+        minlength: [1, "Le pseudo du dresseur doit être plus long que 1 caractère."],
+        maxlength: [40, "Le pseudo du dresseur doit être plus court que 40 caractères."],
+        unique: [true, "Le pseudo du dresseur existe déjà."]
     },
     email: {
         type: String,
-        required: [true, "L'email du dresseur est obligatoire."],
+        required: [true, "L'adresse email du dresseur est obligatoire."],
         lowercase: true,
-        match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Entrer une adresse email valide.']
+        match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "L'adresse email du dresseur n'est pas valide."]
     },
     age: {
         type: Number,
         required: [true, "L'âge du dresseur est obligatoire."],
-        min: [1, "On ne peut pas avoir moins de 1 année."]
+        min: [1, "L'âge du dresseur doit être plus grand que 1."],
+        max: [200, "L'âge du dresseur doit être plus petit que 200."]
     },
     ville: {
         type: String,
         required: [true, "La ville du dresseur est obligatoire."],
-        maxlength: [40, "La ville ne doit pas dépasser 40 caractères."]
+        minlength: [1, "La ville du dresseur doit être plus longue que 1 caractère."],
+        maxlength: [60, "La ville du dresseur doit être plus courte que 60 caractères."]
+    },
+    url_image_profil: {
+        type: String,
+        default: 'asset/image_profil_defaut.jpeg'
     },
     en_ligne: {
         type: Boolean,
@@ -48,6 +56,14 @@ const dresseurSchema = new Schema({
     mot_de_passe: {
         type: String,
         required: [true, "Le mot de passe du dresseur est obligatoire."],
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
