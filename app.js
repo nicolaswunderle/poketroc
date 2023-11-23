@@ -28,8 +28,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
-app.use("/dresseurs", dresseursRouter);
-app.use("/things", thingsRouter);
+app.use("/api/dresseurs", dresseursRouter);
+app.use("/api/things", thingsRouter);
 
 
 
@@ -38,7 +38,7 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
-app.use('/dresseurs', function (err, req, res, next) {
+app.use('/api/dresseurs', function (err, req, res, next) {
   if (err.code === 11000) {
     const rep = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
     res.status(409).send(rep);

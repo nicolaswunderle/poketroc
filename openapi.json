@@ -2,17 +2,11 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Pokétroc",
-    "version": "1.1.0",
     "description": "Application qui permet aux utilisateurs de lister leurs cartes pokémon, de les échanger ainsi que de chercher des cartes qu’ils aimeraient acquérir.",
-    "contact": {
-      "url": "https://github.com/nicolaswunderle/poketroc"
-    }
+    "version": "1.1.0",
+    "contact": { "url": "https://github.com/nicolaswunderle/poketroc" }
   },
-  "serveur": [
-    {
-      "url": "https://poketroc.ch/api"
-    }
-  ],
+  "servers": [{ "url": "https://poketroc.onrender.com/api"}],
   "tags": [
     {
       "name": "dresseur",
@@ -28,78 +22,14 @@
     },
     {
       "name": "message",
-      "description":""
+      "description": ""
     }
   ],
   "paths": {
-    "/poketroc/deck/carte":{
+    "/poketroc/deck/carte": {
       "get": {
         "summary": "Afficher carte dresseur-----------------------------------------------------",
-        "tags":[
-          "carte"
-        ],
-        "parameters":[
-          {
-            "name": "carteId",
-            "in":"path",
-            "description":"Identifiant de la carte",
-            "required":true,
-            "schema":{
-              "type":"string"
-            }
-          }
-        ],
-        "responses":{
-          "200":{
-            "description": "La carte a été affichée",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/Carte"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/CartePasTrouvee"
-          }
-        }
-      },
-      "post": {
-        "summary": "Echanger carte-----------------------------------------------",
-        "tags":[
-          "carte"
-        ],
-        "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/CarteData"
-                    }
-                }
-            }
-        },
-        "responses": {
-            "201": {
-                "description": "Echange réussi",
-                "content": {
-                  "application/json":{
-                    "schema":{
-                      "$ref": "#/components/schemas/Carte"
-                    }
-                  }
-                }
-            },
-            "422": {
-              "$ref": "#/components/responses/CarteValidationErreur"
-            }
-        }
-      },
-      "patch": {
-        "summary": "Modifier carte du dresseur en partie---------------------------------------",
-        "tags":[
-          "carte"
-        ],
+        "tags": ["carte"],
         "parameters": [
           {
             "name": "carteId",
@@ -111,22 +41,13 @@
             }
           }
         ],
-        "requestBody":{
-          "content":{
-            "application/json":{
-              "schema":{
-                "$ref":"#/components/schemas/CarteDataPartiel"
-              }
-            }
-          }
-        },
-        "responses":{
-          "200":{
-            "description":"",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/Carte"
+        "responses": {
+          "200": {
+            "description": "La carte a été affichée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
                 }
               }
             }
@@ -136,25 +57,90 @@
           }
         }
       },
-      "delete":{
-        "summary":"Supprimer carte-------------------------------------------------------------",
-        "tags":[
-          "carte"
-        ],
-        "parameters":[
+      "post": {
+        "summary": "Echanger carte-----------------------------------------------",
+        "tags": ["carte"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarteData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Echange réussi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/CarteValidationErreur"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifier carte du dresseur en partie---------------------------------------",
+        "tags": ["carte"],
+        "parameters": [
           {
             "name": "carteId",
-            "in":"path",
-            "description":"Identifiant de la carte",
-            "required":true,
-            "schema":{
-              "type":"string"
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
-        "responses":{
-          "204":{
-            "description":"La carte a été correctement supprimée"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarteDataPartiel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/CartePasTrouvee"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer carte-------------------------------------------------------------",
+        "tags": ["carte"],
+        "parameters": [
+          {
+            "name": "carteId",
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "La carte a été correctement supprimée"
           },
           "404": {
             "$ref": "#/components/responses/CartePasTrouvee"
@@ -162,116 +148,44 @@
         }
       }
     },
-    "/poketroc/dresseurs/connection": {
-      
-    },
+    "/poketroc/dresseurs/connection": {},
     "/poketroc/dresseurs": {
       "post": {
         "summary": "Inscription à l'application-----------------------------------------------",
-        "tags":[
-          "dresseur"
-        ],
+        "tags": ["dresseur"],
         "requestBody": {
-            "content": {
-                "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/DresseurData"
-                    }
-                }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DresseurData"
+              }
             }
+          }
         },
         "responses": {
-            "200": {
-                "description": "Inscription réussie",
-                "content": {
-                  "application/json":{
-                    "schema":{
-                      "$ref": "#/components/schemas/Dresseur"
-                    }
-                  }
+          "200": {
+            "description": "Inscription réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dresseur"
                 }
+              }
             }
+          }
         }
       }
     },
     "/poketroc/dresseurs/deconnexion": {
       "post": {
         "summary": "Deconnexion du compte dresseur-----------------------------------------------",
-        "tags":[
-          "dresseur"
-        ]
+        "tags": ["dresseur"]
       }
     },
     "poketroc/profil": {
       "get": {
         "summary": "Afficher profil dresseur-----------------------------------------------------",
-        "tags":[
-          "dresseur"
-        ],
-        "parameters":[
-          {
-            "name": "dresseurId",
-            "in":"path",
-            "description":"Identifiant du dresseur",
-            "required":true,
-            "schema":{
-              "type":"string"
-            }
-          }
-        ],
-        "responses":{
-          "200":{
-            "description": "Le profil à été affiché",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/Dresseur"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete":{
-        "summary": "Supprimer profil-------------------------------------------------------------",
-        "tags":[
-          "dresseur"
-        ],
-        "securitySchemes":[
-          "JWT"
-        ],
-        "parameters":[
-          {
-            "name": "dresseurId",
-            "in":"path",
-            "description":"",
-            "required":true,
-            "schema":{
-              "type":"string"
-            }
-          }
-        ],
-        "responses":{
-          "200":{
-            "description":"Le dresseur à été supprimé"
-          }
-        }
-      }
-    },
-    "poketroc/profil/modification/mot-de-passe": {
-      "put": {
-        "summary": "Modifier le mot de passe-----------------------------------------------------",
-        "tags":[
-          "dresseur"
-        ]
-      }
-    },
-    "poketroc/profil/modification": {
-      "put": {
-        "summary": "Modifier profil du dresseur en entier---------------------------------------",
-        "tags":[
-          "dresseur"
-        ],
+        "tags": ["dresseur"],
         "parameters": [
           {
             "name": "dresseurId",
@@ -283,22 +197,78 @@
             }
           }
         ],
-        "requestBody":{
-          "content":{
-            "application/json":{
-              "schema":{
-                "$ref":"#/components/schemas/DresseurData"
+        "responses": {
+          "200": {
+            "description": "Le profil à été affiché",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dresseur"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer profil-------------------------------------------------------------",
+        "tags": ["dresseur"],
+        "securitySchemes": ["JWT"],
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Le dresseur à été supprimé"
+          }
+        }
+      }
+    },
+    "poketroc/profil/modification/mot-de-passe": {
+      "put": {
+        "summary": "Modifier le mot de passe-----------------------------------------------------",
+        "tags": ["dresseur"]
+      }
+    },
+    "poketroc/profil/modification": {
+      "put": {
+        "summary": "Modifier profil du dresseur en entier---------------------------------------",
+        "tags": ["dresseur"],
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DresseurData"
               }
             }
           }
         },
-        "responses":{
-          "200":{
-            "description":"",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/Dresseur"
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dresseur"
                 }
               }
             }
@@ -307,9 +277,7 @@
       },
       "patch": {
         "summary": "Modifier profil du dresseur en partie---------------------------------------",
-        "tags":[
-          "dresseur"
-        ],
+        "tags": ["dresseur"],
         "parameters": [
           {
             "name": "dresseurId",
@@ -321,22 +289,22 @@
             }
           }
         ],
-        "requestBody":{
-          "content":{
-            "application/json":{
-              "schema":{
-                "$ref":"#/components/schemas/DresseurDataPartiel"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DresseurDataPartiel"
               }
             }
           }
         },
-        "responses":{
-          "200":{
-            "description":"",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/Dresseur"
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dresseur"
                 }
               }
             }
@@ -347,27 +315,25 @@
     "poketroc/deck": {
       "get": {
         "summary": "Afficher le deck du dresseur-------------------------------------------------",
-        "tags":[
-          "carte"
-        ],
-        "parameters":[
+        "tags": ["carte"],
+        "parameters": [
           {
             "name": "num_carte",
             "in": "query",
-            "description":"",
-            "schema":{
-              "type":"integer",
+            "description": "",
+            "schema": {
+              "type": "integer",
               "example": 114,
               "minimum": 0,
               "maximum": 1000
             }
           },
           {
-            "name":"quantite",
-            "in":"query",
-            "description":"",
-            "schema":{
-              "type":"integer",
+            "name": "quantite",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
               "example": 1
             }
           },
@@ -375,8 +341,8 @@
             "name": "série",
             "in": "query",
             "description": "",
-            "schema":{
-              "type":"string",
+            "schema": {
+              "type": "string",
               "enum": [
                 "écarlate et violet",
                 "épée et bouclier",
@@ -389,13 +355,13 @@
           }
         ],
         "responses": {
-          "200":{
+          "200": {
             "description": "",
-            "content":{
-              "application/json":{
-                "schema":{
+            "content": {
+              "application/json": {
+                "schema": {
                   "type": "array",
-                  "items":{
+                  "items": {
                     "$ref": "#/components/schemas/Carte"
                   }
                 }
@@ -405,33 +371,31 @@
         }
       }
     },
-    "poketroc/fil-actualite":{
-      "get":{
+    "poketroc/fil-actualite": {
+      "get": {
         "summary": "Afficher le fil d'actualité--------------------------------------------------",
-        "tags":[
-          "échange"
-        ],
-        "parameters":[
+        "tags": ["échange"],
+        "parameters": [
           {
-            "name":"ville",
-            "in":"query",
+            "name": "ville",
+            "in": "query",
             "description": "Trier les échange par ville",
-            "schema":{
-              "type":"string",
-              "example":"Genève"
+            "schema": {
+              "type": "string",
+              "example": "Genève"
             }
           }
         ],
-        "responses":{
-          "200":{
-            "description":"Les échanges on bien été affiché",
-            "content":{
-              "application/json":{
-                "schema":{
-                 "type":"array",
-                 "items":{
-                  "$ref":"#/components/schemas/Echange"
-                 } 
+        "responses": {
+          "200": {
+            "description": "Les échanges on bien été affiché",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Echange"
+                  }
                 }
               }
             }
@@ -439,52 +403,48 @@
         }
       }
     },
-    "poketroc/fil-actualite/echange":{
-      "delete":{
-        "summary":"Supprimer un échange-----------------------------------------------------------",
-        "tags":[
-          "échange"
-        ],
-        "parameters":[
+    "poketroc/fil-actualite/echange": {
+      "delete": {
+        "summary": "Supprimer un échange-----------------------------------------------------------",
+        "tags": ["échange"],
+        "parameters": [
           {
             "name": "echangeId",
-            "in":"path",
-            "description":"",
-            "required":true,
-            "schema":{
-              "type":"string"
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
-        "responses":{
+        "responses": {
           "204": {
-            "description":"L'échange à été supprimé"
+            "description": "L'échange à été supprimé"
           }
         }
       }
     },
-    "poketroc/echange/proposition":{
-      "post":{
-        "summary":"Envoyer une proposition--------------------------------------------------------",
-        "tags":[
-          "échange"
-        ],
-        "requestBody":{
-          "content":{
-            "application/json":{
-              "schema":{
-                "$ref":"#/components/schemas/EchangeData"
+    "poketroc/echange/proposition": {
+      "post": {
+        "summary": "Envoyer une proposition--------------------------------------------------------",
+        "tags": ["échange"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EchangeData"
               }
             }
           }
         },
-        "responses":{
-          "201":{
-            "description":"",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/Echange"
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
                 }
               }
             }
@@ -492,32 +452,30 @@
         }
       }
     },
-    "poketroc/conversations":{
-      "get":{
-        "summary":"Afficher conversations-----------------------------------------------------",
-        "tags":[
-          "message"
-        ],
-        "parameters":[
+    "poketroc/conversations": {
+      "get": {
+        "summary": "Afficher conversations-----------------------------------------------------",
+        "tags": ["message"],
+        "parameters": [
           {
-            "name":"pseudo",
-            "in":"query",
-            "description":"",
-            "schema":{
-              "type":"string",
-              "example":"AniraC"
+            "name": "pseudo",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string",
+              "example": "AniraC"
             }
           }
         ],
-        "responses":{
-          "200":{
-            "description":"",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "type":"array",
-                  "items":{
-                    "$ref":"#/components/schemas/Message"
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Message"
                   }
                 }
               }
@@ -528,7 +486,7 @@
     }
   },
   "components": {
-    "responses":{
+    "responses": {
       "DresseurIntrouvable": {
         "description": "Ce-tte dresseu-r-euse n'existe pas"
       }
@@ -640,15 +598,11 @@
             "example": "Genève"
           }
         },
-        "required": [
-          "pseudo",
-          "email",
-          "mot_de_passe"
-        ]
+        "required": ["pseudo", "email", "mot_de_passe"]
       },
       "DresseurDataPartiel": {
         "type": "object",
-        "properties":{
+        "properties": {
           "nom": {
             "type": "string",
             "description": "",
@@ -693,64 +647,52 @@
         }
       },
       "Carte": {
-        "type":"object",
-        "properties":{
-          "id":{
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "num_carte":{
-            "type":"integer",
-            "description":"",
+          "num_carte": {
+            "type": "integer",
+            "description": "",
             "example": 111
           },
-          "etat":{
+          "etat": {
             "type": "string",
-            "description":"",
-            "enum":[
-              "neuf",
-              "occasoon",
-              "abimée"
-            ],
+            "description": "",
+            "enum": ["neuf", "occasoon", "abimée"],
             "example": "neuf"
           },
-          "descr_etat":{
+          "descr_etat": {
             "type": "string",
             "description": "",
             "exemple": "Très bonne état. Aucune éraflure"
           },
-          "statut":{
-            "type":"string",
-            "description":"",
-            "enum":[
-              "collectée",
-              "en échange",
-              "souhaitée"
-            ],
+          "statut": {
+            "type": "string",
+            "description": "",
+            "enum": ["collectée", "en échange", "souhaitée"],
             "example": "collectée"
           },
-          "type":{
-            "type":"string",
-            "description":"",
-            "enum":[
-              "reverse",
-              "holo",
-              "rien"
-            ]
+          "type": {
+            "type": "string",
+            "description": "",
+            "enum": ["reverse", "holo", "rien"]
           },
           "quantite": {
-            "type":"number",
-            "description":"",
+            "type": "number",
+            "description": "",
             "example": 1
           },
-          "possedee_par":{
+          "possedee_par": {
             "type": "string",
-            "description":"",
+            "description": "",
             "example": "7fe91a9a41bc839033eedf0f"
           }
         },
-        "required":[
+        "required": [
           "id",
           "num_carte",
           "etat",
@@ -762,47 +704,41 @@
         ]
       },
       "CarteDataPartial": {
-        "type":"object",
-        "properties":{
-          "id":{
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "num_carte":{
-            "type":"number",
-            "description":"",
+          "num_carte": {
+            "type": "number",
+            "description": "",
             "example": 111
           },
-          "etat":{
+          "etat": {
             "type": "string",
-            "description":"",
-            "enum":[
-              "neuf",
-              "occasion",
-              "abimée"
-            ],
+            "description": "",
+            "enum": ["neuf", "occasion", "abimée"],
             "example": "neuf"
           },
-          "descr_etat":{
+          "descr_etat": {
             "type": "string",
             "description": "",
             "exemple": "Très bon état. Aucune éraflure"
           },
-          "type":{
-            "type":"string",
-            "description":"",
-            "enum":[
-              ""
-            ]
-          },
-          "possedee_par":{
+          "type": {
             "type": "string",
-            "description":"",
+            "description": "",
+            "enum": [""]
+          },
+          "possedee_par": {
+            "type": "string",
+            "description": "",
             "example": "7fe91a9a41bc839033eedf0f"
           }
         },
-        "required":[
+        "required": [
           "id",
           "num_carte",
           "etat",
@@ -812,52 +748,46 @@
         ]
       },
       "CarteEchange": {
-        "type":"object",
-        "properties":{
-          "id":{
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "num_carte":{
-            "type":"number",
-            "description":"",
+          "num_carte": {
+            "type": "number",
+            "description": "",
             "example": 111
           },
-          "etat":{
+          "etat": {
             "type": "string",
-            "description":"",
-            "enum":[
-              "neuf",
-              "occasion",
-              "abimée"
-            ],
+            "description": "",
+            "enum": ["neuf", "occasion", "abimée"],
             "example": "neuf"
           },
-          "descr_etat":{
+          "descr_etat": {
             "type": "string",
             "description": "",
             "exemple": "Très bon état. Aucune éraflure"
           },
-          "type":{
-            "type":"string",
-            "description":"",
-            "enum":[
-              ""
-            ]
-          },
-          "possedee_par":{
+          "type": {
             "type": "string",
-            "description":"",
+            "description": "",
+            "enum": [""]
+          },
+          "possedee_par": {
+            "type": "string",
+            "description": "",
             "example": "7fe91a9a41bc839033eedf0f"
           },
-          "ville":{
+          "ville": {
             "type": "string",
-            "description":"",
+            "description": "",
             "example": "Genève"
           }
         },
-        "required":[
+        "required": [
           "id",
           "num_carte",
           "etat",
@@ -867,122 +797,99 @@
           "ville"
         ]
       },
-      "Echange":{
-        "type":"object",
-        "properties":{
-          "id":{
-            "type":"string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+      "Echange": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "etat":{
-            "type":"string",
-            "description":"",
-            "enum":[
-              "en coure",
-              "fini"
-            ],
-            "example":"en coure"
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["en coure", "fini"],
+            "example": "en coure"
           },
-          "creer_a":{
-            "type":"string",
-            "description":"",
+          "creer_a": {
+            "type": "string",
+            "description": "",
             "format": "data-time",
-            "example":"2020-01-02T10:00:00.000Z"
+            "example": "2020-01-02T10:00:00.000Z"
           },
-          "creer_par":{
-            "$ref":"#/components/schemas/Dresseur"
+          "creer_par": {
+            "$ref": "#/components/schemas/Dresseur"
           },
-          "accepte_par":{
-            "$ref":"#/components/schemas/Dresseur"
+          "accepte_par": {
+            "$ref": "#/components/schemas/Dresseur"
           }
         },
-        "required":[
-          "id",
-          "etat",
-          "creer_a",
-          "creer_par",
-          "accepte_par"
-        ]
+        "required": ["id", "etat", "creer_a", "creer_par", "accepte_par"]
       },
-      "EchangeData":{
-        "type":"object",
-        "properties":{
-          "id":{
-            "type":"string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+      "EchangeData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "etat":{
-            "type":"string",
-            "description":"",
-            "enum":[
-              "en coure",
-              "fini"
-            ],
-            "example":"en coure"
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["en coure", "fini"],
+            "example": "en coure"
           },
-          "creer_a":{
-            "type":"string",
-            "description":"",
+          "creer_a": {
+            "type": "string",
+            "description": "",
             "format": "data-time",
-            "example":"2020-01-02T10:00:00.000Z"
+            "example": "2020-01-02T10:00:00.000Z"
           },
-          "creer_par":{
-            "$ref":"#/components/schemas/Dresseur"
+          "creer_par": {
+            "$ref": "#/components/schemas/Dresseur"
           },
-          "accepte_par":{
-            "$ref":"#/components/schemas/Dresseur"
+          "accepte_par": {
+            "$ref": "#/components/schemas/Dresseur"
           }
         },
-        "required":[
-          "etat",
-          "creer_a",
-          "creer_par",
-          "accepte_par"
-        ]
+        "required": ["etat", "creer_a", "creer_par", "accepte_par"]
       },
-      "Message":{
-        "type":"object",
-        "properties":{
-          "id":{
-            "type":"string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "creer_a":{
-            "type":"string",
-            "description":"",
+          "creer_a": {
+            "type": "string",
+            "description": "",
             "format": "data-time",
-            "example":"2020-01-02T10:00:00.000Z"
+            "example": "2020-01-02T10:00:00.000Z"
           },
-          "contenu":{
-            "type":"string",
-            "description":"",
-            "example":"Salut!"
+          "contenu": {
+            "type": "string",
+            "description": "",
+            "example": "Salut!"
           },
-          "ecrit_par":{
-            "type":"string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+          "ecrit_par": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "stocke_par":{
-            "type":"string",
-            "description":"",
-            "example":"7fe91a9a41bc839033eedf0f"
+          "stocke_par": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           }
         },
-        "required":[
-          "id",
-          "creer_a",
-          "contenu",
-          "ecrit_par",
-          "stocke_par"
-        ]
+        "required": ["id", "creer_a", "contenu", "ecrit_par", "stocke_par"]
       }
     },
-    "securitySchemes":{
-      "authConnexion":{
+    "securitySchemes": {
+      "authConnexion": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
@@ -995,5 +902,5 @@
         "name": "access_token"
       }
     }
-  }      
-}    
+  }
+}
