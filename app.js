@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/", indexRouter);
+app.use("/api", indexRouter);
 app.use("/api/dresseurs", dresseursRouter);
 app.use("/api/things", thingsRouter);
 
