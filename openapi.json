@@ -2,7 +2,493 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Pokétroc",
-    "version": "1.0.0",
-    "description": "API pour échanger des cartes Pokémon"
-  }
-}
+    "version": "1.1.0",
+    "description": "Application qui permet aux utilisateurs de lister leurs cartes pokémon, de les échanger ainsi que de chercher des cartes qu’ils aimeraient acquérir.",
+    "contact": {
+      "url": "https://github.com/nicolaswunderle/poketroc"
+    }
+  },
+  "serveur": [
+    {
+      "url": "https://poketroc.ch/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "dresseur",
+      "description": ""
+    },
+    {
+      "name": "carte",
+      "description": ""
+    },
+    {
+      "name": "échange",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/poketroc/deck/carte":{
+      "get": {
+        "summary": "Afficher carte dresseur-----------------------------------------------------",
+        "tags":[
+          "carte"
+        ],
+        "parameters":[
+          {
+            "name": "carteId",
+            "in":"path",
+            "description":"Identifiant de la carte",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description": "La carte a été affichée",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Carte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poketroc/dresseurs/connection": {
+        "post": {
+            "summary": "Connection d’un dresseur----------------------------------------",
+            "tags": [
+              "dresseur"
+            ],
+            "responses": {
+                "200": {
+                    "description": "Connexion réussie",
+                    "content": {}
+                }
+            }
+        }
+    },
+    "/poketroc/dresseurs": {
+      "post": {
+        "summary": "Inscription à l'application-----------------------------------------------",
+        "tags":[
+          "dresseur"
+        ],
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/DresseurData"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "200": {
+                "description": "Inscription réussie",
+                "content": {
+                  "application/json":{
+                    "schema":{
+                      "$ref": "#/components/schemas/Dresseur"
+                    }
+                  }
+                }
+            }
+        }
+      }
+    },
+    "/poketroc/dresseurs/deconnexion": {
+      "post": {
+        "summary": "Deconnexion du compte dresseur-----------------------------------------------",
+        "tags":[
+          "dresseur"
+        ]
+      }
+    },
+    "poketroc/profil": {
+      "get": {
+        "summary": "Afficher profil dresseur-----------------------------------------------------",
+        "tags":[
+          "dresseur"
+        ],
+        "parameters":[
+          {
+            "name": "dresseurId",
+            "in":"path",
+            "description":"Identifiant du dresseur",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description": "Le profil à été affiché",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Dresseur"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete":{
+        "summary": "Supprimer profil-------------------------------------------------------------",
+        "tags":[
+          "dresseur"
+        ],
+        "parameters":[
+          {
+            "name": "dresseurId",
+            "in":"path",
+            "description":"",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"Le dresseur à été supprimé"
+          }
+        }
+      }
+    },
+    "poketroc/profil/modification/mot-de-passe": {
+      "put": {
+        "summary": "Modifier le mot de passe-----------------------------------------------------",
+        "tags":[
+          "dresseur"
+        ]
+      }
+    },
+    "poketroc/profil/modification": {
+      "put": {
+        "summary": "Modifier profil du dresseur en entier---------------------------------------",
+        "tags":[
+          "dresseur"
+        ],
+        "parameters": [
+          {
+            "nom": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/DresseurData"
+              }
+            }
+          }
+        },
+        "responses":{
+          "200":{
+            "description":"",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Dresseur"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifier profil du dresseur en partie---------------------------------------",
+        "tags":[
+          "dresseur"
+        ],
+        "parameters": [
+          {
+            "nom": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/DresseurDataPartiel"
+              }
+            }
+          }
+        },
+        "responses":{
+          "200":{
+            "description":"",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Dresseur"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "poketroc/deck": {
+      "get": {
+        "summary": "Afficher le deck du dresseur",
+        "tags":[
+          "carte"
+        ],
+        "parameters":[
+          {
+            "name": "série",
+            "in": "query",
+            "description": "",
+            "schema":{
+              "type":"string",
+              "enum": [
+
+              ],
+              "example": ""
+            }
+          }
+        ],
+        "responses": {
+          "200":{
+
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses":{
+      "DresseurIntrouvable": {
+        "description": "Ce-tte dresseu-r-euse n'existe pas"
+      }
+    },
+    "schemas": {
+      "Dresseur": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "nom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 15,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "example": "Genève"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "prenom",
+          "pseudo",
+          "email",
+          "mot_de_passe",
+          "age",
+          "ville"
+        ]
+      },
+      "DresseurData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 15,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "example": "Genève"
+          }
+        },
+        "required": [
+          "pseudo",
+          "email",
+          "mot_de_passe"
+        ]
+      },
+      "DresseurDataPartiel": {
+        "type": "object",
+        "properties":{
+          "nom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 15,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "example": "Genève"
+          }
+        }
+      },
+      "Carte": {
+        "type":"object",
+        "properties":{
+          "id":{
+            "type": "string",
+            "description":"",
+            "example":"7fe91a9a41bc839033eedf0f"
+          },
+          "num_carte":{
+            "type":"number",
+            "description":"",
+            "example": 111
+          },
+          "etat":{
+            "type": "string",
+            "description":"",
+            "enum":[
+              "neuf",
+              "occasoon",
+              "abimée"
+            ],
+            "example": "neuf"
+          },
+          "descr_etat":{
+            "type": "string",
+            "description": "",
+            "exemple": "Très bonne état. Aucune éraflure"
+          },
+          "statut":{
+            "type":"string",
+            "description":"",
+            "enum":[
+              "collectée",
+              "en échange",
+              "souhaitée"
+            ],
+            "example": "collectée"
+          },
+          "type":{
+            "type":"string",
+            "description":"",
+            "enum":[
+              ""
+            ]
+          }
+        }
+      }
+    }
+  }      
+}    
