@@ -12,10 +12,13 @@ try {
 export const databaseUrl = process.env.DATABASE_URL || 'mongodb://localhost/poketroc';
 export const port = process.env.PORT || '3000';
 export const jwtSecret = process.env.JWT_SECRET;
-export const bcryptCostFactor = 10;
+export const bcryptCostFactor = process.env.BCRYPT_COST_FACTOR;
 
 if (!jwtSecret) {
   throw new Error("La variable d'environemment $JWT_SECRET est requise.");
+}
+if (!bcryptCostFactor) {
+  throw new Error("La variable d'environemment $BCRYPT_COST_FACTOR est requise.");
 }
 
 // Valide que le port est un nombre positif

@@ -13,6 +13,14 @@ const echConCarSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Echange',
         required: [true, "L'id de l'échange qui va concerner une ou plusieurs cartes est obligatoire."]
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 

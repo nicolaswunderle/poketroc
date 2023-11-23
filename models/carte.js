@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const carteSchema = new Schema({
     id_api: {
         type: String,
-        required: [true, "L'identifiant API de la carte est obligatoire."],
+        required: [true, "L'identifiant API de la carte est obligatoire."]
     },
     etat: {
         type: String,
@@ -15,7 +15,7 @@ const carteSchema = new Schema({
     },
     desc_etat: {
         type: String,
-        maxlength: [255, "La description de l'état ne doit pas dépasser 255 caractères."]
+        maxlength: [255, "La description de l'état de la carte doit être plus courte que 255 caractères."]
     },
     type: {
         type: String,
@@ -30,12 +30,21 @@ const carteSchema = new Schema({
     quantite: {
         type: Number,
         required: [true, "La quantité de la carte est obligatoire."],
-        min: [1, "Si on possède la carte c'est qu'on en a au minimum 1."]
+        min: [1, "La quantité de la carte doit être plus grande que 1."],
+        max: [1000, "La quantité de la carte doit être plus petite que 1000."],
     },
     dresseur_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur',
-        required: [true, "L'id du dresseur qui possède la carte est obligatoire."]
+        required: [true, "L'id du dresseur de la carte est obligatoire."]
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
