@@ -25,6 +25,10 @@
     {
       "name": "échange",
       "description": ""
+    },
+    {
+      "name": "message",
+      "description":""
     }
   ],
   "paths": {
@@ -60,18 +64,18 @@
       }
     },
     "/poketroc/dresseurs/connection": {
-        "post": {
-            "summary": "Connection d’un dresseur----------------------------------------",
-            "tags": [
-              "dresseur"
-            ],
-            "responses": {
-                "200": {
-                    "description": "Connexion réussie",
-                    "content": {}
-                }
-            }
-        }
+      "post": {
+          "summary": "Connection d’un dresseur----------------------------------------",
+          "tags": [
+            "dresseur"
+          ],
+          "responses": {
+              "200": {
+                  "description": "Connexion réussie",
+                  "content": {}
+              }
+          }
+      }
     },
     "/poketroc/dresseurs": {
       "post": {
@@ -486,8 +490,28 @@
             "enum":[
               ""
             ]
+          },
+          "quantite": {
+            "type":"number",
+            "description":"",
+            "example": 1
+          },
+          "possedee_par":{
+            "type": "string",
+            "description":"",
+            "example": "7fe91a9a41bc839033eedf0f"
           }
-        }
+        },
+        "required":[
+          "id",
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "statut",
+          "type",
+          "quantite",
+          "possedee_par"
+        ]
       }
     }
   }      
