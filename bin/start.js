@@ -11,7 +11,7 @@ import { createWebSocketServer } from '../messaging.js';
 import { port } from "../config.js";
 
 
-const debug = createDebugger('poketroc:server')
+const debug = createDebugger('poketroc:server');
 /**
  * Get port from environment and store in Express.
  */
