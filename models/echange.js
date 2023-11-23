@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const echangeSchema = new Schema({
     date: {
         type: Date,
-        required: [true, "Le date de l'échange est obligatoire."]
+        required: [true, "La date de l'échange est obligatoire."]
     },
     etat: {
         type: String,
@@ -21,6 +21,14 @@ const echangeSchema = new Schema({
     dresseur_accepte_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
