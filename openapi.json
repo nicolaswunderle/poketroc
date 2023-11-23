@@ -57,7 +57,8 @@
             }
           }
         }
-      },
+      }
+    },
     "/poketroc/dresseurs/connection": {
         "post": {
             "summary": "Connection d’un dresseur----------------------------------------",
