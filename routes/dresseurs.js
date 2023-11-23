@@ -60,6 +60,7 @@ router.post("/connexion", function (req, res, next) {
 router.delete("/connexion", function (req, res, next) {
   // si le jwt existe alors on le supprime
   // si le jwt n'existe pas on renvoie une erreur qui dit que le jwt n'existe pas
+  res.send("salut");
 });
 
 export default router;
