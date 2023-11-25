@@ -213,8 +213,8 @@
         }
       }
       },
-    "/poketroc/dresseurs/connection": {},
-    "/poketroc/dresseurs": {
+    "/dresseurs/connection": {},
+    "/dresseurs": {
       "post": {
         "summary": "Inscription à l'application-----------------------------------------------",
         "tags": ["dresseur"],
@@ -241,12 +241,77 @@
         }
       }
     },
-    "/poketroc/dresseurs/deconnexion": {
+    "/dresseurs/connexion": {
       "post": {
-        "summary": "Deconnexion du compte dresseur-----------------------------------------------",
-        "tags": ["dresseur"]
+        "summary": "Connexion au compte dresseur-----------------------------------------------",
+        "tags": ["dresseur"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pseudo": {
+                    "type": "string",
+                    "description": "Le pseudo du dresseur",
+                    "example": "Nerak"
+                  },
+                  "mot_de_passe": {
+                    "type": "string",
+                    "description": "Le mot de passe du compte dresseur",
+                    "example": "unMotDePasse88"
+                  }
+                },
+                "required": ["pseudo", "mot_de_passe"]             
+              }
+            }
+          }
+        },
+      "responses": {
+        "200": {
+          "description": "Connexion réussie",
+          "content": {}
+        },
+        "401": {
+          "description": "Échec de l'authentification",
+          "content": {}
+        } 
       }
-    },
+  },
+      "delete": {
+        "summary": "Deconnexion au compte dresseur-----------------------------------------------",
+        "tags": ["dresseur"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pseudo": {
+                   "type": "string",
+                    "description": "Le pseudo du dresseur",
+                    "example": "Nerak"
+                  },
+                  "mot_de_passe": {
+                    "type": "string",
+                    "description": "Le mot de passe du compte dresseur",
+                    "example": "unMotDePasse88"
+                  }
+                },
+              "required": ["pseudo", "mot_de_passe"]             
+              }
+            }
+          }
+        },
+    "responses": {
+      "200": {
+        "description": "Déconnexion réussie",
+        "content": {}
+      } 
+    }
+  }
+},
+
     "poketroc/profil": {
       "get": {
         "summary": "Afficher profil dresseur-----------------------------------------------------",
