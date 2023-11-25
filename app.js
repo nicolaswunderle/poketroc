@@ -43,6 +43,11 @@ app.use('/api/dresseurs', function (err, req, res, next) {
     const rep = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
     res.status(409).send(rep);
   }
+  // Si c'est une erreur de validation mongoose
+  if (err.name === "ValidationError") {
+    res.status(400).send(err.message);
+  }
+  next();
 });
 
 // error handler
@@ -50,13 +55,10 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-  if (err.code === 11000) {
-    res.status(409).send('Email already registered.');
-  } else {
-    // Send the error status
-    res.status(err.status || 500);
-    res.send(err.message);
-  }
+
+  // Send the error status
+  res.status(err.status || 500);
+  res.send(err.message);
 });
 
 export default app;

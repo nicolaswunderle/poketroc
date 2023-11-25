@@ -7,21 +7,18 @@ const dresseurSchema = new Schema({
     prenom: {
         type: String,
         required: [true, "Le prénom du dresseur est obligatoire."],
-        minlength: [1, "Le prénom du dresseur doit être plus long que 1 caractère."],
-        maxlength: [40, "Le prénom du dresseur doit être plus court que 40 caractères."]
+        maxlength: [40, "Le prénom du dresseur doit être plus court ou égal à 40 caractères."]
     },
     nom: {
         type: String,
         required: [true, "Le nom du dresseur est obligatoire."],
-        minlength: [1, "Le nom du dresseur doit être plus long que 1 caractère."],
-        maxlength: [40, "Le nom du dresseur doit être plus court que 40 caractères."]
+        maxlength: [40, "Le nom du dresseur doit être plus court ou égal à 40 caractères."]
     },
     pseudo: {
         type: String,
         required: [true, "Le pseudo du dresseur est obligatoire."],
-        minlength: [1, "Le pseudo du dresseur doit être plus long que 1 caractère."],
-        maxlength: [40, "Le pseudo du dresseur doit être plus court que 40 caractères."],
-        unique: [true, "Le pseudo du dresseur existe déjà."]
+        maxlength: [40, "Le pseudo du dresseur doit être plus court ou égal à 40 caractères."],
+        unique: true,
     },
     email: {
         type: String,
@@ -32,14 +29,13 @@ const dresseurSchema = new Schema({
     age: {
         type: Number,
         required: [true, "L'âge du dresseur est obligatoire."],
-        min: [1, "L'âge du dresseur doit être plus grand que 1."],
-        max: [200, "L'âge du dresseur doit être plus petit que 200."]
+        min: [1, "L'âge du dresseur doit être plus grand ou égal à 1."],
+        max: [200, "L'âge du dresseur doit être plus petit ou égal à 200."]
     },
     ville: {
         type: String,
         required: [true, "La ville du dresseur est obligatoire."],
-        minlength: [1, "La ville du dresseur doit être plus longue que 1 caractère."],
-        maxlength: [60, "La ville du dresseur doit être plus courte que 60 caractères."]
+        maxlength: [60, "La ville du dresseur doit être plus courte ou égale à 60 caractères."]
     },
     url_image_profil: {
         type: String,
@@ -75,6 +71,8 @@ dresseurSchema.set("toJSON", {
 function transformJsonDresseur(doc, json, options) {
     // Enlève le mot de passe hashé lorsqu'on génère le JSON
     delete json.mot_de_passe;
+    delete json.createdAt;
+    delete json.updatedAt;
     delete json.__v;
     return json;
 }

@@ -6,6 +6,7 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
+import { authenticate, loadDresseurFromParams, editPermissionDresseur } from "./utils.js";
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -28,6 +29,56 @@ router.post("/", function (req, res, next) {
       .catch(next);
 });
 
+// Affiche un dresseur
+router.get("/:dresseurId", authenticate, loadDresseurFromParams, function (req, res, next) {
+  res.status(200).send(req.dresseur);
+  next();
+});
+
+// Modifie le dresseur
+router.patch("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
+  const dresseur = req.dresseur;
+  const majDresseur = req.body;
+  // mise à jour des données 
+  Object.keys(majDresseur).forEach((cle) => {
+    if (dresseur[cle] !== majDresseur[cle] && cle !== "_id") {
+      // si la valeur n'est pas la même qu'avant alors on la change
+      dresseur[cle] = majDresseur[cle];
+    }
+  });
+  // ajoute le champ mot de passe si il a été modifié
+  const { mot_de_passe } = majDresseur;
+  if (mot_de_passe) {
+    bcrypt.hash(mot_de_passe, bcryptCostFactor)
+      .then(mdpHashe => {
+        dresseur.mot_de_passe = mdpHashe;
+        return dresseur.save();
+      })
+      .then(dresseurSauve => {   
+        res.status(200).send(dresseurSauve);
+      })
+      .catch(next);
+  } else {
+    dresseur.save().then(dresseurSauve => {   
+      res.status(200).send(dresseurSauve);
+    })
+    .catch(next);
+  }
+  
+
+});
+
+// Supprime le dresseur
+router.delete("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
+  Dresseur.deleteOne({ _id: req.dresseur.id })
+    .exec()
+    .then(valid => {
+      if (!valid) return res.sendStatus(401); // Unauthorized
+      res.status(204).send(`Le dresseur avec l'id ${req.dresseur.id} a été supprimé.`);
+    })
+    .catch(next);
+});
+
 // Permet de se connecter
 router.post("/connexion", function (req, res, next) {
   Dresseur.findOne({ pseudo: req.body.pseudo })
@@ -47,7 +98,7 @@ router.post("/connexion", function (req, res, next) {
                 };
                 // Create and sign a token.
                 signJwt(payload, jwtSecret).then(token => {
-                    res.send({ token });
+                    res.status(201).send({ token });
                 });
                   
 
@@ -57,10 +108,10 @@ router.post("/connexion", function (req, res, next) {
 });
 
 // Permet de se déconnecter
-router.delete("/connexion", function (req, res, next) {
-  // si le jwt existe alors on le supprime
-  // si le jwt n'existe pas on renvoie une erreur qui dit que le jwt n'existe pas
-  res.send("salut");
+router.delete("/connexion", authenticate, function (req, res, next) {
+  // si la personne est connectée et que son id est valide
+  res.status(204).send(`La connexion pour l'utilisateur avec l'id ${req.currentUserId} a bien été fermée.`);
+  next();
 });
 
 export default router;

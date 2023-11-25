@@ -40,6 +40,8 @@ echangeSchema.set("toJSON", {
 });
  
 function transformJsonDresseur(doc, json, options) {
+    delete json.createdAt;
+    delete json.updatedAt;
     delete json.__v;
     return json;
 }

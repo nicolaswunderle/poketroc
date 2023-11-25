@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { promisify } from "util";
 import { jwtSecret } from "../config.js";
+import Dresseur from "../models/dresseur.js";
 
 const verifyJwt = promisify(jwt.verify);
 
@@ -8,19 +10,55 @@ export function authenticate(req, res, next) {
   // Ensure the header is present.
   const authorization = req.get("Authorization");
   if (!authorization) {
-    return res.status(401).send("Authorization header is missing");
+    return res.status(401).send("Il manque l'autorisation dans le header");
   }
   // Check that the header has the correct format.
   const match = authorization.match(/^Bearer (.+)$/);
   if (!match) {
-    return res.status(401).send("Authorization header is not a bearer token");
+    return res.status(401).send("L'autorisation dans le header n'est pas un bearer token");
   }
   // Extract and verify the JWT.
   const token = match[1];
   verifyJwt(token, jwtSecret).then(payload => {
+    if (!mongoose.Types.ObjectId.isValid(payload.sub)) {
+      return res.status(400).send("L'id du dresseur est invalide.");
+    }
     req.currentUserId = payload.sub;
-    next(); // Pass the ID of the authenticated user to the next middleware.
+    // Check if the Dresseur ID exists in the database.
+    return Dresseur.findById(req.currentUserId);
+  })
+  .then(dresseur => {
+    if (!dresseur) {
+      return res.status(404).send(`L'id de dresseur ${req.currentUserId} ne correspond à rien dans le JWT`);
+    }
+    // Dresseur exists, proceed to the next middleware.
+    next();
   }).catch(() => {
-    res.status(401).send("Your token is invalid or has expired");
+    res.status(401).send("Votre token est invalide ou a expiré");
   });
+}
+
+export function loadDresseurFromParams(req, res, next) {
+  // Vérification de la validité de l'ID dans les paramêtres
+  if (!mongoose.Types.ObjectId.isValid(req.params.dresseurId)) {
+    return res.status(400).send("L'id du dresseur est invalide.");
+  }
+  Dresseur.findById(req.params.dresseurId)
+    .exec()
+    .then(dresseur => {
+      if (!dresseur) {
+        return res.status(404).send(`Aucun dresseur ne possède l'id ${req.params.dresseurId}`);
+      }
+      req.dresseur = dresseur;
+      next();
+    })
+    .catch(err => next(err));
+}
+
+export function editPermissionDresseur(req, res, next) {
+  // il faut que la personne qui est chargée soit la même que celle authentifiée
+  if (req.params.dresseurId !== req.currentUserId) {
+    return res.status(401).send(`Vous n'avez pas les autorisations pour modifier un autre compte`);
+  }
+  next();
 }

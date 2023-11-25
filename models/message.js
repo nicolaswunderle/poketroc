@@ -11,8 +11,7 @@ const messageSchema = new Schema({
     contenu: {
         type: String,
         required: [true, "Le contenu du message est obligatoire."],
-        minlength: [1, "Le contenu du message doit être plus long que 1 caractère."],
-        maxlength: [255, "Le contenu du message doit être plus court que 60 caractères."]
+        maxlength: [255, "Le contenu du message doit être plus court ou égal à 255 caractères."]
     },
     dresseur_id: {
         type: Schema.Types.ObjectId,
@@ -42,6 +41,8 @@ messageSchema.set("toJSON", {
 });
  
 function transformJsonDresseur(doc, json, options) {
+    delete json.createdAt;
+    delete json.updatedAt;
     delete json.__v;
     return json;
 }
