@@ -20,12 +20,12 @@ const carteSchema = new Schema({
     type: {
         type: String,
         required: [true, "Le type de la carte est obligatoire."],
-        enum: ['normal', 'reverse', 'holo']
+        enum: ['normale', 'reverse', 'holo']
     },
     statut: {
         type: String,
         required: [true, "Le statut de la carte est obligatoire."],
-        enum: ['collectée', 'souhaitée']
+        enum: ['collectee', 'souhaitee']
     },
     quantite: {
         type: Number,
