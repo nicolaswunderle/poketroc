@@ -6,7 +6,7 @@
     "version": "1.1.0",
     "contact": { "url": "https://github.com/nicolaswunderle/poketroc" }
   },
-  "servers": [{ "url": "https://poketroc.onrender.com/api"}],
+  "servers": [{ "url": "https://poketroc.onrender.com/api" }],
   "tags": [
     {
       "name": "dresseur",
@@ -212,7 +212,7 @@
           }
         }
       }
-      },
+    },
     "/dresseurs/connection": {},
     "/dresseurs": {
       "post": {
@@ -263,22 +263,22 @@
                     "example": "unMotDePasse88"
                   }
                 },
-                "required": ["pseudo", "mot_de_passe"]             
+                "required": ["pseudo", "mot_de_passe"]
               }
             }
           }
         },
-      "responses": {
-        "200": {
-          "description": "Connexion réussie",
-          "content": {}
-        },
-        "401": {
-          "description": "Échec de l'authentification",
-          "content": {}
-        } 
-      }
-  },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie",
+            "content": {}
+          },
+          "401": {
+            "description": "Échec de l'authentification",
+            "content": {}
+          }
+        }
+      },
       "delete": {
         "summary": "Deconnexion au compte dresseur-----------------------------------------------",
         "tags": ["dresseur"],
@@ -290,7 +290,7 @@
                 "type": "object",
                 "properties": {
                   "pseudo": {
-                   "type": "string",
+                    "type": "string",
                     "description": "Le pseudo du dresseur",
                     "example": "Nerak"
                   },
@@ -300,19 +300,19 @@
                     "example": "unMotDePasse88"
                   }
                 },
-              "required": ["pseudo", "mot_de_passe"]             
+                "required": ["pseudo", "mot_de_passe"]
               }
             }
           }
         },
-    "responses": {
-      "200": {
-        "description": "Déconnexion réussie",
-        "content": {}
-      } 
-    }
-  }
-},
+        "responses": {
+          "200": {
+            "description": "Déconnexion réussie",
+            "content": {}
+          }
+        }
+      }
+    },
 
     "poketroc/profil": {
       "get": {
@@ -506,7 +506,7 @@
     "/echanges": {
       "post": {
         "summary": "Créer un échange--------------------------------------------------",
-      "tags": ["échange"],
+        "tags": ["échange"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -534,7 +534,7 @@
       }
     },
     "/echanges/{echangeId}": {
-      "get":{
+      "get": {
         "summary": "Afficher un échange--------------------------------------------------------",
         "tags": ["échange"],
         "parameters": [
@@ -563,8 +563,8 @@
             "$ref": "#/components/responses/EchangePasTrouve"
           }
         }
-      }, 
-      "patch" : {
+      },
+      "patch": {
         "summary": "Modifier quelques informations d'un échange--------------------------------------------------------",
         "tags": ["échange"],
         "parameters": [
@@ -597,14 +597,15 @@
                 }
               }
             }
-          }, "404": {
+          },
+          "404": {
             "$ref": "#/components/responses/EchangePasTrouve"
           },
           "422": {
             "$ref": "#/components/responses/EchangeValidationErreur"
           }
         }
-      }, 
+      },
       "delete": {
         "summary": "Supprimer un échange-----------------------------------------------------------",
         "tags": ["échange"],
@@ -651,35 +652,37 @@
                 }
               }
             }
-          }, "404": {
+          },
+          "404": {
             "$ref": "#/components/responses/EchangesPasTrouves"
           }
         }
-    }
-  },
-  "/echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}": {
-    "get": {
-      "summary": "Afficher tous les échanges proposés--------------------------------------------------------",
-      "tags": ["échange"],
-      "parameters": [
-        {
-          "name": "tri",
-          "in": "query",
-          "description": "Critère de tri des échanges (nouveaute, pertinence)",
-          "required": false,
-          "schema": {
-            "type": "string",
-            "enum": ["nouveaute", "pertinence"]
-          }
-        },
-        {
-          "name": "page",
-          "in": "query",
-          "description": "Numéro de la pages",
-          "required": false,
-          "schema": {
-            "type": "integer"
-          }},
+      }
+    },
+    "/echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}": {
+      "get": {
+        "summary": "Afficher tous les échanges proposés--------------------------------------------------------",
+        "tags": ["échange"],
+        "parameters": [
+          {
+            "name": "tri",
+            "in": "query",
+            "description": "Critère de tri des échanges (nouveaute, pertinence)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["nouveaute", "pertinence"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la pages",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
           {
             "name": "pageSize",
             "in": "query",
@@ -689,62 +692,65 @@
               "type": "integer"
             }
           }
-      ],
-      "responses": {
-        "200": {
-          "description": "La liste des échanges proposés est affichée",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Echange"
+        ],
+        "responses": {
+          "200": {
+            "description": "La liste des échanges proposés est affichée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/EchangesPasTrouves"
           }
-        }, "404": {
-          "$ref": "#/components/responses/EchangesPasTrouves"
         }
       }
-  }
-},
-"/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
-  "get": {
-    "summary": "Afficher les échanges du dresseur en fonction de l'état--------------------------------------------------------",
-    "tags": ["échange"],
-    "parameters": [
-      {
-        "name": "dresseurId",
-        "in": "query",
-        "description": "Identifiant du dresseur",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "état",
-        "in": "query",
-        "description": "État des échanges (accepte, attente, refuse)",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "enum": ["accepte", "attente", "refuse"]
-        }}
-    ],
-    "responses": {
-      "200": {
-        "description": "La Liste des échanges du dresseur en fonction de l'état",
-        "content": {
-          "application/json": {
+    },
+    "/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
+      "get": {
+        "summary": "Afficher les échanges du dresseur en fonction de l'état--------------------------------------------------------",
+        "tags": ["échange"],
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "query",
+            "description": "Identifiant du dresseur",
+            "required": true,
             "schema": {
-              "$ref": "#/components/schemas/Echange"
+              "type": "string"
+            }
+          },
+          {
+            "name": "état",
+            "in": "query",
+            "description": "État des échanges (accepte, attente, refuse)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["accepte", "attente", "refuse"]
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "La Liste des échanges du dresseur en fonction de l'état",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/EchangesPasTrouves"
+          }
         }
-      }, "404": {
-        "$ref": "#/components/responses/EchangesPasTrouves"
       }
-    }
-  }
     },
     "messages/{echangeId}": {
       "get": {
@@ -779,8 +785,7 @@
       }
     },
 
-
-    "messages/{messageId}":{
+    "messages/{messageId}": {
       "delete": {
         "summary": "Supprimer un message-----------------------------------------------------------",
         "tags": ["message"],
@@ -800,525 +805,520 @@
             "description": "Le message à été supprimé avec succès."
           },
           "404": {
-            "description": "Message non trouvé."       
+            "description": "Message non trouvé."
+          }
         }
-      }
-    },
-    "poketroc/conversations": {
-      "get": {
-        "summary": "Afficher conversations-----------------------------------------------------",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "pseudo",
-            "in": "query",
-            "description": "Affichage du message.",
-            "schema": {
-              "type": "string",
-              "example": "AniraC"
+      },
+      "poketroc/conversations": {
+        "get": {
+          "summary": "Afficher conversations-----------------------------------------------------",
+          "tags": ["message"],
+          "parameters": [
+            {
+              "name": "pseudo",
+              "in": "query",
+              "description": "Affichage du message.",
+              "schema": {
+                "type": "string",
+                "example": "AniraC"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  }
+                }
+              }
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
+        }
+      },
+
+      "messages": {
+        "post": {
+          "summary": "Créer un message-----------------------------------------------------------",
+          "tags": ["message"],
+          "requestBody": {
+            "description": "Le message à créer.",
+            "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
+                  "$ref": "#/components/schemas/Message",
+                  "type": "object",
+                  "properties": {
+                    "contenu": {
+                      "type": "string",
+                      "description": "Le contenu du message",
+                      "example": "Salut! Cette carte m'intéresse."
+                    },
+                    "expéditeur": {
+                      "type": "string",
+                      "description": "L'expéditeur du message.",
+                      "example": "Salocin"
+                    },
+                    "destinataire": {
+                      "type": "string",
+                      "description": "Le destinataire du message.",
+                      "example": "Enirehtac"
+                    }
+                  },
+                  "required": ["contenu", "expéditeur", "destinataire"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Message créé avec succès.",
+              "content": {
+                "application/json": {
+                  "schema": {
                     "$ref": "#/components/schemas/Message"
                   }
                 }
               }
-            }
-          }
-        }
-      }
-    },
-
-
-    "messages": {
-      "post": {
-        "summary": "Créer un message-----------------------------------------------------------",
-        "tags": ["message"],
-        "requestBody": {
-          "description": "Le message à créer.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Message",
-                "type": "object",
-                "properties": {
-                  "contenu": {
-                    "type": "string",
-                    "description": "Le contenu du message",
-                    "example": "Salut! Cette carte m'intéresse."
-                  },
-                  "expéditeur": {
-                    "type": "string",
-                    "description": "L'expéditeur du message.",
-                    "example": "Salocin"
-                  },
-                  "destinataire": {
-                    "type": "string",
-                    "description": "Le destinataire du message.",
-                    "example": "Enirehtac"
+            },
+            "404": {
+              "description": "Destinataire manquant.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/MessageValidationErreur"
                   }
-                },
-                "required": ["contenu", "expéditeur", "destinataire"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Message créé avec succès.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
                 }
               }
             }
-          },
-          "404": {
-            "description": "Destinataire manquant.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageValidationErreur"
-                }
-              }
+          }
+        }
+      }
+    },
+
+    "components": {
+      "responses": {
+        "DresseurIntrouvable": {
+          "description": "Ce-tte dresseu-r-euse n'existe pas"
+        }
+      },
+      "schemas": {
+        "Dresseur": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "nom": {
+              "type": "string",
+              "description": "",
+              "minlength": 3,
+              "maxlength": 40,
+              "example": "Fonseca"
+            },
+            "prenom": {
+              "type": "string",
+              "description": "",
+              "minlength": 3,
+              "maxlength": 15,
+              "example": "Carina"
+            },
+            "pseudo": {
+              "type": "string",
+              "description": "",
+              "example": "AniraC"
+            },
+            "email": {
+              "type": "string",
+              "description": "",
+              "example": "adresse@email.ch"
+            },
+            "mot_de_passe": {
+              "type": "string",
+              "description": "",
+              "example": "unMotDePasse32"
+            },
+            "age": {
+              "type": "integer",
+              "description": "",
+              "minimum": 0,
+              "maximum": 100,
+              "example": 25
+            },
+            "ville": {
+              "type": "string",
+              "description": "",
+              "example": "Genève"
             }
-          }  
+          },
+          "required": [
+            "id",
+            "nom",
+            "prenom",
+            "pseudo",
+            "email",
+            "mot_de_passe",
+            "age",
+            "ville"
+          ]
+        },
+        "DresseurData": {
+          "type": "object",
+          "properties": {
+            "nom": {
+              "type": "string",
+              "description": "",
+              "minlength": 3,
+              "maxlength": 40,
+              "example": "Fonseca"
+            },
+            "prenom": {
+              "type": "string",
+              "description": "",
+              "minlength": 3,
+              "maxlength": 15,
+              "example": "Carina"
+            },
+            "pseudo": {
+              "type": "string",
+              "description": "",
+              "example": "AniraC"
+            },
+            "email": {
+              "type": "string",
+              "description": "",
+              "example": "adresse@email.ch"
+            },
+            "mot_de_passe": {
+              "type": "string",
+              "description": "",
+              "example": "unMotDePasse32"
+            },
+            "age": {
+              "type": "number",
+              "description": "",
+              "minimum": 0,
+              "maximum": 100,
+              "example": 25
+            },
+            "ville": {
+              "type": "string",
+              "description": "",
+              "example": "Genève"
+            }
+          },
+          "required": ["pseudo", "email", "mot_de_passe"]
+        },
+        "DresseurDataPartiel": {
+          "type": "object",
+          "properties": {
+            "nom": {
+              "type": "string",
+              "description": "",
+              "minlength": 3,
+              "maxlength": 40,
+              "example": "Fonseca"
+            },
+            "prenom": {
+              "type": "string",
+              "description": "",
+              "minlength": 3,
+              "maxlength": 15,
+              "example": "Carina"
+            },
+            "pseudo": {
+              "type": "string",
+              "description": "",
+              "example": "AniraC"
+            },
+            "email": {
+              "type": "string",
+              "description": "",
+              "example": "adresse@email.ch"
+            },
+            "mot_de_passe": {
+              "type": "string",
+              "description": "",
+              "example": "unMotDePasse32"
+            },
+            "age": {
+              "type": "number",
+              "description": "",
+              "minimum": 0,
+              "maximum": 100,
+              "example": 25
+            },
+            "ville": {
+              "type": "string",
+              "description": "",
+              "example": "Genève"
+            }
+          }
+        },
+        "Carte": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "num_carte": {
+              "type": "integer",
+              "description": "",
+              "example": 111
+            },
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["neuf", "occasoon", "abimée"],
+              "example": "neuf"
+            },
+            "descr_etat": {
+              "type": "string",
+              "description": "",
+              "exemple": "Très bonne état. Aucune éraflure"
+            },
+            "statut": {
+              "type": "string",
+              "description": "",
+              "enum": ["collectée", "en échange", "souhaitée"],
+              "example": "collectée"
+            },
+            "type": {
+              "type": "string",
+              "description": "",
+              "enum": ["reverse", "holo", "rien"]
+            },
+            "quantite": {
+              "type": "number",
+              "description": "",
+              "example": 1
+            },
+            "possedee_par": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            }
+          },
+          "required": [
+            "id",
+            "num_carte",
+            "etat",
+            "descr_etat",
+            "statut",
+            "type",
+            "quantite",
+            "possedee_par"
+          ]
+        },
+        "CarteDataPartial": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "num_carte": {
+              "type": "number",
+              "description": "",
+              "example": 111
+            },
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["neuf", "occasion", "abimée"],
+              "example": "neuf"
+            },
+            "descr_etat": {
+              "type": "string",
+              "description": "",
+              "exemple": "Très bon état. Aucune éraflure"
+            },
+            "type": {
+              "type": "string",
+              "description": "",
+              "enum": [""]
+            },
+            "possedee_par": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            }
+          },
+          "required": [
+            "id",
+            "num_carte",
+            "etat",
+            "descr_etat",
+            "type",
+            "possedee_par"
+          ]
+        },
+        "CarteEchange": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "num_carte": {
+              "type": "number",
+              "description": "",
+              "example": 111
+            },
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["neuf", "occasion", "abimée"],
+              "example": "neuf"
+            },
+            "descr_etat": {
+              "type": "string",
+              "description": "",
+              "exemple": "Très bon état. Aucune éraflure"
+            },
+            "type": {
+              "type": "string",
+              "description": "",
+              "enum": [""]
+            },
+            "possedee_par": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "ville": {
+              "type": "string",
+              "description": "",
+              "example": "Genève"
+            }
+          },
+          "required": [
+            "id",
+            "num_carte",
+            "etat",
+            "descr_etat",
+            "type",
+            "possedee_par",
+            "ville"
+          ]
+        },
+        "Echange": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["en coure", "fini"],
+              "example": "en coure"
+            },
+            "creer_a": {
+              "type": "string",
+              "description": "",
+              "format": "data-time",
+              "example": "2020-01-02T10:00:00.000Z"
+            },
+            "creer_par": {
+              "$ref": "#/components/schemas/Dresseur"
+            },
+            "accepte_par": {
+              "$ref": "#/components/schemas/Dresseur"
+            }
+          },
+          "required": ["id", "etat", "creer_a", "creer_par", "accepte_par"]
+        },
+        "EchangeData": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["en coure", "fini"],
+              "example": "en coure"
+            },
+            "creer_a": {
+              "type": "string",
+              "description": "",
+              "format": "data-time",
+              "example": "2020-01-02T10:00:00.000Z"
+            },
+            "creer_par": {
+              "$ref": "#/components/schemas/Dresseur"
+            },
+            "accepte_par": {
+              "$ref": "#/components/schemas/Dresseur"
+            }
+          },
+          "required": ["etat", "creer_a", "creer_par", "accepte_par"]
+        },
+        "Message": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "date": {
+              "type": "string",
+              "description": "",
+              "format": "data-time",
+              "example": "2020-01-02T10:00:00.000Z"
+            },
+            "contenu": {
+              "type": "string",
+              "description": "",
+              "example": "Salut!"
+            },
+            "expéditeur": {
+              "type": "string",
+              "description": "Celui qui envoie le message.",
+              "example": "Nerak"
+            },
+            "destinataire": {
+              "type": "string",
+              "description": "Celui qui reçoit le message.",
+              "example": "Salocin"
+            }
+          },
+          "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
         }
-      }
-    }
-  },
-
-
-
-
-
-  "components": {
-    "responses": {
-      "DresseurIntrouvable": {
-        "description": "Ce-tte dresseu-r-euse n'existe pas"
-      }
-    },
-    "schemas": {
-      "Dresseur": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "nom": {
-            "type": "string",
-            "description": "",
-            "minlength": 3,
-            "maxlength": 40,
-            "example": "Fonseca"
-          },
-          "prenom": {
-            "type": "string",
-            "description": "",
-            "minlength": 3,
-            "maxlength": 15,
-            "example": "Carina"
-          },
-          "pseudo": {
-            "type": "string",
-            "description": "",
-            "example": "AniraC"
-          },
-          "email": {
-            "type": "string",
-            "description": "",
-            "example": "adresse@email.ch"
-          },
-          "mot_de_passe": {
-            "type": "string",
-            "description": "",
-            "example": "unMotDePasse32"
-          },
-          "age": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "example": 25
-          },
-          "ville": {
-            "type": "string",
-            "description": "",
-            "example": "Genève"
-          }
-        },
-        "required": [
-          "id",
-          "nom",
-          "prenom",
-          "pseudo",
-          "email",
-          "mot_de_passe",
-          "age",
-          "ville"
-        ]
       },
-      "DresseurData": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "description": "",
-            "minlength": 3,
-            "maxlength": 40,
-            "example": "Fonseca"
-          },
-          "prenom": {
-            "type": "string",
-            "description": "",
-            "minlength": 3,
-            "maxlength": 15,
-            "example": "Carina"
-          },
-          "pseudo": {
-            "type": "string",
-            "description": "",
-            "example": "AniraC"
-          },
-          "email": {
-            "type": "string",
-            "description": "",
-            "example": "adresse@email.ch"
-          },
-          "mot_de_passe": {
-            "type": "string",
-            "description": "",
-            "example": "unMotDePasse32"
-          },
-          "age": {
-            "type": "number",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "example": 25
-          },
-          "ville": {
-            "type": "string",
-            "description": "",
-            "example": "Genève"
-          }
-        },
-        "required": ["pseudo", "email", "mot_de_passe"]
-      },
-      "DresseurDataPartiel": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "description": "",
-            "minlength": 3,
-            "maxlength": 40,
-            "example": "Fonseca"
-          },
-          "prenom": {
-            "type": "string",
-            "description": "",
-            "minlength": 3,
-            "maxlength": 15,
-            "example": "Carina"
-          },
-          "pseudo": {
-            "type": "string",
-            "description": "",
-            "example": "AniraC"
-          },
-          "email": {
-            "type": "string",
-            "description": "",
-            "example": "adresse@email.ch"
-          },
-          "mot_de_passe": {
-            "type": "string",
-            "description": "",
-            "example": "unMotDePasse32"
-          },
-          "age": {
-            "type": "number",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "example": 25
-          },
-          "ville": {
-            "type": "string",
-            "description": "",
-            "example": "Genève"
-          }
+      "securitySchemes": {
+        "authConnexion": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
         }
       },
-      "Carte": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "num_carte": {
-            "type": "integer",
-            "description": "",
-            "example": 111
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": ["neuf", "occasoon", "abimée"],
-            "example": "neuf"
-          },
-          "descr_etat": {
-            "type": "string",
-            "description": "",
-            "exemple": "Très bonne état. Aucune éraflure"
-          },
-          "statut": {
-            "type": "string",
-            "description": "",
-            "enum": ["collectée", "en échange", "souhaitée"],
-            "example": "collectée"
-          },
-          "type": {
-            "type": "string",
-            "description": "",
-            "enum": ["reverse", "holo", "rien"]
-          },
-          "quantite": {
-            "type": "number",
-            "description": "",
-            "example": 1
-          },
-          "possedee_par": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          }
-        },
-        "required": [
-          "id",
-          "num_carte",
-          "etat",
-          "descr_etat",
-          "statut",
-          "type",
-          "quantite",
-          "possedee_par"
-        ]
-      },
-      "CarteDataPartial": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "num_carte": {
-            "type": "number",
-            "description": "",
-            "example": 111
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": ["neuf", "occasion", "abimée"],
-            "example": "neuf"
-          },
-          "descr_etat": {
-            "type": "string",
-            "description": "",
-            "exemple": "Très bon état. Aucune éraflure"
-          },
-          "type": {
-            "type": "string",
-            "description": "",
-            "enum": [""]
-          },
-          "possedee_par": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          }
-        },
-        "required": [
-          "id",
-          "num_carte",
-          "etat",
-          "descr_etat",
-          "type",
-          "possedee_par"
-        ]
-      },
-      "CarteEchange": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "num_carte": {
-            "type": "number",
-            "description": "",
-            "example": 111
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": ["neuf", "occasion", "abimée"],
-            "example": "neuf"
-          },
-          "descr_etat": {
-            "type": "string",
-            "description": "",
-            "exemple": "Très bon état. Aucune éraflure"
-          },
-          "type": {
-            "type": "string",
-            "description": "",
-            "enum": [""]
-          },
-          "possedee_par": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "ville": {
-            "type": "string",
-            "description": "",
-            "example": "Genève"
-          }
-        },
-        "required": [
-          "id",
-          "num_carte",
-          "etat",
-          "descr_etat",
-          "type",
-          "possedee_par",
-          "ville"
-        ]
-      },
-      "Echange": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": ["en coure", "fini"],
-            "example": "en coure"
-          },
-          "creer_a": {
-            "type": "string",
-            "description": "",
-            "format": "data-time",
-            "example": "2020-01-02T10:00:00.000Z"
-          },
-          "creer_par": {
-            "$ref": "#/components/schemas/Dresseur"
-          },
-          "accepte_par": {
-            "$ref": "#/components/schemas/Dresseur"
-          }
-        },
-        "required": ["id", "etat", "creer_a", "creer_par", "accepte_par"]
-      },
-      "EchangeData": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": ["en coure", "fini"],
-            "example": "en coure"
-          },
-          "creer_a": {
-            "type": "string",
-            "description": "",
-            "format": "data-time",
-            "example": "2020-01-02T10:00:00.000Z"
-          },
-          "creer_par": {
-            "$ref": "#/components/schemas/Dresseur"
-          },
-          "accepte_par": {
-            "$ref": "#/components/schemas/Dresseur"
-          }
-        },
-        "required": ["etat", "creer_a", "creer_par", "accepte_par"]
-      },
-      "Message": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "date": {
-            "type": "string",
-            "description": "",
-            "format": "data-time",
-            "example": "2020-01-02T10:00:00.000Z"
-          },
-          "contenu": {
-            "type": "string",
-            "description": "",
-            "example": "Salut!"
-          },
-          "expéditeur": {
-            "type": "string",
-            "description": "Celui qui envoie le message.",
-            "example": "Nerak"
-          },
-          "destinataire": {
-            "type": "string",
-            "description": "Celui qui reçoit le message.",
-            "example": "Salocin"
-          }
-        },
-        "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
-      }
-    },
-    "securitySchemes": {
-      "authConnexion": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
-    "securityDefinitions": {
-      "JWT": {
-        "type": "apiKey",
-        "in": "query",
-        "name": "access_token"
+      "securityDefinitions": {
+        "JWT": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "access_token"
+        }
       }
     }
   }
 }
-  

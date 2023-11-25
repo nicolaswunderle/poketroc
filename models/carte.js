@@ -15,7 +15,7 @@ const carteSchema = new Schema({
     },
     desc_etat: {
         type: String,
-        maxlength: [255, "La description de l'état de la carte doit être plus courte que 255 caractères."]
+        maxlength: [255, "La description de l'état de la carte doit être plus courte ou égale à 255 caractères."]
     },
     type: {
         type: String,
@@ -30,8 +30,8 @@ const carteSchema = new Schema({
     quantite: {
         type: Number,
         required: [true, "La quantité de la carte est obligatoire."],
-        min: [1, "La quantité de la carte doit être plus grande que 1."],
-        max: [1000, "La quantité de la carte doit être plus petite que 1000."],
+        min: [1, "La quantité de la carte doit être plus grande ou égale à 1."],
+        max: [1000, "La quantité de la carte doit être plus petite ou égale à 1000."],
     },
     dresseur_id: {
         type: Schema.Types.ObjectId,
@@ -56,6 +56,8 @@ carteSchema.set("toJSON", {
 });
  
 function transformJsonDresseur(doc, json, options) {
+    delete json.createdAt;
+    delete json.updatedAt;
     delete json.__v;
     return json;
 }
