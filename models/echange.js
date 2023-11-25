@@ -10,15 +10,15 @@ const echangeSchema = new Schema({
     },
     etat: {
         type: String,
-        required: [true, "L'état de l'échange est obligatoire."],
-        enum: ['accepté', 'attente', 'refusé']
+        enum: ['accepte', 'attente', 'refuse'],
+        default: 'attente'
     },
     dresseur_cree_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur',
         required: [true, "L'id du dresseur qui crée l'échange est obligatoire."]
     },
-    dresseur_accepte_id: {
+    dresseur_concerne_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur'
     },
