@@ -26,7 +26,37 @@
     }
   ],
   "paths": {
-    "/poketroc/deck/carte": {
+    "/cartes": {
+      "post": {
+        "summary": "Echanger carte-----------------------------------------------",
+        "tags": ["carte"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarteData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Echange réussi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/CarteValidationErreur"
+          }
+        }
+      }
+    },
+    "/cartes/{carteId}": {
       "get": {
         "summary": "Afficher carte dresseur-----------------------------------------------------",
         "tags": ["carte"],
@@ -54,34 +84,6 @@
           },
           "404": {
             "$ref": "#/components/responses/CartePasTrouvee"
-          }
-        }
-      },
-      "post": {
-        "summary": "Echanger carte-----------------------------------------------",
-        "tags": ["carte"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CarteData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Echange réussi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Carte"
-                }
-              }
-            }
-          },
-          "422": {
-            "$ref": "#/components/responses/CarteValidationErreur"
           }
         }
       },
@@ -148,6 +150,69 @@
         }
       }
     },
+    "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
+      "get": {
+        "summary": "Afficher toutes les cartes du dresseur en fonction du statut-----------------------------------------------------",
+        "tags": ["carte"],
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statut",
+            "in": "query",
+            "description": "Statut des cartes (collectee, souhaitee)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["collectee", "souhaitee"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cartes du dresseur avec le statut spécifié est affichée corectement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListeCarte"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/ListeCartePasTrouvee"
+          }
+        }
+      }
+      },
     "/poketroc/dresseurs/connection": {},
     "/poketroc/dresseurs": {
       "post": {
@@ -371,39 +436,108 @@
         }
       }
     },
-    "poketroc/fil-actualite": {
-      "get": {
-        "summary": "Afficher le fil d'actualité--------------------------------------------------",
+    "/echanges": {
+      "post": {
+        "summary": "Créer un échange--------------------------------------------------",
+      "tags": ["échange"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EchangeData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "L'échange a été crée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/EchangeValidationErreur"
+          }
+        }
+      }
+    },
+    "/echanges/{echangeId}": {
+      "get":{
+        "summary": "Afficher un échange--------------------------------------------------------",
         "tags": ["échange"],
         "parameters": [
           {
-            "name": "ville",
-            "in": "query",
-            "description": "Trier les échange par ville",
+            "name": "echangeId",
+            "in": "path",
+            "description": "",
+            "required": true,
             "schema": {
-              "type": "string",
-              "example": "Genève"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Les échanges on bien été affiché",
+            "description": "L'échange est affiché",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Echange"
-                  }
+                  "$ref": "#/components/schemas/Echange"
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/EchangePasTrouve"
           }
         }
-      }
-    },
-    "poketroc/fil-actualite/echange": {
+      }, 
+      "patch" : {
+        "summary": "Modifier quelques informations d'un échange--------------------------------------------------------",
+        "tags": ["échange"],
+        "parameters": [
+          {
+            "name": "echangeId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EchangeData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "L'échange a été modifié",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
+              }
+            }
+          }, "404": {
+            "$ref": "#/components/responses/EchangePasTrouve"
+          },
+          "422": {
+            "$ref": "#/components/responses/EchangeValidationErreur"
+          }
+        }
+      }, 
       "delete": {
         "summary": "Supprimer un échange-----------------------------------------------------------",
         "tags": ["échange"],
@@ -420,27 +554,29 @@
         ],
         "responses": {
           "204": {
-            "description": "L'échange à été supprimé"
+            "description": "L'échange a été supprimé avec succès"
           }
         }
       }
     },
-    "poketroc/echange/proposition": {
-      "post": {
-        "summary": "Envoyer une proposition--------------------------------------------------------",
+    "/echanges/{dresseurId}": {
+      "get": {
+        "summary": "Afficher tous les échanges du dresseur--------------------------------------------------------",
         "tags": ["échange"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EchangeData"
-              }
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
-          "201": {
-            "description": "",
+          "200": {
+            "description": "Les échanges sont affichés",
             "content": {
               "application/json": {
                 "schema": {
@@ -448,10 +584,102 @@
                 }
               }
             }
+          }, "404": {
+            "$ref": "#/components/responses/EchangesPasTrouves"
           }
         }
+    }
+  },
+  "/echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}": {
+    "get": {
+      "summary": "Afficher tous les échanges proposés--------------------------------------------------------",
+      "tags": ["échange"],
+      "parameters": [
+        {
+          "name": "tri",
+          "in": "query",
+          "description": "Critère de tri des échanges (nouveaute, pertinence)",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": ["nouveaute", "pertinence"]
+          }
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "description": "Numéro de la pages",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }},
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+      ],
+      "responses": {
+        "200": {
+          "description": "La liste des échanges proposés est affichée",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Echange"
+              }
+            }
+          }
+        }, "404": {
+          "$ref": "#/components/responses/EchangesPasTrouves"
+        }
       }
+  }
+},
+"/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
+  "get": {
+    "summary": "Afficher les échanges du dresseur en fonction de l'état--------------------------------------------------------",
+    "tags": ["échange"],
+    "parameters": [
+      {
+        "name": "dresseurId",
+        "in": "query",
+        "description": "Identifiant du dresseur",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "état",
+        "in": "query",
+        "description": "État des échanges (accepte, attente, refuse)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": ["accepte", "attente", "refuse"]
+        }}
+    ],
+    "responses": {
+      "200": {
+        "description": "La Liste des échanges du dresseur en fonction de l'état",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Echange"
+            }
+          }
+        }
+      }, "404": {
+        "$ref": "#/components/responses/EchangesPasTrouves"
+      }
+    }
+  }
     },
+
     "poketroc/conversations": {
       "get": {
         "summary": "Afficher conversations-----------------------------------------------------",
@@ -904,3 +1132,4 @@
     }
   }
 }
+  
