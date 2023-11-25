@@ -184,6 +184,7 @@
           "content": {
             "application/json": {
               "schema": {
+                "$ref": "#/components/schemas/connexion",
                 "type": "object",
                 "properties": {
                   "pseudo": {
@@ -220,6 +221,7 @@
           "content": {
             "application/json": {
               "schema": {
+                "$ref": "#/components/schemas/connexion",
                 "type": "object",
                 "properties": {
                   "pseudo": {
@@ -517,7 +519,67 @@
         }
       }
     },
-    "poketroc/conversations": {
+
+    "messages/{echangeId}": {
+      "get": {
+        "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
+        "tags": ["message"],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "Conversation d'un échange.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message trouvé.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Message non trouvé."
+          }
+        }
+      }
+    },
+
+
+    "messages/{messageId}":{
+      "delete": {
+        "summary": "Supprimer un message-----------------------------------------------------------",
+        "tags": ["message"],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "Le message a supprimer.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Le message à été supprimé avec succès."
+          },
+          "404": {
+            "description": "Message non trouvé."       
+        }
+      }
+    },
+
+
       "get": {
         "summary": "Afficher conversations-----------------------------------------------------",
         "tags": ["message"],
@@ -525,7 +587,7 @@
           {
             "name": "pseudo",
             "in": "query",
-            "description": "",
+            "description": "Affichage du message.",
             "schema": {
               "type": "string",
               "example": "AniraC"
@@ -548,8 +610,73 @@
           }
         }
       }
+    },
+
+
+    "messages": {
+      "post": {
+        "summary": "Créer un message-----------------------------------------------------------",
+        "tags": ["message"],
+        "requestBody": {
+          "description": "Le message à créer.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message",
+                "type": "object",
+                "properties": {
+                  "contenu": {
+                    "type": "string",
+                    "description": "Le contenu du message",
+                    "example": "Salut! Cette carte m'intéresse."
+                  },
+                  "expéditeur": {
+                    "type": "string",
+                    "description": "L'expéditeur du message.",
+                    "example": "Salocin"
+                  },
+                  "destinataire": {
+                    "type": "string",
+                    "description": "Le destinataire du message.",
+                    "example": "Enirehtac"
+                  }
+                },
+                "required": ["contenu", "expéditeur", "destinataire"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message créé avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Destinataire manquant.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageValidationErreur"
+                }
+              }
+            }
+          }  
+        }
+      }
     }
   },
+
+
+
+
+
   "components": {
     "responses": {
       "DresseurIntrouvable": {
@@ -928,7 +1055,7 @@
             "description": "",
             "example": "7fe91a9a41bc839033eedf0f"
           },
-          "creer_a": {
+          "date": {
             "type": "string",
             "description": "",
             "format": "data-time",
@@ -939,18 +1066,18 @@
             "description": "",
             "example": "Salut!"
           },
-          "ecrit_par": {
+          "expéditeur": {
             "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
+            "description": "Celui qui envoie le message.",
+            "example": "Nerak"
           },
-          "stocke_par": {
+          "destinataire": {
             "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
+            "description": "Celui qui reçoit le message.",
+            "example": "Salocin"
           }
         },
-        "required": ["id", "creer_a", "contenu", "ecrit_par", "stocke_par"]
+        "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
       }
     },
     "securitySchemes": {
