@@ -28,7 +28,7 @@
   "paths": {
     "/cartes": {
       "post": {
-        "summary": "Echanger carte-----------------------------------------------",
+        "summary": "Créer une carte",
         "tags": ["carte"],
         "requestBody": {
           "content": {
@@ -41,7 +41,7 @@
         },
         "responses": {
           "201": {
-            "description": "Echange réussi",
+            "description": "Création réussie.",
             "content": {
               "application/json": {
                 "schema": {
@@ -51,14 +51,22 @@
             }
           },
           "422": {
-            "$ref": "#/components/responses/CarteValidationErreur"
+            "description": "Échec de la création.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarteValidationErreur"
+                }
+              }
+            }
           }
         }
       }
     },
+
     "/cartes/{carteId}": {
       "get": {
-        "summary": "Afficher carte dresseur-----------------------------------------------------",
+        "summary": "Afficher carte dresseur",
         "tags": ["carte"],
         "parameters": [
           {
@@ -73,7 +81,7 @@
         ],
         "responses": {
           "200": {
-            "description": "La carte a été affichée",
+            "description": "La carte a été affichée.",
             "content": {
               "application/json": {
                 "schema": {
@@ -83,12 +91,19 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/CartePasTrouvee"
+            "description": "La carte n'est pas affichée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartePasAffichee"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "summary": "Modifier carte du dresseur en partie---------------------------------------",
+        "summary": "Modifier partiellement la carte du dresseur",
         "tags": ["carte"],
         "parameters": [
           {
@@ -112,7 +127,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
+            "description": "Modification réussie.",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,12 +137,19 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/CartePasTrouvee"
+            "description": "La carte n'a pas été modifiée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartePasModifiee"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "summary": "Supprimer carte-------------------------------------------------------------",
+        "summary": "Supprimer la carte",
         "tags": ["carte"],
         "parameters": [
           {
@@ -142,17 +164,32 @@
         ],
         "responses": {
           "204": {
-            "description": "La carte a été correctement supprimée"
+            "description": "La carte a été correctement supprimée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarteSupprimee"
+                }
+              }
+            }
           },
           "404": {
-            "$ref": "#/components/responses/CartePasTrouvee"
+            "description": "La carte n'a pas été supprimée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartePasSupprimee"
+                }
+              }
+            }
           }
         }
       }
     },
+
     "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
       "get": {
-        "summary": "Afficher toutes les cartes du dresseur en fonction du statut-----------------------------------------------------",
+        "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
         "tags": ["carte"],
         "parameters": [
           {
@@ -195,7 +232,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Liste des cartes du dresseur avec le statut spécifié est affichée corectement",
+            "description": "Liste des cartes du dresseur avec le statut spécifié est affichée corectement.",
             "content": {
               "application/json": {
                 "schema": {
@@ -208,15 +245,22 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/ListeCartePasTrouvee"
+            "description": "Liste des cartes du dresseur avec le statut spécifié n'est pas affichée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeCartePasAffichee"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/dresseurs/connection": {},
+
     "/dresseurs": {
       "post": {
-        "summary": "Inscription à l'application-----------------------------------------------",
+        "summary": "Inscription à l'application",
         "tags": ["dresseur"],
         "requestBody": {
           "content": {
@@ -228,7 +272,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Inscription réussie",
             "content": {
               "application/json": {
@@ -237,86 +281,95 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/dresseurs/connexion": {
-      "post": {
-        "summary": "Connexion au compte dresseur-----------------------------------------------",
-        "tags": ["dresseur"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/connexion",
-                "type": "object",
-                "properties": {
-                  "pseudo": {
-                    "type": "string",
-                    "description": "Le pseudo du dresseur",
-                    "example": "Nerak"
-                  },
-                  "mot_de_passe": {
-                    "type": "string",
-                    "description": "Le mot de passe du compte dresseur",
-                    "example": "unMotDePasse88"
-                  }
-                },
-                "required": ["pseudo", "mot_de_passe"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Connexion réussie",
-            "content": {}
           },
-          "401": {
-            "description": "Échec de l'authentification",
-            "content": {}
-          }
-        }
-      },
-      "delete": {
-        "summary": "Deconnexion au compte dresseur-----------------------------------------------",
-        "tags": ["dresseur"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/connexion",
-                "type": "object",
-                "properties": {
-                  "pseudo": {
-                    "type": "string",
-                    "description": "Le pseudo du dresseur",
-                    "example": "Nerak"
-                  },
-                  "mot_de_passe": {
-                    "type": "string",
-                    "description": "Le mot de passe du compte dresseur",
-                    "example": "unMotDePasse88"
-                  }
-                },
-                "required": ["pseudo", "mot_de_passe"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Déconnexion réussie",
-            "content": {}
+          "422": {           
+                  "$ref": "#/components/schemas/DresseurValidationErreur"
+            
           }
         }
       }
     },
 
-    "poketroc/profil": {
+    "/dresseurs/connexion": {
+      "post": {
+        "summary": "Connexion au compte dresseur",
+        "tags": ["dresseur"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/connexion"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Connexion réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/connexionReussie"
+                }
+              }
+            }
+          },
+          "401": { 
+                  "$ref": "#/components/schemas/connexionEchouee"       
+          },
+          "422": {
+                  "$ref": "#/components/schemas/connexionErreur" 
+          }
+        }
+      },
+
+      "delete": {
+        "summary": "Deconnexion au compte dresseur",
+        "tags": ["dresseur"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/connexion",
+                "type": "object",
+                "properties": {
+                  "pseudo": {
+                    "type": "string",
+                    "description": "Le pseudo du dresseur",
+                    "example": "Nerak"
+                  },
+                  "mot_de_passe": {
+                    "type": "string",
+                    "description": "Le mot de passe du compte dresseur",
+                    "example": "unMotDePasse88"
+                  }
+                },
+                "required": ["pseudo", "mot_de_passe"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Déconnexion réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deconnexionReussie"
+                }
+              }
+            }
+          },            
+          "404":{
+            "$ref": "#/components/schemas/deconnexionEchouee"
+                }    
+        }
+      }
+    },
+
+    "dresseurs/{dresseurId}": {
       "get": {
-        "summary": "Afficher profil dresseur-----------------------------------------------------",
+        "summary": "Afficher le dresseur",
         "tags": ["dresseur"],
         "parameters": [
           {
@@ -331,7 +384,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Le profil à été affiché",
+            "description": "Le dresseur a été affiché",
             "content": {
               "application/json": {
                 "schema": {
@@ -339,18 +392,21 @@
                 }
               }
             }
+          },
+          "404": {
+                  "$ref": "#/components/schemas/DresseurEstPasAffiche"
           }
         }
       },
       "delete": {
-        "summary": "Supprimer profil-------------------------------------------------------------",
+        "summary": "Supprimer le compte du dresseur",
         "tags": ["dresseur"],
         "securitySchemes": ["JWT"],
         "parameters": [
           {
             "name": "dresseurId",
             "in": "path",
-            "description": "",
+            "description": "Identifiant du dresseur",
             "required": true,
             "schema": {
               "type": "string"
@@ -358,9 +414,19 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Le dresseur à été supprimé"
-          }
+          "204": {
+            "description": "Le dresseur a été supprimé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DresseurSupprime"
+                }
+              }
+            }
+          },
+          "404":{
+              "$ref": "#/components/schemas/DresseurIntrouvable"
+                }
         }
       }
     },
@@ -505,7 +571,7 @@
     },
     "/echanges": {
       "post": {
-        "summary": "Créer un échange--------------------------------------------------",
+        "summary": "Créer un échange",
         "tags": ["échange"],
         "requestBody": {
           "content": {
@@ -518,7 +584,7 @@
         },
         "responses": {
           "201": {
-            "description": "L'échange a été crée avec succès",
+            "description": "L'échange a été crée avec succès.",
             "content": {
               "application/json": {
                 "schema": {
@@ -528,20 +594,27 @@
             }
           },
           "422": {
-            "$ref": "#/components/responses/EchangeValidationErreur"
+            "description": "L'échange n'a pas été crée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                }
+              }
+            }
           }
         }
       }
     },
     "/echanges/{echangeId}": {
       "get": {
-        "summary": "Afficher un échange--------------------------------------------------------",
+        "summary": "Afficher un échange",
         "tags": ["échange"],
         "parameters": [
           {
             "name": "echangeId",
             "in": "path",
-            "description": "",
+            "description": "Identifiant de l'échange.",
             "required": true,
             "schema": {
               "type": "string"
@@ -550,7 +623,7 @@
         ],
         "responses": {
           "200": {
-            "description": "L'échange est affiché",
+            "description": "L'échange est affiché.",
             "content": {
               "application/json": {
                 "schema": {
@@ -560,18 +633,25 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/EchangePasTrouve"
+            "description": "L'échange n'est pas affiché.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EchangePasAffiche"
+                }
+              }
+            }
           }
         }
       },
       "patch": {
-        "summary": "Modifier quelques informations d'un échange--------------------------------------------------------",
+        "summary": "Modifier quelques informations d'un échange",
         "tags": ["échange"],
         "parameters": [
           {
             "name": "echangeId",
             "in": "path",
-            "description": "",
+            "description": "Identifiant de l'échange.",
             "required": true,
             "schema": {
               "type": "string"
@@ -589,7 +669,7 @@
         },
         "responses": {
           "200": {
-            "description": "L'échange a été modifié",
+            "description": "L'échange a été modifié.",
             "content": {
               "application/json": {
                 "schema": {
@@ -599,15 +679,29 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/EchangePasTrouve"
+            "description": "L'échange n'a pas pu être modifié.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EchangePasModifie"
+                }
+              }
+            }
           },
           "422": {
-            "$ref": "#/components/responses/EchangeValidationErreur"
+            "description": "L'échange n'a pas pu être modifié.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "summary": "Supprimer un échange-----------------------------------------------------------",
+        "summary": "Supprimer un échange",
         "tags": ["échange"],
         "parameters": [
           {
@@ -622,14 +716,31 @@
         ],
         "responses": {
           "204": {
-            "description": "L'échange a été supprimé avec succès"
+            "description": "L'échange a été supprimé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EchangeSupprime"
+                },
+                "404": {
+                  "description": "L'échange n'a pas été supprimé.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/EchangePasSupprime"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/echanges/{dresseurId}": {
       "get": {
-        "summary": "Afficher tous les échanges du dresseur--------------------------------------------------------",
+        "summary": "Afficher tous les échanges du dresseur",
         "tags": ["échange"],
         "parameters": [
           {
@@ -644,7 +755,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Les échanges sont affichés",
+            "description": "Les échanges sont affichés.",
             "content": {
               "application/json": {
                 "schema": {
@@ -654,14 +765,15 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/EchangesPasTrouves"
+            "description": "Les échanges ne sont pas affichés.",
+            "$ref": "#/components/responses/EchangesPasAffiche"
           }
         }
       }
     },
     "/echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}": {
       "get": {
-        "summary": "Afficher tous les échanges proposés--------------------------------------------------------",
+        "summary": "Afficher tous les échanges proposés",
         "tags": ["échange"],
         "parameters": [
           {
@@ -695,7 +807,7 @@
         ],
         "responses": {
           "200": {
-            "description": "La liste des échanges proposés est affichée",
+            "description": "La liste des échanges proposés est affichée.",
             "content": {
               "application/json": {
                 "schema": {
@@ -705,6 +817,7 @@
             }
           },
           "404": {
+            "description": "La liste des échanges proposés n'est pas affichée.",
             "$ref": "#/components/responses/EchangesPasTrouves"
           }
         }
@@ -712,7 +825,7 @@
     },
     "/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
       "get": {
-        "summary": "Afficher les échanges du dresseur en fonction de l'état--------------------------------------------------------",
+        "summary": "Afficher les échanges du dresseur en fonction de l'état",
         "tags": ["échange"],
         "parameters": [
           {
@@ -737,7 +850,7 @@
         ],
         "responses": {
           "200": {
-            "description": "La Liste des échanges du dresseur en fonction de l'état",
+            "description": "La Liste des échanges du dresseur en fonction de l'état.",
             "content": {
               "application/json": {
                 "schema": {
@@ -747,7 +860,8 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/EchangesPasTrouves"
+            "description": "La Liste des échanges du dresseur en fonction de l'état n'est pas affichée.",
+            "$ref": "#/components/responses/EchangesPasAffiche"
           }
         }
       }
@@ -911,12 +1025,167 @@
 
 
     "components": {
-      "responses": {
-        "DresseurIntrouvable": {
-          "description": "Ce-tte dresseu-r-euse n'existe pas"
+    
+      "schemas": {
+
+        "CartePasAffichee":{
+          "description": "La carte n'est pas affichée.",
+          "content": {
+            "text/plain": {
+              "example": "La carte n'est pas affichée."
+            }
+          }
+        },
+        "CarteData":{
+          "description": "La carte à créer.",
+          "type": "object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "num_carte": {
+                    "type": "integer",
+                    "description": "Le numéro de la carte",
+                    "example": 114
+                  },
+                  "etat": {
+                    "type": "string",
+                    "description": "L'état de la carte",
+                    "enum": ["neuf", "occasoon", "abimée"],
+                    "example": "neuf"
+                  },
+                  "descr_etat": {
+                    "type": "string",
+                    "description": "La description de l'état de la carte",
+                    "example": "Très bonne état. Aucune éraflure"
+                  },
+                  "statut": {
+                    "type": "string",
+                    "description": "Le statut de la carte",
+                    "enum": ["collectée", "en échange", "souhaitée"],
+                    "example": "collectée"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Le type de la carte",
+                    "enum": ["reverse", "holo", "rien"]
+                  },
+                  "quantite": {
+                    "type": "integer",
+                    "description": "La quantité de la carte",
+                    "example": 1
+                  },
+                  "serie": {
+                    "type": "string",
+                    "description": "La série de la carte",
+                    "enum": [
+                      "écarlate et violet",
+                      "épée et bouclier",
+                      "soleil et lune",
+                      "xy",
+                      "noir et blanc"
+                    ],
+                    "example": "xy"
+                  }
+                },
+                "required": [
+                  "num_carte",
+                  "etat",
+                  "descr_etat",
+                  "statut",
+                  "type",
+                  "quantite",
+                  "serie"
+                ]
+              }
+            }
+          }
+        },
+      "CarteValidationErreur": {
+        "description": "Echec de la création.",
+        "content": {
+          "text/plain": {
+            "example": "La carte n'a pas été créée."
+          }
         }
       },
-      "schemas": {
+        "DresseurSupprime":{
+          "description": "Le dresseur a été supprimé.",
+          "content": {
+            "text/plain": {
+              "example": "Le dresseur a été supprimé."
+            }
+          }
+        },
+        "DresseurEstPasAffiche":{
+          "description": "Le dresseur n'a pas été affiché.",
+          "content":{
+              "text/plain":{
+              "example": "Le dresseur ne s'affiche pas."
+            }
+          }
+        },
+        "connexionErreur":{
+          "description": "Mots de passe ou pseudo incorrect",
+          "content":{
+              "text/plain":{
+              "example": "Connexion échouée, veuillez retenter."
+            }
+          }
+        },
+        "connexionEchouee": {
+          "description": "Mots de passe ou pseudo incorrect",
+          "content":{
+              "text/plain":{
+              "example": "Mots de passe ou pseudo incorrect."
+            }
+          }
+        },
+        "connexion": {
+          "type": "object",
+          "properties": {
+            "pseudo": {
+              "type": "string",
+              "description": "Le pseudo du dresseur",
+              "example": "Nerak"
+            },
+            "mot_de_passe": {
+              "type": "string",
+              "description": "Le mot de passe du compte dresseur",
+              "example": "unMotDePasse88"
+            }
+          },
+          "required": ["pseudo", "mot_de_passe"]
+        },
+        "deconnexionReussie": {
+          "description": "Déconnexion réussie.",
+          "content":{
+              "text/plain":{
+              "example": "Déconnexion réussie."
+              }
+            }
+          },
+          "deconnexionEchouee": {
+            "description": "Déconnexion échouée.",
+            "content":{
+              "text/plain":{
+              "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
+              }
+            }
+          },
+        "connexionReussie": {
+          "type": "object",
+          "example": "Connexion réussie"
+          },
+        "DresseurValidationErreur": {
+          "description": "Echec de l'inscription.",
+          "content":{
+              "text/plain":{
+              "example": "Inscription échouée."
+            }
+          }
+        },
         "Dresseur": {
           "type": "object",
           "properties": {
@@ -1311,8 +1580,9 @@
             }
           },
           "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
-        }
+        }   
       },
+
       "securitySchemes": {
         "authConnexion": {
           "type": "http",
