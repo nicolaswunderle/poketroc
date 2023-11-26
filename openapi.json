@@ -752,6 +752,10 @@
         }
       }
     },
+
+
+
+
     "messages/{echangeId}": {
       "get": {
         "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
@@ -782,10 +786,8 @@
             "description": "Message non trouvé."
           }
         }
-      }
-    },
+      },
 
-    "messages/{messageId}": {
       "delete": {
         "summary": "Supprimer un message-----------------------------------------------------------",
         "tags": ["message"],
@@ -808,8 +810,10 @@
             "description": "Message non trouvé."
           }
         }
-      },
-      "poketroc/conversations": {
+      }
+    },  
+      
+    "messages/{messageId}": {
         "get": {
           "summary": "Afficher conversations-----------------------------------------------------",
           "tags": ["message"],
@@ -839,10 +843,10 @@
               }
             }
           }
-        }
+        }               
       },
 
-      "messages": {
+      "messages":{
         "post": {
           "summary": "Créer un message-----------------------------------------------------------",
           "tags": ["message"],
@@ -901,6 +905,10 @@
         }
       }
     },
+
+
+
+
 
     "components": {
       "responses": {
@@ -1321,4 +1329,4 @@
       }
     }
   }
-}
+
