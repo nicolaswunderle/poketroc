@@ -1021,600 +1021,665 @@
           }
       }
     }
+    }
   },
   "components": {
-    "responses":{
-        "DresseurValidationErreur": {
-          "description": "Echec de l'inscription.",
-          "content":{
-              "text/plain":{
-              "example": "Inscription échouée."
-            }
-          }
-        },
-        "dresseurIntrouvable": {
-          "description": "Dresseur introuvable.",
-          "content":{
-              "text/plain":{
-              "example": "Dresseur avec le pseudo Nerak n'existe pas."
-            }
-          }
-        },
-        "DresseurEstPasAffiche":{
-          "description": "Le dresseur n'a pas été affiché.",
-          "content":{
-              "text/plain":{
-              "example": "Le dresseur avec le pseudo Nerak ne s'affiche pas."
-            }
-          }
-        },
-        "ErreurConnexion": {
-          "description": "Erreur de connexion.",
-          "content":{
-              "text/plain":{
-              "example": " Le serveur n'est pas disponible en raison d'une surcharge temporaire ou de travaux de maintenance."
-            }
-          }
-        },
-        "deconnexionReussie": {
-          "description": "Déconnexion réussie.",
-          "content":{
-              "text/plain":{
-              "example": "Déconnexion réussie."
-              }
-            }
-          },
-          "deconnexionEchouee": {
-            "description": "Déconnexion échouée.",
-            "content":{
-              "text/plain":{
-              "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
-              }
-            }
-          },             
-          "connexionReussie": {
-            "type": "object",
-            "example": "Connexion réussie"
-            },
-        "connexionEchouee": {
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Mots de passe ou pseudo incorrect."
-            }
-          }
-        }    
-      },
-      "schemas": {
-        "CartePasAffichee":{
-          "description": "La carte n'est pas affichée.",
-          "content": {
-            "text/plain": {
-              "example": "La carte n'est pas affichée."
-            }
-          }
-        },
-        "DresseurMap":{
-          "type": "object",
-          "properties": {
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "AniraC"
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "maxlength": 60,
-              "example": "Genève"
-            },
-            "image":{
-              "type": "string",
-              "description": "",
-              "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
-          },
-          "carte":{
-            "$ref": "#/components/schemas/Carte"
-          }
-          },
-          "required": [
-            "pseudo",
-            "ville",
-            "carte"
-          ]
-        },
-        "CarteData":{
-          "description": "La carte à créer.",
-          "type": "object",
-          "properties": {
-            "num_carte": {
-              "type": "integer",
-              "description": "Le numéro de la carte",
-              "example": 114
-            },
-            "etat": {
-              "type": "string",
-              "description": "L'état de la carte",
-              "enum": ["neuf", "occasoon", "abimée"],
-              "example": "neuf"
-            },
-            "descr_etat": {
-              "type": "string",
-              "description": "La description de l'état de la carte",
-              "example": "Très bonne état. Aucune éraflure"
-            },
-            "statut": {
-              "type": "string",
-              "description": "Le statut de la carte",
-              "enum": ["collectée", "en échange", "souhaitée"],
-              "example": "collectée"
-            },
-            "type": {
-              "type": "string",
-              "description": "Le type de la carte",
-              "enum": ["reverse", "holo", "rien"]
-            },
-            "quantite": {
-              "type": "integer",
-              "description": "La quantité de la carte",
-              "example": 1
-            },
-            "serie": {
-              "type": "string",
-              "description": "La série de la carte",
-              "enum": [
-                "écarlate et violet",
-                "épée et bouclier",
-                "soleil et lune",
-                "xy",
-                "noir et blanc"
-              ],
-              "example": "xy"
-            }
-          },
-          "required": [
-            "num_carte",
-            "etat",
-            "descr_etat",
-            "statut",
-            "type",
-            "quantite",
-            "serie"
-          ]
-        },
-    "CarteValidationErreur": {
-          "description": "Echec de la création.",
-          "content": {
-            "text/plain": {
-              "example": "La carte n'a pas été créée."
-            }
-          }
-        },
-        "connexion": {
-          "type": "object",
-          "properties": {
-            "pseudo": {
-              "type": "string",
-              "maxlength": 40,
-              "unique": true,
-              "description": "",
-              "example": "Nerak"
-            },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse88"
-            }
-          },
-          "required": ["pseudo", "mot_de_passe"]
-        },
-        "Dresseur": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "nom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Fonseca"
-            },
-            "prenom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Carina"
-            },
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "AniraC"
-            },
-            "email": {
-              "type": "string",
-              "description": "",
-              "example": "adresse@email.ch"
-            },
-            "age": {
-              "type": "integer",
-              "description": "",
-              "minimum": 1,
-              "maximum": 200,
-              "example": 25
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "maxlength": 60,
-              "example": "Genève"
-            },
-            "image":{
-              "type": "string",
-              "description": "",
-              "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
-          }
-          },
-          "required": [
-            "id",
-            "nom",
-            "prenom",
-            "pseudo",
-            "email",
-            "mot_de_passe",
-            "age",
-            "ville"
-          ]
-        },
-        "DresseurData": {
-          "type": "object",
-          "properties": {
-            "nom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Fonseca"
-            },
-            "prenom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Carina"
-            },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse32"
-            },
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "unique": true,
-              "maxlength": 40,
-              "example": "AniraC"
-            },
-            "email": {
-              "type": "string",
-              "description": "",
-              "example": "adresse@email.ch"
-            },
-            "age": {
-              "type": "number",
-              "description": "",
-              "minimum": 1,
-              "maximum": 200,
-              "example": 25
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "maxlength": 60,
-              "example": "Genève"
-            } 
-          },
-          "required": ["prenom", "nom","pseudo", "email", "age", "ville"]
-        
-        },
-        "DresseurDataPartiel": {
-          "type": "object",
-          "properties": {
-            "nom": {
-              "type": "string",
-              "description": "",
-              "minlength": 3,
-              "maxlength": 40,
-              "example": "Fonseca"
-            },
-            "prenom": {
-              "type": "string",
-              "description": "",
-              "minlength": 3,
-              "maxlength": 15,
-              "example": "Carina"
-            },
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "example": "AniraC"
-            },
-            "email": {
-              "type": "string",
-              "description": "",
-              "example": "adresse@email.ch"
-            },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse32"
-            },
-            "age": {
-              "type": "number",
-              "description": "",
-              "minimum": 0,
-              "maximum": 100,
-              "example": 25
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "example": "Genève"
-            }
-          }
-        },
-        "Carte": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "num_carte": {
-              "type": "integer",
-              "description": "",
-              "example": 111
-            },
-            "etat": {
-              "type": "string",
-              "description": "",
-              "enum": ["neuf", "occasoon", "abimée"],
-              "example": "neuf"
-            },
-            "descr_etat": {
-              "type": "string",
-              "description": "",
-              "exemple": "Très bonne état. Aucune éraflure"
-            },
-            "statut": {
-              "type": "string",
-              "description": "",
-              "enum": ["collectée", "en échange", "souhaitée"],
-              "example": "collectée"
-            },
-            "type": {
-              "type": "string",
-              "description": "",
-              "enum": ["reverse", "holo", "rien"]
-            },
-            "quantite": {
-              "type": "number",
-              "description": "",
-              "example": 1
-            },
-            "possedee_par": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            }
-          },
-          "required": [
-            "id",
-            "num_carte",
-            "etat",
-            "descr_etat",
-            "statut",
-            "type",
-            "quantite",
-            "possedee_par"
-          ]
-        },
-        "CarteDataPartial": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "num_carte": {
-              "type": "number",
-              "description": "",
-              "example": 111
-            },
-            "etat": {
-              "type": "string",
-              "description": "",
-              "enum": ["neuf", "occasion", "abimée"],
-              "example": "neuf"
-            },
-            "descr_etat": {
-              "type": "string",
-              "description": "",
-              "exemple": "Très bon état. Aucune éraflure"
-            },
-            "type": {
-              "type": "string",
-              "description": "",
-              "enum": ["reverse", "holo", "rien"],
-              "example": "rien"
-            },
-            "possedee_par": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            }
-          },
-          "required": [
-            "id",
-            "num_carte",
-            "etat",
-            "descr_etat",
-            "type",
-            "possedee_par"
-          ]
-        },
-        "CarteEchange": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "num_carte": {
-              "type": "number",
-              "description": "",
-              "example": 111
-            },
-            "etat": {
-              "type": "string",
-              "description": "",
-              "enum": ["neuf", "occasion", "abimée"],
-              "example": "neuf"
-            },
-            "descr_etat": {
-              "type": "string",
-              "description": "",
-              "exemple": "Très bon état. Aucune éraflure"
-            },
-            "type": {
-              "type": "string",
-              "description": "",
-              "enum": [""]
-            },
-            "possedee_par": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "example": "Genève"
-            }
-          },
-          "required": [
-            "id",
-            "num_carte",
-            "etat",
-            "descr_etat",
-            "type",
-            "possedee_par",
-            "ville"
-          ]
-        },
-        "Echange": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "etat": {
-              "type": "string",
-              "description": "",
-              "enum": ["en coure", "fini"],
-              "example": "en coure"
-            },
-            "creer_a": {
-              "type": "string",
-              "description": "",
-              "format": "data-time",
-              "example": "2020-01-02T10:00:00.000Z"
-            },
-            "creer_par": {
-              "$ref": "#/components/schemas/Dresseur"
-            },
-            "accepte_par": {
-              "$ref": "#/components/schemas/Dresseur"
-            }
-          },
-          "required": ["id", "etat", "creer_a", "creer_par", "accepte_par"]
-        },
-        "EchangeData": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "etat": {
-              "type": "string",
-              "description": "",
-              "enum": ["en coure", "fini"],
-              "example": "en coure"
-            },
-            "creer_a": {
-              "type": "string",
-              "description": "",
-              "format": "data-time",
-              "example": "2020-01-02T10:00:00.000Z"
-            },
-            "creer_par": {
-              "$ref": "#/components/schemas/Dresseur"
-            },
-            "accepte_par": {
-              "$ref": "#/components/schemas/Dresseur"
-            }
-          },
-          "required": ["etat", "creer_a", "creer_par", "accepte_par"]
-        },
-        "Message": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "date": {
-              "type": "string",
-              "description": "",
-              "format": "data-time",
-              "example": "2020-01-02T10:00:00.000Z"
-            },
-            "contenu": {
-              "type": "string",
-              "description": "",
-              "example": "Salut!"
-            },
-            "expéditeur": {
-              "type": "string",
-              "description": "Celui qui envoie le message.",
-              "example": "Nerak"
-            },
-            "destinataire": {
-              "type": "string",
-              "description": "Celui qui reçoit le message.",
-              "example": "Salocin"
-            }
-          },
-          "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
-        }   
-      },
-      "securitySchemes": {
-        "BearerAuth": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
+  "responses":{
+    "DresseurValidationErreur": {
+      "description": "Echec de l'inscription.",
+      "content":{
+          "text/plain":{
+          "example": "Inscription échouée."
         }
       }
+    },
+    "CarteValidationErreur": {
+      "description": "Echec de la création.",
+      "content": {
+        "text/plain": {
+          "example": "La carte n'a pas été créée."
+        }
+      }
+    },
+    "CartePasAffichee":{
+      "description": "La carte n'est pas affichée.",
+      "content": {
+        "text/plain": {
+          "example": "La carte n'est pas affichée."
+        }
+      }
+    },
+    "connexionReussie": {
+      "type": "object",
+      "example": "Connexion réussie"
+    },
+    "connexionErreur":{
+      "description": "Mots de passe ou pseudo incorrect",
+      "content":{
+          "text/plain":{
+          "example": "Connexion échouée, veuillez retenter."
+        }
+      }
+    },
+    "connexionEchouee": {
+      "description": "Mots de passe ou pseudo incorrect",
+      "content":{
+          "text/plain":{
+          "example": "Mots de passe ou pseudo incorrect."
+        }
+      }
+    },
+    "deconnexionReussie": {
+      "description": "Déconnexion réussie.",
+      "content":{
+          "text/plain":{
+          "example": "Déconnexion réussie."
+          }
+      }
+    },
+    "deconnexionEchouee": {
+      "description": "Déconnexion échouée.",
+      "content":{
+        "text/plain":{
+        "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
+        }
+      }
+    },
+    "DresseurSupprime":{
+      "description": "Le dresseur a été supprimé.",
+      "content": {
+        "text/plain": {
+          "example": "Le dresseur a été supprimé."
+        }
+      }
+    },
+    "DresseurEstPasAffiche":{
+      "description": "Le dresseur n'a pas été affiché.",
+      "content":{
+          "text/plain":{
+          "example": "Le dresseur ne s'affiche pas."
+        }
+      }
+    },
+    "ErreurConnexion": {
+      "description": "Erreur de connexion.",
+      "content":{
+          "text/plain":{
+          "example": " Le serveur n'est pas disponible en raison d'une surcharge temporaire ou de travaux de maintenance."
+        }
+      }
+    },
+    "ModificationErreur":{
+      "description":"La modification n'a pas été validé",
+      "content":{
+        "text/plain":{
+          "example":"La modification n'a pas été effectué"
+        }
+      }
+    },
+    "DresseurIntrouvable":{
+      "description":"Le dresseur est introuvable",
+      "content":{
+        "text/plain":{
+          "example":"Ce dresseur est introuvable"
+        }
+      }
+    },
+    "DeckErreur":{
+      "description":"Erreur dans l'affichage du deck",
+      "content":{
+        "text/plain":{
+          "example":"Une erreur est survenu dans l'affichage de votre deck"
+        }
+      }
+    },
+    "DestinataireErreur":{
+      "description":"Destinataire introuvable.",
+      "content":{
+        "text/plain":{
+          "example":"Le destinataire n'a pas été trouvé"
+        }
+      }
+    },
+    "MessageErreur":{
+      "description":"Le message n'a pas été créée",
+      "content":{
+        "text/plain":{
+          "example":"Le message n'a pas pu être créée"
+        }
+      }
+    },
+    "MessageIntrouvable":{
+      "description":"Message introuvable",
+      "content":{
+        "text/plain":{
+          "example": "Le message est introuvable"
+        }
+      }
+    },
+    "DiscutionIntrouvable":{
+      "description":"Discution introuvable",
+      "content":{
+        "text/plain":{
+          "example":"La discution est introuvable"
+        }
+      }
+    }
+  },
+    "schemas": {
+      "DresseurMap":{
+        "type": "object",
+        "properties": {
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "AniraC"
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "maxlength": 60,
+            "example": "Genève"
+          },
+          "image":{
+            "type": "string",
+            "description": "",
+            "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
+        },
+        "carte":{
+          "$ref": "#/components/schemas/Carte"
+        }
+        },
+        "required": [
+          "pseudo",
+          "ville",
+          "carte"
+        ]
+      },
+      "CarteData":{
+        "description": "La carte à créer.",
+        "type": "object",
+        "properties": {
+          "num_carte": {
+            "type": "integer",
+            "description": "Le numéro de la carte",
+            "example": 114
+          },
+          "etat": {
+            "type": "string",
+            "description": "L'état de la carte",
+            "enum": ["neuf", "occasion", "abimée"],
+            "example": "neuf"
+          },
+          "descr_etat": {
+            "type": "string",
+            "description": "La description de l'état de la carte",
+            "example": "Très bonne état. Aucune éraflure"
+          },
+          "statut": {
+            "type": "string",
+            "description": "Le statut de la carte",
+            "enum": ["collectée", "en échange", "souhaitée"],
+            "example": "collectée"
+          },
+          "type": {
+            "type": "string",
+            "description": "Le type de la carte",
+            "enum": ["reverse", "holo", "rien"]
+          },
+          "quantite": {
+            "type": "integer",
+            "description": "La quantité de la carte",
+            "example": 1
+          },
+          "serie": {
+            "type": "string",
+            "description": "La série de la carte",
+            "enum": [
+              "écarlate et violet",
+              "épée et bouclier",
+              "soleil et lune",
+              "xy",
+              "noir et blanc"
+            ],
+            "example": "xy"
+          }
+        },
+        "required": [
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "statut",
+          "type",
+          "quantite",
+          "serie"
+        ]
+      },
+      "connexion": {
+        "type": "object",
+        "properties": {
+          "pseudo": {
+            "type": "string",
+            "maxlength": 40,
+            "unique": true,
+            "description": "",
+            "example": "Nerak"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse88"
+          }
+        },
+        "required": ["pseudo", "mot_de_passe"]
+      },
+      "Dresseur": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "nom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "age": {
+            "type": "integer",
+            "description": "",
+            "minimum": 1,
+            "maximum": 200,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "maxlength": 60,
+            "example": "Genève"
+          },
+          "image":{
+            "type": "string",
+            "description": "",
+            "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
+        }
+        },
+        "required": [
+          "id",
+          "nom",
+          "prenom",
+          "pseudo",
+          "email",
+          "mot_de_passe",
+          "age",
+          "ville"
+        ]
+      },
+      "DresseurData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Carina"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "unique": true,
+            "maxlength": 40,
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 1,
+            "maximum": 200,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "maxlength": 60,
+            "example": "Genève"
+          } 
+        },
+        "required": ["prenom", "nom","pseudo", "email", "age", "ville"]
+      
+      },
+      "DresseurDataPartiel": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 15,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "example": "Genève"
+          }
+        }
+      },
+      "Carte": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "num_carte": {
+            "type": "integer",
+            "description": "",
+            "example": 111
+          },
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["neuf", "occasoon", "abimée"],
+            "example": "neuf"
+          },
+          "descr_etat": {
+            "type": "string",
+            "description": "",
+            "example": "Très bonne état. Aucune éraflure"
+          },
+          "statut": {
+            "type": "string",
+            "description": "",
+            "enum": ["collectée", "en échange", "souhaitée"],
+            "example": "collectée"
+          },
+          "type": {
+            "type": "string",
+            "description": "",
+            "enum": ["reverse", "holo", "rien"]
+          },
+          "quantite": {
+            "type": "number",
+            "description": "",
+            "example": 1
+          },
+          "possedee_par": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          }
+        },
+        "required": [
+          "id",
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "statut",
+          "type",
+          "quantite",
+          "possedee_par"
+        ]
+      },
+      "CarteDataPartial": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "num_carte": {
+            "type": "number",
+            "description": "",
+            "example": 111
+          },
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["neuf", "occasion", "abimée"],
+            "example": "neuf"
+          },
+          "descr_etat": {
+            "type": "string",
+            "description": "",
+            "example": "Très bon état. Aucune éraflure"
+          },
+          "type": {
+            "type": "string",
+            "description": "",
+            "enum": ["reverse", "holo", "rien"],
+            "example": "rien"
+          },
+          "possedee_par": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          }
+        },
+        "required": [
+          "id",
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "type",
+          "possedee_par"
+        ]
+      },
+      "CarteEchange": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "num_carte": {
+            "type": "number",
+            "description": "",
+            "example": 111
+          },
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["neuf", "occasion", "abimée"],
+            "example": "neuf"
+          },
+          "descr_etat": {
+            "type": "string",
+            "description": "",
+            "example": "Très bon état. Aucune éraflure"
+          },
+          "type": {
+            "type": "string",
+            "description": "",
+            "enum": ["normale", "reverse", "holo"]
+          },
+          "possedee_par": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "example": "Genève"
+          }
+        },
+        "required": [
+          "id",
+          "num_carte",
+          "etat",
+          "descr_etat",
+          "type",
+          "possedee_par",
+          "ville"
+        ]
+      },
+      "Echange": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["en cours", "fini"],
+            "example": "en coure"
+          },
+          "creer_a": {
+            "type": "string",
+            "description": "",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
+          },
+          "creer_par": {
+            "$ref": "#/components/schemas/Dresseur"
+          },
+          "accepte_par": {
+            "$ref": "#/components/schemas/Dresseur"
+          }
+        },
+        "required": ["id", "etat", "creer_a", "creer_par", "accepte_par"]
+      },
+      "EchangeData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "etat": {
+            "type": "string",
+            "description": "",
+            "enum": ["en cours", "fini"],
+            "example": "en coure"
+          },
+          "creer_a": {
+            "type": "string",
+            "description": "",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
+          },
+          "creer_par": {
+            "$ref": "#/components/schemas/Dresseur"
+          },
+          "accepte_par": {
+            "$ref": "#/components/schemas/Dresseur"
+          }
+        },
+        "required": ["etat", "creer_a", "creer_par", "accepte_par"]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "date": {
+            "type": "string",
+            "description": "",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
+          },
+          "contenu": {
+            "type": "string",
+            "description": "",
+            "example": "Salut!"
+          },
+          "expéditeur": {
+            "type": "string",
+            "description": "Celui qui envoie le message.",
+            "example": "Nerak"
+          },
+          "destinataire": {
+            "type": "string",
+            "description": "Celui qui reçoit le message.",
+            "example": "Salocin"
+          }
+        },
+        "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
+      }   
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
   }
-  }
+}
 
