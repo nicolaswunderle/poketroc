@@ -283,7 +283,7 @@
             }
           },
           "422": {           
-                  "$ref": "#/components/messages/DresseurValidationErreur"
+                  "$ref": "#/components/responses/DresseurValidationErreur"
             
           }
         }
@@ -309,16 +309,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/connexionReussie"
+                  "$ref": "#/components/responses/connexionReussie"
                 }
               }
             }
           },
           "401": { 
-                  "$ref": "#/components/schemas/connexionEchouee"       
-          },
-          "422": {
-                  "$ref": "#/components/schemas/connexionErreur" 
+                  "$ref": "#/components/responses/connexionEchouee"       
           }
         }
       },
@@ -329,23 +326,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/connexion",
-                "type": "object",
-                "properties": {
-                  "pseudo": {
-                    "type": "string",
-                    "description": "Le pseudo du dresseur",
-                    "example": "Nerak"
-                  },
-                  "mot_de_passe": {
-                    "type": "string",
-                    "description": "Le mot de passe du compte dresseur",
-                    "example": "unMotDePasse88"
-                  }
-                },
-                "required": ["pseudo", "mot_de_passe"]
-              }
             }
           }
         },
@@ -354,7 +334,7 @@
             "description": "Déconnexion réussie"
           },            
           "404":{
-            "$ref": "#/components/schemas/deconnexionEchouee"
+            "$ref": "#/components/responses/deconnexionEchouee"
                 }    
         }
       }
@@ -377,7 +357,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Le dresseur a été affiché",
+            "description": "Le dresseur est affiché",
             "content": {
               "application/json": {
                 "schema": {
@@ -408,21 +388,70 @@
         ],
         "responses": {
           "204": {
-            "description": "Le dresseur a été supprimé",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DresseurSupprime"
-                }
-              }
-            }
-          },
+            "description": "Le dresseur a été supprimé."
+                  },
           "404":{
-              "$ref": "#/components/schemas/DresseurIntrouvable"
+              "$ref": "#/components/responses/dresseurIntrouvable"
                 }
         }
       }
     },
+    "dresseurs/proches/{coordonnéesGeographique}?page={number}&pageSize={number}": {
+      "get": {
+        "summary": "Afficher les dresseurs proches",
+        "tags": ["dresseur"],
+        "parameters": [
+          {
+            "name": "coordonnéesGeographique",
+            "in": "path",
+            "description": "Coordonnées géographiques du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+
+        "responses": {
+          "200": {
+            "description": "Liste des dresseurs proches est affichée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DresseurMap"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+                  "$ref": "#/components/responses/ErreurConnexion"
+               
+          }
+        }
+      }      
+    },
+
     "poketroc/profil/modification/mot-de-passe": {
       "put": {
         "summary": "Modifier le mot de passe-----------------------------------------------------",
@@ -1018,7 +1047,7 @@
 
 
     "components": {
-      "messages": {
+      "responses": {
         "DresseurValidationErreur": {
           "description": "Echec de l'inscription.",
           "content":{
@@ -1026,10 +1055,61 @@
               "example": "Inscription échouée."
             }
           }
-        }
+        },
+        "dresseurIntrouvable": {
+          "description": "Dresseur introuvable.",
+          "content":{
+              "text/plain":{
+              "example": "Dresseur avec le pseudo Nerak n'existe pas."
+            }
+          }
+        },
+        "DresseurEstPasAffiche":{
+          "description": "Le dresseur n'a pas été affiché.",
+          "content":{
+              "text/plain":{
+              "example": "Le dresseur avec le pseudo Nerak ne s'affiche pas."
+            }
+          }
+        },
+        "ErreurConnexion": {
+          "description": "Erreur de connexion.",
+          "content":{
+              "text/plain":{
+              "example": " Le serveur n'est pas disponible en raison d'une surcharge temporaire ou de travaux de maintenance."
+            }
+          }
+        },
+        "deconnexionReussie": {
+          "description": "Déconnexion réussie.",
+          "content":{
+              "text/plain":{
+              "example": "Déconnexion réussie."
+              }
+            }
+          },
+          "deconnexionEchouee": {
+            "description": "Déconnexion échouée.",
+            "content":{
+              "text/plain":{
+              "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
+              }
+            }
+          },             
+          "connexionReussie": {
+            "type": "object",
+            "example": "Connexion réussie"
+            },
+        "connexionEchouee": {
+          "description": "Mots de passe ou pseudo incorrect",
+          "content":{
+              "text/plain":{
+              "example": "Mots de passe ou pseudo incorrect."
+            }
+          }
+        }    
       },
       "schemas": {
-
         "CartePasAffichee":{
           "description": "La carte n'est pas affichée.",
           "content": {
@@ -1037,6 +1117,36 @@
               "example": "La carte n'est pas affichée."
             }
           }
+        },
+        "DresseurMap":{
+          "type": "object",
+          "properties": {
+            "pseudo": {
+              "type": "string",
+              "description": "",
+              "maxlength": 40,
+              "example": "AniraC"
+            },
+            "ville": {
+              "type": "string",
+              "description": "",
+              "maxlength": 60,
+              "example": "Genève"
+            },
+            "image":{
+              "type": "string",
+              "description": "",
+              "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
+          },
+          "carte":{
+            "$ref": "#/components/schemas/Carte"
+          }
+          },
+          "required": [
+            "pseudo",
+            "ville",
+            "carte"
+          ]
         },
         "CarteData":{
           "description": "La carte à créer.",
@@ -1106,75 +1216,24 @@
           }
         }
       },
-        "DresseurSupprime":{
-          "description": "Le dresseur a été supprimé.",
-          "content": {
-            "text/plain": {
-              "example": "Le dresseur a été supprimé."
-            }
-          }
-        },
-        "DresseurEstPasAffiche":{
-          "description": "Le dresseur n'a pas été affiché.",
-          "content":{
-              "text/plain":{
-              "example": "Le dresseur ne s'affiche pas."
-            }
-          }
-        },
-        "connexionErreur":{
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Connexion échouée, veuillez retenter."
-            }
-          }
-        },
-        "connexionEchouee": {
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Mots de passe ou pseudo incorrect."
-            }
-          }
-        },
         "connexion": {
           "type": "object",
           "properties": {
             "pseudo": {
               "type": "string",
-              "description": "Le pseudo du dresseur",
+              "maxlength": 40,
+              "unique": true,
+              "description": "",
               "example": "Nerak"
             },
             "mot_de_passe": {
               "type": "string",
-              "description": "Le mot de passe du compte dresseur",
+              "description": "",
               "example": "unMotDePasse88"
             }
           },
           "required": ["pseudo", "mot_de_passe"]
         },
-        "deconnexionReussie": {
-          "description": "Déconnexion réussie.",
-          "content":{
-              "text/plain":{
-              "example": "Déconnexion réussie."
-              }
-            }
-          },
-          "deconnexionEchouee": {
-            "description": "Déconnexion échouée.",
-            "content":{
-              "text/plain":{
-              "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
-              }
-            }
-          },
-        "connexionReussie": {
-          "type": "object",
-          "example": "Connexion réussie"
-          },
-        
         "Dresseur": {
           "type": "object",
           "properties": {
@@ -1259,6 +1318,7 @@
             "pseudo": {
               "type": "string",
               "description": "",
+              "unique": true,
               "maxlength": 40,
               "example": "AniraC"
             },
