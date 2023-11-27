@@ -55,7 +55,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CarteValidationErreur"
+                  "$ref": "#/components/responses/CarteValidationErreur"
                 }
               }
             }
@@ -63,7 +63,6 @@
         }
       }
     },
-
     "/cartes/{carteId}": {
       "get": {
         "summary": "Afficher carte dresseur",
@@ -95,7 +94,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CartePasAffichee"
+                  "$ref": "#/components/responses/CartePasAffichee"
                 }
               }
             }
@@ -168,7 +167,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CarteSupprimee"
+                  "$ref": "#/components/responses/CarteSupprimee"
                 }
               }
             }
@@ -178,7 +177,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CartePasSupprimee"
+                  "$ref": "#/components/responses/CartePasSupprimee"
                 }
               }
             }
@@ -186,7 +185,6 @@
         }
       }
     },
-
     "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
       "get": {
         "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
@@ -249,7 +247,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListeCartePasAffichee"
+                  "$ref": "#/components/responses/ListeCartePasAffichee"
                 }
               }
             }
@@ -257,7 +255,6 @@
         }
       }
     },
-
     "/dresseurs": {
       "post": {
         "summary": "Inscription à l'application",
@@ -289,7 +286,6 @@
         }
       }
     },
-
     "/dresseurs/connexion": {
       "post": {
         "summary": "Connexion au compte dresseur",
@@ -309,16 +305,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/connexionReussie"
+                  "$ref": "#/components/responses/connexionReussie"
                 }
               }
             }
           },
           "401": { 
-                  "$ref": "#/components/schemas/connexionEchouee"       
+                  "$ref": "#/components/responses/connexionEchouee"       
           },
           "422": {
-                  "$ref": "#/components/schemas/connexionErreur" 
+                  "$ref": "#/components/responses/connexionErreur" 
           }
         }
       },
@@ -354,12 +350,11 @@
             "description": "Déconnexion réussie"
           },            
           "404":{
-            "$ref": "#/components/schemas/deconnexionEchouee"
+            "$ref": "#/components/responses/deconnexionEchouee"
                 }    
         }
       }
     },
-
     "dresseurs/{dresseurId}": {
       "get": {
         "summary": "Afficher le dresseur",
@@ -387,7 +382,7 @@
             }
           },
           "404": {
-                  "$ref": "#/components/schemas/DresseurEstPasAffiche"
+                  "$ref": "#/components/responses/DresseurEstPasAffiche"
           }
         }
       },
@@ -412,13 +407,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DresseurSupprime"
+                  "$ref": "#/components/responses/DresseurSupprime"
                 }
               }
             }
           },
           "404":{
-              "$ref": "#/components/schemas/DresseurIntrouvable"
+              "$ref": "#/components/responses/DresseurIntrouvable"
                 }
         }
       }
@@ -467,7 +462,7 @@
         }
       },
       "patch": {
-        "summary": "Modifier profil du dresseur en partie---------------------------------------",
+        "summary": "Modifier partiellement le profil du dresseur",
         "tags": ["dresseur"],
         "parameters": [
           {
@@ -591,7 +586,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                  "$ref": "#/components/responses/EchangeValidationErreur"
                 }
               }
             }
@@ -630,7 +625,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangePasAffiche"
+                  "$ref": "#/components/responses/EchangePasAffiche"
                 }
               }
             }
@@ -676,7 +671,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangePasModifie"
+                  "$ref": "#/components/responses/EchangePasModifie"
                 }
               }
             }
@@ -686,7 +681,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                  "$ref": "#/components/responses/EchangeValidationErreur"
                 }
               }
             }
@@ -713,14 +708,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeSupprime"
+                  "$ref": "#/components/responses/EchangeSupprime"
                 },
                 "404": {
                   "description": "L'échange n'a pas été supprimé.",
                   "content": {
                     "application/json": {
                       "schema": {
-                        "$ref": "#/components/schemas/EchangePasSupprime"
+                        "$ref": "#/components/responses/EchangePasSupprime"
                       }
                     }
                   }
@@ -859,10 +854,6 @@
         }
       }
     },
-
-
-
-
     "messages/{echangeId}": {
       "get": {
         "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
@@ -894,7 +885,6 @@
           }
         }
       },
-
       "delete": {
         "summary": "Supprimer un message-----------------------------------------------------------",
         "tags": ["message"],
@@ -919,7 +909,6 @@
         }
       }
     },  
-      
     "messages/{messageId}": {
         "get": {
           "summary": "Afficher conversations-----------------------------------------------------",
@@ -1003,7 +992,7 @@
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/MessageValidationErreur"
+                    "$ref": "#/components/responses/MessageValidationErreur"
                   }
                 }
               }
@@ -1012,11 +1001,6 @@
         }
       }
     },
-
-
-
-
-
     "components": {
       "messages": {
         "DresseurValidationErreur": {
@@ -1028,8 +1012,15 @@
           }
         }
       },
-      "schemas": {
-
+      "responses":{
+        "CarteValidationErreur": {
+          "description": "Echec de la création.",
+          "content": {
+            "text/plain": {
+              "example": "La carte n'a pas été créée."
+            }
+          }
+        },
         "CartePasAffichee":{
           "description": "La carte n'est pas affichée.",
           "content": {
@@ -1038,6 +1029,60 @@
             }
           }
         },
+        "connexionReussie": {
+          "type": "object",
+          "example": "Connexion réussie"
+        },
+        "connexionErreur":{
+          "description": "Mots de passe ou pseudo incorrect",
+          "content":{
+              "text/plain":{
+              "example": "Connexion échouée, veuillez retenter."
+            }
+          }
+        },
+        "connexionEchouee": {
+          "description": "Mots de passe ou pseudo incorrect",
+          "content":{
+              "text/plain":{
+              "example": "Mots de passe ou pseudo incorrect."
+            }
+          }
+        },
+        "deconnexionReussie": {
+          "description": "Déconnexion réussie.",
+          "content":{
+              "text/plain":{
+              "example": "Déconnexion réussie."
+              }
+          }
+        },
+        "deconnexionEchouee": {
+          "description": "Déconnexion échouée.",
+          "content":{
+            "text/plain":{
+            "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
+            }
+          }
+        },
+        "DresseurSupprime":{
+          "description": "Le dresseur a été supprimé.",
+          "content": {
+            "text/plain": {
+              "example": "Le dresseur a été supprimé."
+            }
+          }
+        },
+        "DresseurEstPasAffiche":{
+          "description": "Le dresseur n'a pas été affiché.",
+          "content":{
+              "text/plain":{
+              "example": "Le dresseur ne s'affiche pas."
+            }
+          }
+        }
+      },
+      "schemas": {
         "CarteData":{
           "description": "La carte à créer.",
           "type": "object",
@@ -1098,46 +1143,6 @@
                 ]
               
         },
-      "CarteValidationErreur": {
-        "description": "Echec de la création.",
-        "content": {
-          "text/plain": {
-            "example": "La carte n'a pas été créée."
-          }
-        }
-      },
-        "DresseurSupprime":{
-          "description": "Le dresseur a été supprimé.",
-          "content": {
-            "text/plain": {
-              "example": "Le dresseur a été supprimé."
-            }
-          }
-        },
-        "DresseurEstPasAffiche":{
-          "description": "Le dresseur n'a pas été affiché.",
-          "content":{
-              "text/plain":{
-              "example": "Le dresseur ne s'affiche pas."
-            }
-          }
-        },
-        "connexionErreur":{
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Connexion échouée, veuillez retenter."
-            }
-          }
-        },
-        "connexionEchouee": {
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Mots de passe ou pseudo incorrect."
-            }
-          }
-        },
         "connexion": {
           "type": "object",
           "properties": {
@@ -1154,27 +1159,6 @@
           },
           "required": ["pseudo", "mot_de_passe"]
         },
-        "deconnexionReussie": {
-          "description": "Déconnexion réussie.",
-          "content":{
-              "text/plain":{
-              "example": "Déconnexion réussie."
-              }
-            }
-          },
-          "deconnexionEchouee": {
-            "description": "Déconnexion échouée.",
-            "content":{
-              "text/plain":{
-              "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
-              }
-            }
-          },
-        "connexionReussie": {
-          "type": "object",
-          "example": "Connexion réussie"
-          },
-        
         "Dresseur": {
           "type": "object",
           "properties": {
@@ -1414,7 +1398,8 @@
             "type": {
               "type": "string",
               "description": "",
-              "enum": [""]
+              "enum": ["reverse", "holo", "rien"],
+              "example": "rien"
             },
             "possedee_par": {
               "type": "string",
@@ -1572,7 +1557,6 @@
           "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
         }   
       },
-
       "securitySchemes": {
         "authConnexion": {
           "type": "http",
