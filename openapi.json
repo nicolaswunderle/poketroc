@@ -236,7 +236,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListeCarte"
+                    "$ref": "#/components/schemas/Carte"
                   }
                 }
               }
@@ -280,7 +280,7 @@
             }
           },
           "422": {           
-                  "$ref": "#/components/messages/DresseurValidationErreur"
+                  "$ref": "#/components/responses/DresseurValidationErreur"
             
           }
         }
@@ -422,51 +422,9 @@
         }
       }
     },
-    "poketroc/profil/modification/mot-de-passe": {
-      "put": {
-        "summary": "Modifier le mot de passe-----------------------------------------------------",
-        "tags": ["dresseur"]
-      }
-    },
-    "poketroc/profil/modification": {
-      "put": {
-        "summary": "Modifier profil du dresseur en entier---------------------------------------",
-        "tags": ["dresseur"],
-        "parameters": [
-          {
-            "name": "dresseurId",
-            "in": "path",
-            "description": "Identifiant du dresseur",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DresseurData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Dresseur"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/{dresseur.id}/modification": {
       "patch": {
-        "summary": "Modifier partiellement le profil du dresseur",
+        "summary": "Modifier partiellement le profil du dresseurs",
         "tags": ["dresseur"],
         "parameters": [
           {
@@ -498,13 +456,16 @@
                 }
               }
             }
+          },
+          "404":{
+            "$ref":"#/components/responses/ModificationErreur"
           }
         }
       }
     },
-    "poketroc/deck": {
+    "/{dresseur.id}/deck": {
       "get": {
-        "summary": "Afficher le deck du dresseur-------------------------------------------------",
+        "summary": "Afficher le deck du dresseur",
         "tags": ["carte"],
         "parameters": [
           {
@@ -557,6 +518,9 @@
                 }
               }
             }
+          },
+          "404":{
+            "$ref":"#/components/responses/DeckErreur"
           }
         }
       }
@@ -858,124 +822,100 @@
         }
       }
     },
-    "messages/{echangeId}": {
+    "/messages/{echangeId}": {
       "get": {
-        "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
+        "summary": "Afficher une discution",
         "tags": ["message"],
         "parameters": [
           {
-            "name": "messageId",
+            "name": "echangeId",
             "in": "path",
-            "description": "Conversation d'un échange.",
+            "description": "Identifiant de l'échange.",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Message trouvé.",
+            "description": "Discution affiché",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      },
-      "delete": {
-        "summary": "Supprimer un message-----------------------------------------------------------",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "Le message a supprimer.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Le message à été supprimé avec succès."
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      }
-    },  
-    "messages/{messageId}": {
-        "get": {
-          "summary": "Afficher conversations-----------------------------------------------------",
-          "tags": ["message"],
-          "parameters": [
-            {
-              "name": "pseudo",
-              "in": "query",
-              "description": "Affichage du message.",
-              "schema": {
-                "type": "string",
-                "example": "AniraC"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Message"
-                    }
+                  "type":"array",
+                  "items":{
+                    "$ref":"#/components/schemas/Message"
                   }
                 }
               }
             }
+          },
+          "404": {
+            "$ref":"#/components/responses/DiscutionIntrouvable"
           }
-        }               
-      },
-
-      "messages":{
-        "post": {
-          "summary": "Créer un message-----------------------------------------------------------",
+        }
+      }
+    },  
+    "/messages/{messageId}": {
+      "delete":{
+        "summary":"Supprimer un message",
+        "tags":["message"],
+        "parameters":[
+          {
+            "name":"messageId",
+            "in":"path",
+            "description":"Identifiant du message",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"Le message à été supprimé",
+            "content":{
+              "text/plain":{
+                "schema":{
+                  "example":"Le message à été supprimé"
+                }
+              }
+            }
+          },
+          "404":{
+            "$ref":"#/components/responses/MessageIntrouvable"
+          }
+        }
+      }
+    },
+    "messages":{
+      "post": {
+          "summary": "Créer un message",
           "tags": ["message"],
           "requestBody": {
-            "description": "Le message à créer.",
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message",
-                  "type": "object",
-                  "properties": {
-                    "contenu": {
-                      "type": "string",
-                      "description": "Le contenu du message",
-                      "example": "Salut! Cette carte m'intéresse."
-                    },
-                    "expéditeur": {
-                      "type": "string",
-                      "description": "L'expéditeur du message.",
-                      "example": "Salocin"
-                    },
-                    "destinataire": {
-                      "type": "string",
-                      "description": "Le destinataire du message.",
-                      "example": "Enirehtac"
-                    }
-                  },
-                  "required": ["contenu", "expéditeur", "destinataire"]
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Message"
                 }
               }
             }
@@ -991,22 +931,18 @@
                 }
               }
             },
-            "404": {
-              "description": "Destinataire manquant.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/responses/MessageValidationErreur"
-                  }
-                }
-              }
+            "404":{
+              "$ref":"#/components/responses/MessageErreur"
+            },
+            "422": {
+              "$ref":"#/components/responses/DestinataireErreur"
             }
           }
-        }
       }
-    },
-    "components": {
-      "messages": {
+    }
+  },
+  "components": {
+    "responses":{
         "DresseurValidationErreur": {
           "description": "Echec de l'inscription.",
           "content":{
@@ -1014,9 +950,7 @@
               "example": "Inscription échouée."
             }
           }
-        }
-      },
-      "responses":{
+        },
         "CarteValidationErreur": {
           "description": "Echec de la création.",
           "content": {
@@ -1084,68 +1018,123 @@
               "example": "Le dresseur ne s'affiche pas."
             }
           }
+        },
+        "ModificationErreur":{
+          "description":"La modification n'a pas été validé",
+          "content":{
+            "text/plain":{
+              "example":"La modification n'a pas été effectué"
+            }
+          }
+        },
+        "DresseurIntrouvable":{
+          "description":"Le dresseur est introuvable",
+          "content":{
+            "text/plain":{
+              "example":"Ce dresseur est introuvable"
+            }
+          }
+        },
+        "DeckErreur":{
+          "description":"Erreur dans l'affichage du deck",
+          "content":{
+            "text/plain":{
+              "example":"Une erreur est survenu dans l'affichage de votre deck"
+            }
+          }
+        },
+        "DestinataireErreur":{
+          "description":"Destinataire introuvable.",
+          "content":{
+            "text/plain":{
+              "example":"Le destinataire n'a pas été trouvé"
+            }
+          }
+        },
+        "MessageErreur":{
+          "description":"Le message n'a pas été créée",
+          "content":{
+            "text/plain":{
+              "example":"Le message n'a pas pu être créée"
+            }
+          }
+        },
+        "MessageIntrouvable":{
+          "description":"Message introuvable",
+          "content":{
+            "text/plain":{
+              "example": "Le message est introuvable"
+            }
+          }
+        },
+        "DiscutionIntrouvable":{
+          "description":"Discution introuvable",
+          "content":{
+            "text/plain":{
+              "example":"La discution est introuvable"
+            }
+          }
         }
-      },
+    },
       "schemas": {
         "CarteData":{
           "description": "La carte à créer.",
           "type": "object",
           "properties": {
-                  "num_carte": {
-                    "type": "integer",
-                    "description": "Le numéro de la carte",
-                    "example": 114
-                  },
-                  "etat": {
-                    "type": "string",
-                    "description": "L'état de la carte",
-                    "enum": ["neuf", "occasoon", "abimée"],
-                    "example": "neuf"
-                  },
-                  "descr_etat": {
-                    "type": "string",
-                    "description": "La description de l'état de la carte",
-                    "example": "Très bonne état. Aucune éraflure"
-                  },
-                  "statut": {
-                    "type": "string",
-                    "description": "Le statut de la carte",
-                    "enum": ["collectée", "en échange", "souhaitée"],
-                    "example": "collectée"
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "Le type de la carte",
-                    "enum": ["reverse", "holo", "rien"]
-                  },
-                  "quantite": {
-                    "type": "integer",
-                    "description": "La quantité de la carte",
-                    "example": 1
-                  },
-                  "serie": {
-                    "type": "string",
-                    "description": "La série de la carte",
-                    "enum": [
-                      "écarlate et violet",
-                      "épée et bouclier",
-                      "soleil et lune",
-                      "xy",
-                      "noir et blanc"
-                    ],
-                    "example": "xy"
-                  }
-                },
-                "required": [
-                  "num_carte",
-                  "etat",
-                  "descr_etat",
-                  "statut",
-                  "type",
-                  "quantite",
-                  "serie"
-                ]
-              
+            "num_carte": {
+              "type": "integer",
+              "description": "Le numéro de la carte",
+              "example": 114
+            },
+            "etat": {
+              "type": "string",
+              "description": "L'état de la carte",
+              "enum": ["neuf", "occasoon", "abimée"],
+              "example": "neuf"
+            },
+            "descr_etat": {
+              "type": "string",
+              "description": "La description de l'état de la carte",
+              "example": "Très bonne état. Aucune éraflure"
+            },
+            "statut": {
+              "type": "string",
+              "description": "Le statut de la carte",
+              "enum": ["collectée", "en échange", "souhaitée"],
+              "example": "collectée"
+            },
+            "type": {
+              "type": "string",
+              "description": "Le type de la carte",
+              "enum": ["reverse", "holo", "rien"]
+            },
+            "quantite": {
+              "type": "integer",
+              "description": "La quantité de la carte",
+              "example": 1
+            },
+            "serie": {
+              "type": "string",
+              "description": "La série de la carte",
+              "enum": [
+                "écarlate et violet",
+                "épée et bouclier",
+                "soleil et lune",
+                "xy",
+                "noir et blanc"
+              ],
+              "example": "xy"
+            }
+          },
+          "required": [
+            "num_carte",
+            "etat",
+            "descr_etat",
+            "statut",
+            "type",
+            "quantite",
+            "serie"
+          ]
         },
         "connexion": {
           "type": "object",
@@ -1568,6 +1557,6 @@
           "bearerFormat": "JWT"
         }
       }
-    }
+  }
   }
 
