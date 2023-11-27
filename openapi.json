@@ -283,7 +283,7 @@
             }
           },
           "422": {           
-                  "$ref": "#/components/schemas/DresseurValidationErreur"
+                  "$ref": "#/components/messages/DresseurValidationErreur"
             
           }
         }
@@ -351,14 +351,7 @@
         },
         "responses": {
           "204": {
-            "description": "Déconnexion réussie",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/deconnexionReussie"
-                }
-              }
-            }
+            "description": "Déconnexion réussie"
           },            
           "404":{
             "$ref": "#/components/schemas/deconnexionEchouee"
@@ -1025,7 +1018,16 @@
 
 
     "components": {
-    
+      "messages": {
+        "DresseurValidationErreur": {
+          "description": "Echec de l'inscription.",
+          "content":{
+              "text/plain":{
+              "example": "Inscription échouée."
+            }
+          }
+        }
+      },
       "schemas": {
 
         "CartePasAffichee":{
@@ -1039,11 +1041,7 @@
         "CarteData":{
           "description": "La carte à créer.",
           "type": "object",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
+          "properties": {
                   "num_carte": {
                     "type": "integer",
                     "description": "Le numéro de la carte",
@@ -1098,9 +1096,7 @@
                   "quantite",
                   "serie"
                 ]
-              }
-            }
-          }
+              
         },
       "CarteValidationErreur": {
         "description": "Echec de la création.",
@@ -1178,14 +1174,7 @@
           "type": "object",
           "example": "Connexion réussie"
           },
-        "DresseurValidationErreur": {
-          "description": "Echec de l'inscription.",
-          "content":{
-              "text/plain":{
-              "example": "Inscription échouée."
-            }
-          }
-        },
+        
         "Dresseur": {
           "type": "object",
           "properties": {
@@ -1197,20 +1186,19 @@
             "nom": {
               "type": "string",
               "description": "",
-              "minlength": 3,
               "maxlength": 40,
               "example": "Fonseca"
             },
             "prenom": {
               "type": "string",
               "description": "",
-              "minlength": 3,
-              "maxlength": 15,
+              "maxlength": 40,
               "example": "Carina"
             },
             "pseudo": {
               "type": "string",
               "description": "",
+              "maxlength": 40,
               "example": "AniraC"
             },
             "email": {
@@ -1218,23 +1206,24 @@
               "description": "",
               "example": "adresse@email.ch"
             },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse32"
-            },
             "age": {
               "type": "integer",
               "description": "",
-              "minimum": 0,
-              "maximum": 100,
+              "minimum": 1,
+              "maximum": 200,
               "example": 25
             },
             "ville": {
               "type": "string",
               "description": "",
+              "maxlength": 60,
               "example": "Genève"
-            }
+            },
+            "image":{
+              "type": "string",
+              "description": "",
+              "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
+          }
           },
           "required": [
             "id",
@@ -1253,20 +1242,24 @@
             "nom": {
               "type": "string",
               "description": "",
-              "minlength": 3,
               "maxlength": 40,
               "example": "Fonseca"
             },
             "prenom": {
               "type": "string",
               "description": "",
-              "minlength": 3,
-              "maxlength": 15,
+              "maxlength": 40,
               "example": "Carina"
+            },
+            "mot_de_passe": {
+              "type": "string",
+              "description": "",
+              "example": "unMotDePasse32"
             },
             "pseudo": {
               "type": "string",
               "description": "",
+              "maxlength": 40,
               "example": "AniraC"
             },
             "email": {
@@ -1274,25 +1267,22 @@
               "description": "",
               "example": "adresse@email.ch"
             },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse32"
-            },
             "age": {
               "type": "number",
               "description": "",
-              "minimum": 0,
-              "maximum": 100,
+              "minimum": 1,
+              "maximum": 200,
               "example": 25
             },
             "ville": {
               "type": "string",
               "description": "",
+              "maxlength": 60,
               "example": "Genève"
-            }
+            } 
           },
-          "required": ["pseudo", "email", "mot_de_passe"]
+          "required": ["prenom", "nom","pseudo", "email", "age", "ville"]
+        
         },
         "DresseurDataPartiel": {
           "type": "object",
