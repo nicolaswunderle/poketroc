@@ -1042,10 +1042,10 @@
           "description": "La carte à créer.",
           "type": "object",
           "properties": {
-                  "num_carte": {
-                    "type": "integer",
+                  "id_api": {
+                    "type": "string",
                     "description": "Le numéro de la carte",
-                    "example": 114
+                    "example": "aaab"
                   },
                   "etat": {
                     "type": "string",
@@ -1053,10 +1053,10 @@
                     "enum": ["neuf", "occasoon", "abimée"],
                     "example": "neuf"
                   },
-                  "descr_etat": {
+                  "desc_etat": {
                     "type": "string",
                     "description": "La description de l'état de la carte",
-                    "example": "Très bonne état. Aucune éraflure"
+                    "example": "Très bon état. Aucune éraflure"
                   },
                   "statut": {
                     "type": "string",
@@ -1088,9 +1088,9 @@
                   }
                 },
                 "required": [
-                  "num_carte",
+                  "id_api",
                   "etat",
-                  "descr_etat",
+                  "desc_etat",
                   "statut",
                   "type",
                   "quantite",
@@ -1338,53 +1338,73 @@
               "description": "",
               "example": "7fe91a9a41bc839033eedf0f"
             },
-            "num_carte": {
-              "type": "integer",
+            "id_api": {
+              "type": "string",
               "description": "",
-              "example": 111
+              "example": "aaab",
+              "unique": true
             },
             "etat": {
               "type": "string",
               "description": "",
-              "enum": ["neuf", "occasoon", "abimée"],
-              "example": "neuf"
+              "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+              "example": "neuf",
+              "unique": true
             },
-            "descr_etat": {
+            "desc_etat": {
               "type": "string",
               "description": "",
-              "exemple": "Très bonne état. Aucune éraflure"
+              "maxlength": 255,
+              "exemple": "Très bon état. Aucune éraflure",
+              "unique": true
             },
             "statut": {
               "type": "string",
               "description": "",
-              "enum": ["collectée", "en échange", "souhaitée"],
+              "enum": ["collectée","souhaitée"],
               "example": "collectée"
             },
             "type": {
               "type": "string",
               "description": "",
-              "enum": ["reverse", "holo", "rien"]
+              "enum": ["normale", "reverse", "holo"],
+              "unique": true
             },
             "quantite": {
               "type": "number",
               "description": "",
+              "minimum":1,
+              "maximum": 1000,
               "example": 1
             },
-            "possedee_par": {
+            "dresseur_id":{
               "type": "string",
               "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
+              "example": "7fe91a9a41bc839033eedf0f",
+              "$ref": "#/components/schemas/Dresseur"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "",
+              "default": "2023-01-01T00:00:00Z"
+             },
+             "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "",
+              "default": "2023-01-01T00:00:00Z"
             }
           },
-          "required": [
-            "id",
-            "num_carte",
+             "required": [
+              "id",
+            "id_api",
             "etat",
-            "descr_etat",
+            "desc_etat",
             "statut",
             "type",
             "quantite",
-            "possedee_par"
+            "dresseur_id"
           ]
         },
         "CarteDataPartial": {
@@ -1395,26 +1415,31 @@
               "description": "",
               "example": "7fe91a9a41bc839033eedf0f"
             },
-            "num_carte": {
-              "type": "number",
+            "id_api": {
+              "type": "string",
               "description": "",
-              "example": 111
+              "example": "aaab",
+              "unique":true
             },
             "etat": {
               "type": "string",
               "description": "",
-              "enum": ["neuf", "occasion", "abimée"],
-              "example": "neuf"
+              "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+              "example": "neuf",
+              "unique": true
             },
-            "descr_etat": {
+            "desc_etat": {
               "type": "string",
               "description": "",
-              "exemple": "Très bon état. Aucune éraflure"
+              "maxlength": 255,
+              "exemple": "Très bon état. Aucune éraflure",
+              "unique": true
             },
             "type": {
               "type": "string",
               "description": "",
-              "enum": [""]
+              "enum": ["normale", "reverse", "holo"],
+              "unique": true
             },
             "possedee_par": {
               "type": "string",
@@ -1424,9 +1449,9 @@
           },
           "required": [
             "id",
-            "num_carte",
+            "id_api",
             "etat",
-            "descr_etat",
+            "desc_etat",
             "type",
             "possedee_par"
           ]
@@ -1439,26 +1464,31 @@
               "description": "",
               "example": "7fe91a9a41bc839033eedf0f"
             },
-            "num_carte": {
-              "type": "number",
+            "id_api": {
+              "type": "string",
               "description": "",
-              "example": 111
+              "example": "aaab",
+              "unique":true
             },
             "etat": {
               "type": "string",
               "description": "",
-              "enum": ["neuf", "occasion", "abimée"],
-              "example": "neuf"
+              "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+              "example": "neuf",
+              "unique": true
             },
-            "descr_etat": {
+            "desc_etat": {
               "type": "string",
               "description": "",
-              "exemple": "Très bon état. Aucune éraflure"
+              "maxlength": 255,
+              "exemple": "Très bon état. Aucune éraflure",
+              "unique": true
             },
             "type": {
               "type": "string",
               "description": "",
-              "enum": [""]
+              "enum": ["normale", "reverse", "holo"],
+              "unique": true
             },
             "possedee_par": {
               "type": "string",
@@ -1473,9 +1503,9 @@
           },
           "required": [
             "id",
-            "num_carte",
+            "id_api",
             "etat",
-            "descr_etat",
+            "desc_etat",
             "type",
             "possedee_par",
             "ville"
@@ -1489,26 +1519,44 @@
               "description": "",
               "example": "7fe91a9a41bc839033eedf0f"
             },
-            "etat": {
-              "type": "string",
-              "description": "",
-              "enum": ["en coure", "fini"],
-              "example": "en coure"
-            },
-            "creer_a": {
+            "date": {
               "type": "string",
               "description": "",
               "format": "data-time",
-              "example": "2020-01-02T10:00:00.000Z"
+              "example": "2023-01-01T00:00:00Z",
+              "unique": true
             },
-            "creer_par": {
-              "$ref": "#/components/schemas/Dresseur"
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["accepte", "attente","refus"],
+              "example": "attente"
             },
-            "accepte_par": {
-              "$ref": "#/components/schemas/Dresseur"
+            "dresseur_cree_id": {
+              "type": "string",
+              "description": "",
+              "$ref": "#/components/schemas/Dresseur",
+              "unique": true
+          },
+          "dresseur_concerne_id": {
+            "type": "string",
+            "description": "",
+            "$ref": "#/components/schemas/Dresseur"
+          },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "",
+              "default": "2023-01-01T00:00:00Z"
+             },
+             "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "",
+              "default": "2023-01-01T00:00:00Z"
             }
           },
-          "required": ["id", "etat", "creer_a", "creer_par", "accepte_par"]
+          "required": ["id", "date","dresseur_cree_id"]
         },
         "EchangeData": {
           "type": "object",
@@ -1521,23 +1569,34 @@
             "etat": {
               "type": "string",
               "description": "",
-              "enum": ["en coure", "fini"],
-              "example": "en coure"
+              "enum": ["accepte", "attente","refus"],
+              "example": "attente"
             },
-            "creer_a": {
+            "dresseur_cree_id": {
               "type": "string",
               "description": "",
-              "format": "data-time",
-              "example": "2020-01-02T10:00:00.000Z"
-            },
-            "creer_par": {
-              "$ref": "#/components/schemas/Dresseur"
-            },
-            "accepte_par": {
-              "$ref": "#/components/schemas/Dresseur"
+              "$ref": "#/components/schemas/Dresseur",
+              "unique": true
+          },
+          "dresseur_concerne_id": {
+            "type": "string",
+            "description": "",
+            "$ref": "#/components/schemas/Dresseur"
+          },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "",
+              "default": "2023-01-01T00:00:00Z"
+             },
+             "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "",
+              "default": "2023-01-01T00:00:00Z"
             }
           },
-          "required": ["etat", "creer_a", "creer_par", "accepte_par"]
+          "required": ["id", "date","dresseur_cree_id"]
         },
         "Message": {
           "type": "object",
