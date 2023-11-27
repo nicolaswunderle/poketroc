@@ -55,7 +55,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CarteValidationErreur"
+                  "$ref": "#/components/responses/CarteValidationErreur"
                 }
               }
             }
@@ -63,7 +63,6 @@
         }
       }
     },
-
     "/cartes/{carteId}": {
       "get": {
         "summary": "Afficher carte dresseur",
@@ -95,7 +94,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CartePasAffichee"
+                  "$ref": "#/components/responses/CartePasAffichee"
                 }
               }
             }
@@ -168,7 +167,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CarteSupprimee"
+                  "$ref": "#/components/responses/CarteSupprimee"
                 }
               }
             }
@@ -178,7 +177,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CartePasSupprimee"
+                  "$ref": "#/components/responses/CartePasSupprimee"
                 }
               }
             }
@@ -186,7 +185,6 @@
         }
       }
     },
-
     "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
       "get": {
         "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
@@ -238,7 +236,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListeCarte"
+                    "$ref": "#/components/schemas/Carte"
                   }
                 }
               }
@@ -249,7 +247,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListeCartePasAffichee"
+                  "$ref": "#/components/responses/ListeCartePasAffichee"
                 }
               }
             }
@@ -257,7 +255,6 @@
         }
       }
     },
-
     "/dresseurs": {
       "post": {
         "summary": "Inscription à l'application",
@@ -289,8 +286,7 @@
         }
       }
     },
-
-    "/dresseurs/connexion/BearerAuth": {
+    "/dresseurs/connexion": {
       "post": {
         "summary": "Connexion au compte dresseur",
         "tags": ["dresseur"],
@@ -316,6 +312,9 @@
           },
           "401": { 
                   "$ref": "#/components/responses/connexionEchouee"       
+          },
+          "422": {
+                  "$ref": "#/components/responses/connexionErreur" 
           }
         }
       },
@@ -339,7 +338,6 @@
         }
       }
     },
-
     "dresseurs/{dresseurId}": {
       "get": {
         "summary": "Afficher le dresseur",
@@ -367,14 +365,18 @@
             }
           },
           "404": {
-                  "$ref": "#/components/schemas/DresseurEstPasAffiche"
+                  "$ref": "#/components/responses/DresseurEstPasAffiche"
           }
         }
       },
       "delete": {
         "summary": "Supprimer le compte du dresseur",
         "tags": ["dresseur"],
-        "securitySchemes": ["JWT"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "dresseurId",
@@ -388,10 +390,17 @@
         ],
         "responses": {
           "204": {
-            "description": "Le dresseur a été supprimé."
-                  },
+            "description": "Le dresseur a été supprimé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/responses/DresseurSupprime"
+                }
+              }
+            }
+          },
           "404":{
-              "$ref": "#/components/responses/dresseurIntrouvable"
+              "$ref": "#/components/responses/DresseurIntrouvable"
                 }
         }
       }
@@ -445,13 +454,11 @@
             }
           },
           "503": {
-                  "$ref": "#/components/responses/ErreurConnexion"
-               
+                  "$ref": "#/components/responses/ErreurConnexion"    
           }
         }
       }      
     },
-
     "poketroc/profil/modification/mot-de-passe": {
       "put": {
         "summary": "Modifier le mot de passe-----------------------------------------------------",
@@ -495,8 +502,10 @@
           }
         }
       },
+    "/{dresseur.id}/modification": {
+
       "patch": {
-        "summary": "Modifier profil du dresseur en partie---------------------------------------",
+        "summary": "Modifier partiellement le profil du dresseurs",
         "tags": ["dresseur"],
         "parameters": [
           {
@@ -528,13 +537,16 @@
                 }
               }
             }
+          },
+          "404":{
+            "$ref":"#/components/responses/ModificationErreur"
           }
         }
       }
     },
-    "poketroc/deck": {
+    "/{dresseur.id}/deck": {
       "get": {
-        "summary": "Afficher le deck du dresseur-------------------------------------------------",
+        "summary": "Afficher le deck du dresseur",
         "tags": ["carte"],
         "parameters": [
           {
@@ -587,6 +599,9 @@
                 }
               }
             }
+          },
+          "404":{
+            "$ref":"#/components/responses/DeckErreur"
           }
         }
       }
@@ -620,7 +635,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                  "$ref": "#/components/responses/EchangeValidationErreur"
                 }
               }
             }
@@ -659,7 +674,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangePasAffiche"
+                  "$ref": "#/components/responses/EchangePasAffiche"
                 }
               }
             }
@@ -705,7 +720,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangePasModifie"
+                  "$ref": "#/components/responses/EchangePasModifie"
                 }
               }
             }
@@ -715,7 +730,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                  "$ref": "#/components/responses/EchangeValidationErreur"
                 }
               }
             }
@@ -742,14 +757,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeSupprime"
+                  "$ref": "#/components/responses/EchangeSupprime"
                 },
                 "404": {
                   "description": "L'échange n'a pas été supprimé.",
                   "content": {
                     "application/json": {
                       "schema": {
-                        "$ref": "#/components/schemas/EchangePasSupprime"
+                        "$ref": "#/components/responses/EchangePasSupprime"
                       }
                     }
                   }
@@ -888,130 +903,100 @@
         }
       }
     },
-
-
-
-
-    "messages/{echangeId}": {
+    "/messages/{echangeId}": {
       "get": {
-        "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
+        "summary": "Afficher une discution",
         "tags": ["message"],
         "parameters": [
           {
-            "name": "messageId",
+            "name": "echangeId",
             "in": "path",
-            "description": "Conversation d'un échange.",
+            "description": "Identifiant de l'échange.",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Message trouvé.",
+            "description": "Discution affiché",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      },
-
-      "delete": {
-        "summary": "Supprimer un message-----------------------------------------------------------",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "Le message a supprimer.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Le message à été supprimé avec succès."
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      }
-    },  
-      
-    "messages/{messageId}": {
-        "get": {
-          "summary": "Afficher conversations-----------------------------------------------------",
-          "tags": ["message"],
-          "parameters": [
-            {
-              "name": "pseudo",
-              "in": "query",
-              "description": "Affichage du message.",
-              "schema": {
-                "type": "string",
-                "example": "AniraC"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Message"
-                    }
+                  "type":"array",
+                  "items":{
+                    "$ref":"#/components/schemas/Message"
                   }
                 }
               }
             }
+          },
+          "404": {
+            "$ref":"#/components/responses/DiscutionIntrouvable"
           }
-        }               
-      },
-
-      "messages":{
-        "post": {
-          "summary": "Créer un message-----------------------------------------------------------",
+        }
+      }
+    },  
+    "/messages/{messageId}": {
+      "delete":{
+        "summary":"Supprimer un message",
+        "tags":["message"],
+        "parameters":[
+          {
+            "name":"messageId",
+            "in":"path",
+            "description":"Identifiant du message",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"Le message à été supprimé",
+            "content":{
+              "text/plain":{
+                "schema":{
+                  "example":"Le message à été supprimé"
+                }
+              }
+            }
+          },
+          "404":{
+            "$ref":"#/components/responses/MessageIntrouvable"
+          }
+        }
+      }
+    },
+    "messages":{
+      "post": {
+          "summary": "Créer un message",
           "tags": ["message"],
           "requestBody": {
-            "description": "Le message à créer.",
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message",
-                  "type": "object",
-                  "properties": {
-                    "contenu": {
-                      "type": "string",
-                      "description": "Le contenu du message",
-                      "example": "Salut! Cette carte m'intéresse."
-                    },
-                    "expéditeur": {
-                      "type": "string",
-                      "description": "L'expéditeur du message.",
-                      "example": "Salocin"
-                    },
-                    "destinataire": {
-                      "type": "string",
-                      "description": "Le destinataire du message.",
-                      "example": "Enirehtac"
-                    }
-                  },
-                  "required": ["contenu", "expéditeur", "destinataire"]
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Message"
                 }
               }
             }
@@ -1027,27 +1012,18 @@
                 }
               }
             },
-            "404": {
-              "description": "Destinataire manquant.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MessageValidationErreur"
-                  }
-                }
-              }
+            "404":{
+              "$ref":"#/components/responses/MessageErreur"
+            },
+            "422": {
+              "$ref":"#/components/responses/DestinataireErreur"
             }
           }
-        }
       }
-    },
-
-
-
-
-
-    "components": {
-      "responses": {
+    }
+  },
+  "components": {
+    "responses":{
         "DresseurValidationErreur": {
           "description": "Echec de l'inscription.",
           "content":{
@@ -1152,70 +1128,69 @@
           "description": "La carte à créer.",
           "type": "object",
           "properties": {
-                  "num_carte": {
-                    "type": "integer",
-                    "description": "Le numéro de la carte",
-                    "example": 114
-                  },
-                  "etat": {
-                    "type": "string",
-                    "description": "L'état de la carte",
-                    "enum": ["neuf", "occasoon", "abimée"],
-                    "example": "neuf"
-                  },
-                  "descr_etat": {
-                    "type": "string",
-                    "description": "La description de l'état de la carte",
-                    "example": "Très bonne état. Aucune éraflure"
-                  },
-                  "statut": {
-                    "type": "string",
-                    "description": "Le statut de la carte",
-                    "enum": ["collectée", "en échange", "souhaitée"],
-                    "example": "collectée"
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "Le type de la carte",
-                    "enum": ["reverse", "holo", "rien"]
-                  },
-                  "quantite": {
-                    "type": "integer",
-                    "description": "La quantité de la carte",
-                    "example": 1
-                  },
-                  "serie": {
-                    "type": "string",
-                    "description": "La série de la carte",
-                    "enum": [
-                      "écarlate et violet",
-                      "épée et bouclier",
-                      "soleil et lune",
-                      "xy",
-                      "noir et blanc"
-                    ],
-                    "example": "xy"
-                  }
-                },
-                "required": [
-                  "num_carte",
-                  "etat",
-                  "descr_etat",
-                  "statut",
-                  "type",
-                  "quantite",
-                  "serie"
-                ]
-              
+            "num_carte": {
+              "type": "integer",
+              "description": "Le numéro de la carte",
+              "example": 114
+            },
+            "etat": {
+              "type": "string",
+              "description": "L'état de la carte",
+              "enum": ["neuf", "occasoon", "abimée"],
+              "example": "neuf"
+            },
+            "descr_etat": {
+              "type": "string",
+              "description": "La description de l'état de la carte",
+              "example": "Très bonne état. Aucune éraflure"
+            },
+            "statut": {
+              "type": "string",
+              "description": "Le statut de la carte",
+              "enum": ["collectée", "en échange", "souhaitée"],
+              "example": "collectée"
+            },
+            "type": {
+              "type": "string",
+              "description": "Le type de la carte",
+              "enum": ["reverse", "holo", "rien"]
+            },
+            "quantite": {
+              "type": "integer",
+              "description": "La quantité de la carte",
+              "example": 1
+            },
+            "serie": {
+              "type": "string",
+              "description": "La série de la carte",
+              "enum": [
+                "écarlate et violet",
+                "épée et bouclier",
+                "soleil et lune",
+                "xy",
+                "noir et blanc"
+              ],
+              "example": "xy"
+            }
+          },
+          "required": [
+            "num_carte",
+            "etat",
+            "descr_etat",
+            "statut",
+            "type",
+            "quantite",
+            "serie"
+          ]
         },
-      "CarteValidationErreur": {
-        "description": "Echec de la création.",
-        "content": {
-          "text/plain": {
-            "example": "La carte n'a pas été créée."
+    "CarteValidationErreur": {
+          "description": "Echec de la création.",
+          "content": {
+            "text/plain": {
+              "example": "La carte n'a pas été créée."
+            }
           }
-        }
-      },
+        },
         "connexion": {
           "type": "object",
           "properties": {
@@ -1474,7 +1449,8 @@
             "type": {
               "type": "string",
               "description": "",
-              "enum": [""]
+              "enum": ["reverse", "holo", "rien"],
+              "example": "rien"
             },
             "possedee_par": {
               "type": "string",
@@ -1632,21 +1608,13 @@
           "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
         }   
       },
-
       "securitySchemes": {
-        "authConnexion": {
+        "BearerAuth": {
           "type": "http",
           "scheme": "bearer",
           "bearerFormat": "JWT"
         }
-      },
-      "securityDefinitions": {
-        "JWT": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "access_token"
-        }
       }
-    }
+  }
   }
 
