@@ -15,11 +15,12 @@ const signJwt = promisify(jwt.sign);
 
 // Créer un dresseur
 router.post("/", function (req, res, next) {
-    const mdpBrut = req.body.mot_de_passe;
+  const mdpBrut = req.body.mot_de_passe;
+  const nouveauDresseur = new Dresseur(req.body);
 
+  if (mdpBrut) {
     bcrypt.hash(mdpBrut, bcryptCostFactor)
       .then(mdpHashe => {
-        const nouveauDresseur = new Dresseur(req.body);
         nouveauDresseur.mot_de_passe = mdpHashe;
         return nouveauDresseur.save();
       })
@@ -27,6 +28,13 @@ router.post("/", function (req, res, next) {
         res.status(201).send(dresseurSauve);
       })
       .catch(next);
+  } else {
+    nouveauDresseur.save().then(dresseurSauve => {   
+      res.status(201).send(dresseurSauve);
+    })
+    .catch(next);
+  }
+    
 });
 
 // Affiche un dresseur
@@ -39,30 +47,40 @@ router.get("/:dresseurId", authenticate, loadDresseurFromParams, function (req, 
 router.patch("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
   const dresseur = req.dresseur;
   const majDresseur = req.body;
+  let modification = false;
   // mise à jour des données 
   Object.keys(majDresseur).forEach((cle) => {
-    if (dresseur[cle] !== majDresseur[cle] && cle !== "_id") {
+    if (dresseur[cle] !== majDresseur[cle] && (cle !== "_id" || cle !== "__v" || cle !== "createdAt" || cle !== "updatedAt")) {
       // si la valeur n'est pas la même qu'avant alors on la change
       dresseur[cle] = majDresseur[cle];
+      if (!modification) modification = true;
     }
   });
+
   // ajoute le champ mot de passe si il a été modifié
   const { mot_de_passe } = majDresseur;
-  if (mot_de_passe) {
-    bcrypt.hash(mot_de_passe, bcryptCostFactor)
-      .then(mdpHashe => {
-        dresseur.mot_de_passe = mdpHashe;
-        return dresseur.save();
-      })
-      .then(dresseurSauve => {   
+  if (mot_de_passe || modification) {
+    // Si il y a eu un changement 
+    dresseur.updatedAt = new Date();
+    if (mot_de_passe) {
+      bcrypt.hash(mot_de_passe, bcryptCostFactor)
+        .then(mdpHashe => {
+          dresseur.mot_de_passe = mdpHashe;
+          return dresseur.save();
+        })
+        .then(dresseurSauve => {   
+          res.status(200).send(dresseurSauve);
+        })
+        .catch(next);
+    } else {
+      dresseur.save().then(dresseurSauve => {   
         res.status(200).send(dresseurSauve);
       })
       .catch(next);
+    }
   } else {
-    dresseur.save().then(dresseurSauve => {   
-      res.status(200).send(dresseurSauve);
-    })
-    .catch(next);
+    res.status(304).send("Le dresseur n'a pas été modifié car aucun changement n'a été détecté");
+    next();
   }
   
 
