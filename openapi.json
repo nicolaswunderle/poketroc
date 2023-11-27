@@ -494,6 +494,9 @@
                 }
               }
             }
+          },
+          "422": {
+            "$ref":"#/components/responses/DresseurValidationErreur"
           }
         }
       }
@@ -941,7 +944,6 @@
           }
         }               
       },
-
       "messages":{
         "post": {
           "summary": "Créer un message-----------------------------------------------------------",
@@ -1078,6 +1080,14 @@
           "content":{
               "text/plain":{
               "example": "Le dresseur ne s'affiche pas."
+            }
+          }
+        },
+        "DresseurValidationErreur":{
+          "description":"La modification n'a pas été validé",
+          "content":{
+            "text/plain":{
+              "example":"La modification n'a pas été effectué"
             }
           }
         }
