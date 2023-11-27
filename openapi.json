@@ -290,7 +290,7 @@
       }
     },
 
-    "/dresseurs/connexion": {
+    "/dresseurs/connexion/BearerAuth": {
       "post": {
         "summary": "Connexion au compte dresseur",
         "tags": ["dresseur"],
