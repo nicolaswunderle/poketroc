@@ -462,7 +462,7 @@
         }
       },
       "patch": {
-        "summary": "Modifier partiellement le profil du dresseur",
+        "summary": "Modifier partiellement le profil du dresseurs",
         "tags": ["dresseur"],
         "parameters": [
           {
