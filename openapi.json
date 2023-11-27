@@ -389,7 +389,11 @@
       "delete": {
         "summary": "Supprimer le compte du dresseur",
         "tags": ["dresseur"],
-        "securitySchemes": ["JWT"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "dresseurId",
@@ -1558,17 +1562,10 @@
         }   
       },
       "securitySchemes": {
-        "authConnexion": {
+        "BearerAuth": {
           "type": "http",
           "scheme": "bearer",
           "bearerFormat": "JWT"
-        }
-      },
-      "securityDefinitions": {
-        "JWT": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "access_token"
         }
       }
     }
