@@ -859,10 +859,6 @@
         }
       }
     },
-
-
-
-
     "messages/{echangeId}": {
       "get": {
         "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
@@ -894,7 +890,6 @@
           }
         }
       },
-
       "delete": {
         "summary": "Supprimer un message-----------------------------------------------------------",
         "tags": ["message"],
