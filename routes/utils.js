@@ -34,7 +34,7 @@ export function authenticate(req, res, next) {
     // Dresseur exists, proceed to the next middleware.
     next();
   }).catch(() => {
-    res.status(401).send("Votre token est invalide ou a expiré");
+    res.status(498).send("Votre token est invalide ou a expiré");
   });
 }
 
