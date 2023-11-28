@@ -32,10 +32,20 @@ const dresseurSchema = new Schema({
         min: [1, "L'âge du dresseur doit être plus grand ou égal à 1."],
         max: [200, "L'âge du dresseur doit être plus petit ou égal à 200."]
     },
-    ville: {
-        type: String,
-        required: [true, "La ville du dresseur est obligatoire."],
-        maxlength: [60, "La ville du dresseur doit être plus courte ou égale à 60 caractères."]
+    localisation: {
+        type: {
+            type: String,
+            required: true,
+            enum: [ 'Point' ]
+        },
+        coordinates: {
+            type: [ Number ],
+            required: true,
+            validate: {
+                validator: validateGeoJsonCoordinates,
+                message: "{VALUE} n'est pas un tableau de coordonnées de longitude/latitude valide."
+            }
+        }
     },
     url_image_profil: {
         type: String,
@@ -62,6 +72,23 @@ const dresseurSchema = new Schema({
         default: Date.now
     }
 });
+
+// Create a geospatial index on the location property.
+dresseurSchema.index({ localisation: '2dsphere' });
+
+
+// Validate a GeoJSON coordinates array (longitude, latitude and optional altitude).
+function validateGeoJsonCoordinates(value) {
+    return Array.isArray(value) && value.length >= 2 && value.length <= 3 && isLatitude(value[0]) && isLongitude(value[1]);
+}
+
+function isLatitude(value) {
+    return value >= -90 && value <= 90;
+}
+
+function isLongitude(value) {
+    return value >= -180 && value <= 180;
+}
 
 
 dresseurSchema.set("toJSON", {

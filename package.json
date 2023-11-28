@@ -7,8 +7,11 @@
     "start": "node ./bin/start",
     "dev": "nodemon",
     "test": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest",
-    "cover": "cross-env DATABASE_URL=mongodb://localhost/my-app-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest --coverage",
-    "para": "cross-env DATABASE_URL=mongodb://localhost/my-app-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest --coverage --runInBand"
+    "cover": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest --coverage",
+    "para": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest --coverage --runInBand",
+    "testw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/jest/bin/jest.js",
+    "coverw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/jest/bin/jest.js --coverage",
+    "paraw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/jest/bin/jest.js --coverage --runInBand"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
