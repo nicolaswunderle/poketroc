@@ -457,49 +457,7 @@
         }
       }
     },
-    "poketroc/profil/modification/mot-de-passe": {
-      "put": {
-        "summary": "Modifier le mot de passe-----------------------------------------------------",
-        "tags": ["dresseur"]
-      }
-    },
     "poketroc/profil/modification": {
-      "put": {
-        "summary": "Modifier profil du dresseur en entier---------------------------------------",
-        "tags": ["dresseur"],
-        "parameters": [
-          {
-            "name": "dresseurId",
-            "in": "path",
-            "description": "Identifiant du dresseur",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DresseurData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Dresseur"
-                }
-              }
-            }
-          }
-        }
-      },
       "/{dresseur.id}/modification": {
         "patch": {
           "summary": "Modifier partiellement le profil du dresseurs",
