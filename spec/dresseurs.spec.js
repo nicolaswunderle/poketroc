@@ -51,7 +51,7 @@ test('POST /api/dresseurs', async () => {
             User.create({ name: 'Jane Doe', password: '1233' })
         ]);
     });
-    test('should retrieve the list of users', async function() {  
+    it('should retrieve the list of users', async function() {  
         const res = await supertest(app)
             .get('/users')
             .expect(200)

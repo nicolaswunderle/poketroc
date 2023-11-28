@@ -1649,11 +1649,10 @@
             "maxlength": 40,
             "example": "AniraC"
           },
-          "ville": {
-            "type": "string",
+          "localisation": {
+            "type": "Point",
             "description": "",
-            "maxlength": 60,
-            "example": "Genève"
+            "example": "[ -73.856077, 40.848447 ]"
           },
           "image": {
             "type": "string",
@@ -1777,11 +1776,10 @@
             "maximum": 200,
             "example": 25
           },
-          "ville": {
-            "type": "string",
+          "localisation": {
+            "type": "Point",
             "description": "",
-            "maxlength": 60,
-            "example": "Genève"
+            "example": "[ -73.856077, 40.848447 ]"
           },
           "image": {
             "type": "string",
@@ -1797,7 +1795,7 @@
           "email",
           "mot_de_passe",
           "age",
-          "ville"
+          "localisation"
         ]
       },
       "DresseurData": {
@@ -1839,14 +1837,13 @@
             "maximum": 200,
             "example": 25
           },
-          "ville": {
-            "type": "string",
+          "localisation": {
+            "type": "Point",
             "description": "",
-            "maxlength": 60,
-            "example": "Genève"
+            "example": "[ -73.856077, 40.848447 ]"
           }
         },
-        "required": ["prenom", "nom", "pseudo", "email", "age", "ville"]
+        "required": ["prenom", "nom", "pseudo", "email", "age", "localisation"]
       },
       "DresseurDataPartiel": {
         "type": "object",
@@ -1887,10 +1884,10 @@
             "maximum": 100,
             "example": 25
           },
-          "ville": {
-            "type": "string",
+          "localisation": {
+            "type": "Point",
             "description": "",
-            "example": "Genève"
+            "example": "[ -73.856077, 40.848447 ]"
           }
         }
       },
@@ -2080,10 +2077,10 @@
             "description": "",
             "example": "7fe91a9a41bc839033eedf0f"
           },
-          "ville": {
-            "type": "string",
+          "localisation": {
+            "type": "Point",
             "description": "",
-            "example": "Genève"
+            "example": "[ -73.856077, 40.848447 ]"
           }
         },
         "required": [
@@ -2093,7 +2090,7 @@
           "desc_etat",
           "type",
           "possedee_par",
-          "ville"
+          "localisation"
         ]
       },
       "Echange": {
