@@ -5,19 +5,39 @@ import { cleanUpDatabase } from "./utils.js"
 
 beforeEach(cleanUpDatabase);
 
-describe('POST /dresseurs', function() {
-    it('Devrait créer un dresseur', async function() {
-        const res = await supertest(app)
-        .post('/dresseurs')
-        .send({"prenom":"Nicolas","nom":"Wunderle","pseudo":"nicorr","email":"nicolas.wunderle@gmail.com","age":"24","ville":"Apples","en_ligne":"true","mot_de_passe":"nicowun"})
-        .expect(201)
-        .expect('Content-Type', /json/);
-        // Check that the response body is a JSON object with exactly the properties we expect with jest-extended    
-        expect(res.body).toBeObject();
-        expect(res.body._id).toMatch(/^[0-9a-f]{24}$/);
-        expect(res.body.prenom).toEqual('Nicolas');
-        expect(res.body).toContainAllKeys(['_id', 'prenom', 'nom', 'pseudo', 'email', 'age', 'ville', 'en_ligne', 'deck_visible']);
+test('POST /api/dresseurs', async () => {
+    const donnees = {
+        prenom: "Nicolas",
+        nom: "Wunderle",
+        pseudo: "nico",
+        email: "nicolas.wunderle@gmail.com",
+        age: 24,
+        ville: "Apples",
+        mot_de_passe: "nicowun"
+    }
+    const donneesAttendues = {
+        ...donnees,
+        url_image_profil: 'asset/image_profil_defaut.jpeg',
+        en_ligne: false,
+        deck_visible: true,
+    }
+
+    const res = await supertest(app)
+    .post('/api/dresseurs')
+    .send(donnees)
+    .expect(201)
+    .expect('Content-Type', /json/);
+    // Check that the response body is a JSON object with exactly the properties we expect with jest-extended    
+    const body = res.body;
+    expect(body).toBeObject();
+    expect(body).toContainAllKeys(['_id', 'prenom', 'nom', 'pseudo', 'email', 'age', 'ville', 'url_image_profil', 'en_ligne', 'deck_visible']);
+    expect(body._id).toMatch(/^[0-9a-f]{24}$/);
+    Object.keys(body).forEach((cle) => {
+        if (cle !== "mot_de_passe" && cle !== "_id") {
+            expect(body[cle]).toEqual(donneesAttendues[cle]);
+        }
     });
+    
 });
 
 /*describe('GET /dresseurs', function() {
