@@ -74,7 +74,7 @@ const dresseurSchema = new Schema({
 });
 
 // Create a geospatial index on the location property.
-geolocatedSchema.index({ localisation: '2dsphere' });
+dresseurSchema.index({ localisation: '2dsphere' });
 
 
 // Validate a GeoJSON coordinates array (longitude, latitude and optional altitude).
