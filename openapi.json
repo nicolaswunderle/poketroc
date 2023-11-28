@@ -1419,18 +1419,17 @@
         }
       }
     },
-    "/messages/{echangeId}": {
-      "get": {
-        "summary": "Afficher une discution",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "Identifiant de l'échange.",
-            "required": true,
-            "schema": {
-              "type": "string"
+    "/messages":{
+      "post": {
+          "summary": "Créer un message",
+          "tags": ["message"],
+          "requestBody": {
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Message"
+                }
+              }
             }
           },
           {
