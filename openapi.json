@@ -903,7 +903,7 @@
         }
       }
     },
-    "messages":{
+    "/messages":{
       "post": {
           "summary": "Créer un message",
           "tags": ["message"],
@@ -1072,7 +1072,7 @@
           }
         }
     },
-      "schemas": {
+    "schemas": {
         "CarteData":{
           "description": "La carte à créer.",
           "type": "object",
@@ -1545,21 +1545,21 @@
           },
           "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
         }   
-      },
-      "securitySchemes": {
-        "authConnexion": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
-        }
-      },
-      "securityDefinitions": {
-        "JWT": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "access_token"
-        }
+    },
+    "securitySchemes": {
+      "authConnexion": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
+    },
+    "securityDefinitions": {
+      "JWT": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "access_token"
+      }
+    }
   }
-  }
+}
 
