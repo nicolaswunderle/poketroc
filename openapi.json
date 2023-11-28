@@ -1432,6 +1432,7 @@
               }
             }
           },
+          "parameters": [
           {
             "name": "page",
             "in": "query",
