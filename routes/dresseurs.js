@@ -29,6 +29,7 @@ router.post("/", function (req, res, next) {
       })
       .catch(next);
   } else {
+    // ne va jamais créer le dressseur car il manque le mot de passe mais permet d'avoir toutes les erreurs de validation si d'autres champs ne sont pas valides
     nouveauDresseur.save().then(dresseurSauve => {   
       res.status(201).send(dresseurSauve);
     })

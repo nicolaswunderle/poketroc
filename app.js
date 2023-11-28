@@ -19,6 +19,7 @@ const app = express();
 
 // Serve the Swagger UI documentation.
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+
 // Log requests (except in test mode).
 if (process.env.NODE_ENV !== 'test') { 
   app.use(logger('dev'));
