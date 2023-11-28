@@ -1673,8 +1673,8 @@
           "etat": {
             "type": "string",
             "description": "L'état de la carte",
-            "enum": ["neuf", "occasoon", "abimée"],
-            "example": "neuf"
+            "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+            "example": "neuve"
           },
           "desc_etat": {
             "type": "string",
@@ -1696,18 +1696,6 @@
             "type": "integer",
             "description": "La quantité de la carte",
             "example": 1
-          },
-          "serie": {
-            "type": "string",
-            "description": "La série de la carte",
-            "enum": [
-              "écarlate et violet",
-              "épée et bouclier",
-              "soleil et lune",
-              "xy",
-              "noir et blanc"
-            ],
-            "example": "xy"
           }
         },
         "required": [
@@ -1716,8 +1704,7 @@
           "desc_etat",
           "statut",
           "type",
-          "quantite",
-          "serie"
+          "quantite"
         ]
       },
       "connexion": {
@@ -1880,8 +1867,8 @@
           "age": {
             "type": "number",
             "description": "",
-            "minimum": 0,
-            "maximum": 100,
+            "minimum": 1,
+            "maximum": 200,
             "example": 25
           },
           "localisation": {
@@ -1891,207 +1878,172 @@
           }
         }
       },
-      "Carte": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
+        "Carte": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "L'identifiant unique de la carte",
+              "example": "7xy10-117"
+            },
+            "id_api": {
+              "type": "string",
+              "description": "L'identifiant de l'api",
+              "example": "aaab",
+              "unique": true
+            },
+            "etat": {
+              "type": "string",
+              "description": "L'état unique de la carte",
+              "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+              "example": "neuve",
+              "unique": true
+            },
+            "desc_etat": {
+              "type": "string",
+              "description": "La description de l'état unique de la carte",
+              "maxlength": 255,
+              "example": "Très bon état. Aucune éraflure",
+              "unique": true
+            },
+            "statut": {
+              "type": "string",
+              "description": "Le statut de la carte",
+              "enum": ["collectée","souhaitée"],
+              "example": "collectée"
+            },
+            "type": {
+              "type": "string",
+              "description": "Le type unique de la carte",
+              "enum": ["normale", "reverse", "holo"],
+              "unique": true
+            },
+            "quantite": {
+              "type": "number",
+              "description": "La quantité de la carte",
+              "minimum":1,
+              "maximum": 1000,
+              "example": 1
+            },
+            "dresseur_id":{
+              "type": "string",
+              "description": "L'identifiant unique d'un dresseur qui possède la carte",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "dresseur":{
+              "type": "string",
+              "$ref": "#/components/schemas/Dresseur"
+            }
           },
-          "id_api": {
-            "type": "string",
-            "description": "",
-            "example": "aaab",
-            "unique": true
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": [
-              "neuve",
-              "excellente",
-              "très bonne",
-              "bonne",
-              "moyenne",
-              "mauvaise"
-            ],
-            "example": "neuf",
-            "unique": true
-          },
-          "desc_etat": {
-            "type": "string",
-            "description": "",
-            "maxlength": 255,
-            "exemple": "Très bon état. Aucune éraflure",
-            "unique": true
-          },
-          "statut": {
-            "type": "string",
-            "description": "",
-            "enum": ["collectée", "souhaitée"],
-            "example": "collectée"
-          },
-          "type": {
-            "type": "string",
-            "description": "",
-            "enum": ["normale", "reverse", "holo"],
-            "unique": true
-          },
-          "quantite": {
-            "type": "number",
-            "description": "",
-            "minimum": 1,
-            "maximum": 1000,
-            "example": 1
-          },
-          "dresseur_id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f",
-            "$ref": "#/components/schemas/Dresseur"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "",
-            "default": "2023-01-01T00:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "",
-            "default": "2023-01-01T00:00:00Z"
+             "required": [
+              "id",
+            "id_api",
+            "etat",
+            "desc_etat",
+            "statut",
+            "type",
+            "quantite",
+            "dresseur_id"
+          ]
+        },
+        "CarteDataPartial": {
+          "type": "object",
+          "properties": {
+            "etat": {
+              "type": "string",
+              "description": "L'état unique de la carte",
+              "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+              "example": "neuve",
+              "unique": true
+            },
+            "desc_etat": {
+              "type": "string",
+              "description": "La description de l'état unique de la carte",
+              "maxlength": 255,
+              "example": "Très bon état. Aucune éraflure",
+              "unique": true
+            },
+            "statut": {
+              "type": "string",
+              "description": "Le statut de la carte",
+              "enum": ["collectée","souhaitée"],
+              "example": "collectée"
+            },
+            "type": {
+              "type": "string",
+              "description": "Le type unique de la carte",
+              "enum": ["normale", "reverse", "holo"],
+              "unique": true
+            },
+            "quantite": {
+              "type": "number",
+              "description": "La quantité de la carte",
+              "minimum":1,
+              "maximum": 1000,
+              "example": 1
+            },
+            "dresseur_id":{
+              "type": "string",
+              "description": "L'identifiant unique d'un dresseur qui possède la carte",
+              "example": "7fe91a9a41bc839033eedf0f"
+            }
           }
         },
-        "required": [
-          "id",
-          "id_api",
-          "etat",
-          "desc_etat",
-          "statut",
-          "type",
-          "quantite",
-          "dresseur_id"
-        ]
-      },
-      "CarteDataPartial": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
+        "CarteEchange": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "id_api": {
+              "type": "string",
+              "description": "",
+              "example": "aaab",
+              "unique":true
+            },
+            "etat": {
+              "type": "string",
+              "description": "",
+              "enum": ["neuve", "excellente", "très bonne", "bonne", "moyenne", "mauvaise"],
+              "example": "neuve",
+              "unique": true
+            },
+            "desc_etat": {
+              "type": "string",
+              "description": "",
+              "maxlength": 255,
+              "exemple": "Très bon état. Aucune éraflure",
+              "unique": true
+            },
+            "type": {
+              "type": "string",
+              "description": "",
+              "enum": ["normale", "reverse", "holo"],
+              "unique": true
+            },
+            "possedee_par": {
+              "type": "string",
+              "description": "",
+              "example": "7fe91a9a41bc839033eedf0f"
+            },
+            "localisation": {
+              "type": "Point",
+              "description": "",
+              "example": "[ -73.856077, 40.848447 ]"
+            }
           },
-          "id_api": {
-            "type": "string",
-            "description": "",
-            "example": "aaab",
-            "unique": true
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": [
-              "neuve",
-              "excellente",
-              "très bonne",
-              "bonne",
-              "moyenne",
-              "mauvaise"
-            ],
-            "example": "neuf",
-            "unique": true
-          },
-          "desc_etat": {
-            "type": "string",
-            "description": "",
-            "maxlength": 255,
-            "exemple": "Très bon état. Aucune éraflure",
-            "unique": true
-          },
-          "type": {
-            "type": "string",
-            "description": "",
-            "enum": ["normale", "reverse", "holo"],
-            "unique": true
-          },
-          "possedee_par": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          }
-        },
-        "required": [
-          "id",
-          "id_api",
-          "etat",
-          "desc_etat",
-          "type",
-          "possedee_par"
-        ]
-      },
-      "CarteEchange": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "id_api": {
-            "type": "string",
-            "description": "",
-            "example": "aaab",
-            "unique": true
-          },
-          "etat": {
-            "type": "string",
-            "description": "",
-            "enum": [
-              "neuve",
-              "excellente",
-              "très bonne",
-              "bonne",
-              "moyenne",
-              "mauvaise"
-            ],
-            "example": "neuf",
-            "unique": true
-          },
-          "desc_etat": {
-            "type": "string",
-            "description": "",
-            "maxlength": 255,
-            "exemple": "Très bon état. Aucune éraflure",
-            "unique": true
-          },
-          "type": {
-            "type": "string",
-            "description": "",
-            "enum": ["normale", "reverse", "holo"],
-            "unique": true
-          },
-          "possedee_par": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
-          "localisation": {
-            "type": "Point",
-            "description": "",
-            "example": "[ -73.856077, 40.848447 ]"
-          }
-        },
-        "required": [
-          "id",
-          "id_api",
-          "etat",
-          "desc_etat",
-          "type",
-          "possedee_par",
-          "localisation"
-        ]
+          "required": [
+            "id",
+            "id_api",
+            "etat",
+            "desc_etat",
+            "type",
+            "possedee_par",
+            "localisation"
+          ]
+        }
       },
       "Echange": {
         "type": "object",
@@ -2125,21 +2077,8 @@
             "description": "",
             "$ref": "#/components/schemas/Dresseur"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "",
-            "default": "2023-01-01T00:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "",
-            "default": "2023-01-01T00:00:00Z"
-          }
+          "required": ["id", "date","dresseur_cree_id", "dresseur_concerne_id"]
         },
-        "required": ["id", "date", "dresseur_cree_id"]
-      },
       "EchangeData": {
         "type": "object",
         "properties": {
@@ -2164,55 +2103,43 @@
             "type": "string",
             "description": "",
             "$ref": "#/components/schemas/Dresseur"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "",
-            "default": "2023-01-01T00:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "",
-            "default": "2023-01-01T00:00:00Z"
           }
         },
         "required": ["id", "date", "dresseur_cree_id"]
-      },
-      "Message": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "date": {
-            "type": "string",
-            "description": "",
-            "format": "data-time",
-            "example": "2020-01-02T10:00:00.000Z"
-          },
-          "contenu": {
-            "type": "string",
-            "description": "",
-            "example": "Salut!"
-          },
-          "expéditeur": {
-            "type": "string",
-            "description": "Celui qui envoie le message.",
-            "example": "Nerak"
-          },
-          "destinataire": {
-            "type": "string",
-            "description": "Celui qui reçoit le message.",
-            "example": "Salocin"
+          "Message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "",
+                "example": "7fe91a9a41bc839033eedf0f"
+              },
+              "date": {
+                "type": "string",
+                "description": "",
+                "format": "data-time",
+                "example": "2020-01-02T10:00:00.000Z"
+              },
+              "contenu": {
+                "type": "string",
+                "description": "",
+                "example": "Salut!"
+              },
+              "expéditeur": {
+                "type": "string",
+                "description": "Celui qui envoie le message.",
+                "example": "Nerak"
+              },
+              "destinataire": {
+                "type": "string",
+                "description": "Celui qui reçoit le message.",
+                "example": "Salocin"
+              }
+            },
+            "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
           }
         },
-        "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
-      }
-    },
     "securitySchemes": {
       "BearerAuth": {
         "type": "http",
