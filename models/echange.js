@@ -33,7 +33,7 @@ const echangeSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-echangeSchema.index({ date: 1, dresseur_cree_id: 1, dresseur_accepte_id: 1 }, { unique: true });
+echangeSchema.index({ date: 1, dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
 
 echangeSchema.set("toJSON", {
     transform: transformJsonDresseur
