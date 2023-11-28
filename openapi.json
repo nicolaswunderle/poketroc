@@ -55,7 +55,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CarteValidationErreur"
+                  "$ref": "#/components/responses/CarteValidationErreur"
                 }
               }
             }
@@ -63,7 +63,6 @@
         }
       }
     },
-
     "/cartes/{carteId}": {
       "get": {
         "summary": "Afficher carte dresseur",
@@ -95,7 +94,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CartePasAffichee"
+                  "$ref": "#/components/responses/CartePasAffichee"
                 }
               }
             }
@@ -168,7 +167,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CarteSupprimee"
+                  "$ref": "#/components/responses/CarteSupprimee"
                 }
               }
             }
@@ -178,7 +177,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CartePasSupprimee"
+                  "$ref": "#/components/responses/CartePasSupprimee"
                 }
               }
             }
@@ -186,7 +185,6 @@
         }
       }
     },
-
     "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
       "get": {
         "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
@@ -238,7 +236,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListeCarte"
+                    "$ref": "#/components/schemas/Carte"
                   }
                 }
               }
@@ -249,7 +247,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListeCartePasAffichee"
+                  "$ref": "#/components/responses/ListeCartePasAffichee"
                 }
               }
             }
@@ -257,7 +255,6 @@
         }
       }
     },
-
     "/dresseurs": {
       "post": {
         "summary": "Inscription à l'application",
@@ -283,13 +280,12 @@
             }
           },
           "422": {           
-                  "$ref": "#/components/messages/DresseurValidationErreur"
+                  "$ref": "#/components/responses/DresseurValidationErreur"
             
           }
         }
       }
     },
-
     "/dresseurs/connexion": {
       "post": {
         "summary": "Connexion au compte dresseur",
@@ -309,16 +305,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/connexionReussie"
+                  "$ref": "#/components/responses/connexionReussie"
                 }
               }
             }
           },
           "401": { 
-                  "$ref": "#/components/schemas/connexionEchouee"       
+                  "$ref": "#/components/responses/connexionEchouee"       
           },
           "422": {
-                  "$ref": "#/components/schemas/connexionErreur" 
+                  "$ref": "#/components/responses/connexionErreur" 
           }
         }
       },
@@ -329,23 +325,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/connexion",
-                "type": "object",
-                "properties": {
-                  "pseudo": {
-                    "type": "string",
-                    "description": "Le pseudo du dresseur",
-                    "example": "Nerak"
-                  },
-                  "mot_de_passe": {
-                    "type": "string",
-                    "description": "Le mot de passe du compte dresseur",
-                    "example": "unMotDePasse88"
-                  }
-                },
-                "required": ["pseudo", "mot_de_passe"]
-              }
             }
           }
         },
@@ -354,12 +333,11 @@
             "description": "Déconnexion réussie"
           },            
           "404":{
-            "$ref": "#/components/schemas/deconnexionEchouee"
+            "$ref": "#/components/responses/deconnexionEchouee"
                 }    
         }
       }
     },
-
     "dresseurs/{dresseurId}": {
       "get": {
         "summary": "Afficher le dresseur",
@@ -377,7 +355,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Le dresseur a été affiché",
+            "description": "Le dresseur est affiché",
             "content": {
               "application/json": {
                 "schema": {
@@ -387,14 +365,18 @@
             }
           },
           "404": {
-                  "$ref": "#/components/schemas/DresseurEstPasAffiche"
+                  "$ref": "#/components/responses/DresseurEstPasAffiche"
           }
         }
       },
       "delete": {
         "summary": "Supprimer le compte du dresseur",
         "tags": ["dresseur"],
-        "securitySchemes": ["JWT"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "dresseurId",
@@ -412,16 +394,70 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DresseurSupprime"
+                  "$ref": "#/components/responses/DresseurSupprime"
                 }
               }
             }
           },
           "404":{
-              "$ref": "#/components/schemas/DresseurIntrouvable"
+              "$ref": "#/components/responses/DresseurIntrouvable"
                 }
         }
       }
+    },
+    "dresseurs/proches/{coordonnéesGeographique}?page={number}&pageSize={number}": {
+      "get": {
+        "summary": "Afficher les dresseurs proches",
+        "tags": ["dresseur"],
+        "parameters": [
+          {
+            "name": "coordonnéesGeographique",
+            "in": "path",
+            "description": "Coordonnées géographiques du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+
+        "responses": {
+          "200": {
+            "description": "Liste des dresseurs proches est affichée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DresseurMap"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+                  "$ref": "#/components/responses/ErreurConnexion"    
+          }
+        }
+      }      
     },
     "poketroc/profil/modification/mot-de-passe": {
       "put": {
@@ -466,8 +502,10 @@
           }
         }
       },
+    "/{dresseur.id}/modification": {
+
       "patch": {
-        "summary": "Modifier profil du dresseur en partie---------------------------------------",
+        "summary": "Modifier partiellement le profil du dresseurs",
         "tags": ["dresseur"],
         "parameters": [
           {
@@ -499,13 +537,16 @@
                 }
               }
             }
+          },
+          "404":{
+            "$ref":"#/components/responses/ModificationErreur"
           }
         }
       }
     },
-    "poketroc/deck": {
+    "/{dresseur.id}/deck": {
       "get": {
-        "summary": "Afficher le deck du dresseur-------------------------------------------------",
+        "summary": "Afficher le deck du dresseur",
         "tags": ["carte"],
         "parameters": [
           {
@@ -558,6 +599,9 @@
                 }
               }
             }
+          },
+          "404":{
+            "$ref":"#/components/responses/DeckErreur"
           }
         }
       }
@@ -591,7 +635,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                  "$ref": "#/components/responses/EchangeValidationErreur"
                 }
               }
             }
@@ -630,7 +674,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangePasAffiche"
+                  "$ref": "#/components/responses/EchangePasAffiche"
                 }
               }
             }
@@ -676,7 +720,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangePasModifie"
+                  "$ref": "#/components/responses/EchangePasModifie"
                 }
               }
             }
@@ -686,7 +730,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
+                  "$ref": "#/components/responses/EchangeValidationErreur"
                 }
               }
             }
@@ -713,14 +757,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EchangeSupprime"
+                  "$ref": "#/components/responses/EchangeSupprime"
                 },
                 "404": {
                   "description": "L'échange n'a pas été supprimé.",
                   "content": {
                     "application/json": {
                       "schema": {
-                        "$ref": "#/components/schemas/EchangePasSupprime"
+                        "$ref": "#/components/responses/EchangePasSupprime"
                       }
                     }
                   }
@@ -859,130 +903,100 @@
         }
       }
     },
-
-
-
-
-    "messages/{echangeId}": {
+    "/messages/{echangeId}": {
       "get": {
-        "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
+        "summary": "Afficher une discution",
         "tags": ["message"],
         "parameters": [
           {
-            "name": "messageId",
+            "name": "echangeId",
             "in": "path",
-            "description": "Conversation d'un échange.",
+            "description": "Identifiant de l'échange.",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Message trouvé.",
+            "description": "Discution affiché",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      },
-
-      "delete": {
-        "summary": "Supprimer un message-----------------------------------------------------------",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "Le message a supprimer.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Le message à été supprimé avec succès."
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      }
-    },  
-      
-    "messages/{messageId}": {
-        "get": {
-          "summary": "Afficher conversations-----------------------------------------------------",
-          "tags": ["message"],
-          "parameters": [
-            {
-              "name": "pseudo",
-              "in": "query",
-              "description": "Affichage du message.",
-              "schema": {
-                "type": "string",
-                "example": "AniraC"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Message"
-                    }
+                  "type":"array",
+                  "items":{
+                    "$ref":"#/components/schemas/Message"
                   }
                 }
               }
             }
+          },
+          "404": {
+            "$ref":"#/components/responses/DiscutionIntrouvable"
           }
-        }               
-      },
-
-      "messages":{
-        "post": {
-          "summary": "Créer un message-----------------------------------------------------------",
+        }
+      }
+    },  
+    "/messages/{messageId}": {
+      "delete":{
+        "summary":"Supprimer un message",
+        "tags":["message"],
+        "parameters":[
+          {
+            "name":"messageId",
+            "in":"path",
+            "description":"Identifiant du message",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"Le message à été supprimé",
+            "content":{
+              "text/plain":{
+                "schema":{
+                  "example":"Le message à été supprimé"
+                }
+              }
+            }
+          },
+          "404":{
+            "$ref":"#/components/responses/MessageIntrouvable"
+          }
+        }
+      }
+    },
+    "messages":{
+      "post": {
+          "summary": "Créer un message",
           "tags": ["message"],
           "requestBody": {
-            "description": "Le message à créer.",
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message",
-                  "type": "object",
-                  "properties": {
-                    "contenu": {
-                      "type": "string",
-                      "description": "Le contenu du message",
-                      "example": "Salut! Cette carte m'intéresse."
-                    },
-                    "expéditeur": {
-                      "type": "string",
-                      "description": "L'expéditeur du message.",
-                      "example": "Salocin"
-                    },
-                    "destinataire": {
-                      "type": "string",
-                      "description": "Le destinataire du message.",
-                      "example": "Enirehtac"
-                    }
-                  },
-                  "required": ["contenu", "expéditeur", "destinataire"]
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Message"
                 }
               }
             }
@@ -998,45 +1012,180 @@
                 }
               }
             },
-            "404": {
-              "description": "Destinataire manquant.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MessageValidationErreur"
-                  }
-                }
-              }
+            "404":{
+              "$ref":"#/components/responses/MessageErreur"
+            },
+            "422": {
+              "$ref":"#/components/responses/DestinataireErreur"
             }
           }
+      }
+    }
+    }
+  },
+  "components": {
+  "responses":{
+    "DresseurValidationErreur": {
+      "description": "Echec de l'inscription.",
+      "content":{
+          "text/plain":{
+          "example": "Inscription échouée."
         }
       }
     },
-
-
-
-
-
-    "components": {
-      "messages": {
-        "DresseurValidationErreur": {
-          "description": "Echec de l'inscription.",
-          "content":{
-              "text/plain":{
-              "example": "Inscription échouée."
-            }
-          }
+    "CarteValidationErreur": {
+      "description": "Echec de la création.",
+      "content": {
+        "text/plain": {
+          "example": "La carte n'a pas été créée."
         }
-      },
-      "schemas": {
-
-        "CartePasAffichee":{
-          "description": "La carte n'est pas affichée.",
-          "content": {
-            "text/plain": {
-              "example": "La carte n'est pas affichée."
-            }
+      }
+    },
+    "CartePasAffichee":{
+      "description": "La carte n'est pas affichée.",
+      "content": {
+        "text/plain": {
+          "example": "La carte n'est pas affichée."
+        }
+      }
+    },
+    "connexionReussie": {
+      "type": "object",
+      "example": "Connexion réussie"
+    },
+    "connexionErreur":{
+      "description": "Mots de passe ou pseudo incorrect",
+      "content":{
+          "text/plain":{
+          "example": "Connexion échouée, veuillez retenter."
+        }
+      }
+    },
+    "connexionEchouee": {
+      "description": "Mots de passe ou pseudo incorrect",
+      "content":{
+          "text/plain":{
+          "example": "Mots de passe ou pseudo incorrect."
+        }
+      }
+    },
+    "deconnexionReussie": {
+      "description": "Déconnexion réussie.",
+      "content":{
+          "text/plain":{
+          "example": "Déconnexion réussie."
           }
+      }
+    },
+    "deconnexionEchouee": {
+      "description": "Déconnexion échouée.",
+      "content":{
+        "text/plain":{
+        "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
+        }
+      }
+    },
+    "DresseurSupprime":{
+      "description": "Le dresseur a été supprimé.",
+      "content": {
+        "text/plain": {
+          "example": "Le dresseur a été supprimé."
+        }
+      }
+    },
+    "DresseurEstPasAffiche":{
+      "description": "Le dresseur n'a pas été affiché.",
+      "content":{
+          "text/plain":{
+          "example": "Le dresseur ne s'affiche pas."
+        }
+      }
+    },
+    "ErreurConnexion": {
+      "description": "Erreur de connexion.",
+      "content":{
+          "text/plain":{
+          "example": " Le serveur n'est pas disponible en raison d'une surcharge temporaire ou de travaux de maintenance."
+        }
+      }
+    },
+    "ModificationErreur":{
+      "description":"La modification n'a pas été validé",
+      "content":{
+        "text/plain":{
+          "example":"La modification n'a pas été effectué"
+        }
+      }
+    },
+    "DresseurIntrouvable":{
+      "description":"Le dresseur est introuvable",
+      "content":{
+        "text/plain":{
+          "example":"Ce dresseur est introuvable"
+        }
+      }
+    },
+    "DeckErreur":{
+      "description":"Erreur dans l'affichage du deck",
+      "content":{
+        "text/plain":{
+          "example":"Une erreur est survenu dans l'affichage de votre deck"
+        }
+      }
+    },
+    "DestinataireErreur":{
+      "description":"Destinataire introuvable.",
+      "content":{
+        "text/plain":{
+          "example":"Le destinataire n'a pas été trouvé"
+        }
+      }
+    },
+    "MessageErreur":{
+      "description":"Le message n'a pas été créée",
+      "content":{
+        "text/plain":{
+          "example":"Le message n'a pas pu être créée"
+        }
+      }
+    },
+    "MessageIntrouvable":{
+      "description":"Message introuvable",
+      "content":{
+        "text/plain":{
+          "example": "Le message est introuvable"
+        }
+      }
+    },
+    "DiscutionIntrouvable":{
+      "description":"Discution introuvable",
+      "content":{
+        "text/plain":{
+          "example":"La discution est introuvable"
+        }
+      }
+    }
+  },
+    "schemas": {
+      "DresseurMap":{
+        "type": "object",
+        "properties": {
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "AniraC"
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "maxlength": 60,
+            "example": "Genève"
+          },
+          "image":{
+            "type": "string",
+            "description": "",
+            "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
         },
         "CarteData":{
           "description": "La carte à créer.",
@@ -1098,238 +1247,180 @@
                 ]
               
         },
-      "CarteValidationErreur": {
-        "description": "Echec de la création.",
-        "content": {
-          "text/plain": {
-            "example": "La carte n'a pas été créée."
+      "connexion": {
+        "type": "object",
+        "properties": {
+          "pseudo": {
+            "type": "string",
+            "maxlength": 40,
+            "unique": true,
+            "description": "",
+            "example": "Nerak"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse88"
+          }
+        },
+        "required": ["pseudo", "mot_de_passe"]
+      },
+      "Dresseur": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
+          },
+          "nom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "age": {
+            "type": "integer",
+            "description": "",
+            "minimum": 1,
+            "maximum": 200,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "maxlength": 60,
+            "example": "Genève"
+          },
+          "image":{
+            "type": "string",
+            "description": "",
+            "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
+        }
+        },
+        "required": [
+          "id",
+          "nom",
+          "prenom",
+          "pseudo",
+          "email",
+          "mot_de_passe",
+          "age",
+          "ville"
+        ]
+      },
+      "DresseurData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "maxlength": 40,
+            "example": "Carina"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "unique": true,
+            "maxlength": 40,
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 1,
+            "maximum": 200,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "maxlength": 60,
+            "example": "Genève"
+          } 
+        },
+        "required": ["prenom", "nom","pseudo", "email", "age", "ville"]
+      
+      },
+      "DresseurDataPartiel": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 40,
+            "example": "Fonseca"
+          },
+          "prenom": {
+            "type": "string",
+            "description": "",
+            "minlength": 3,
+            "maxlength": 15,
+            "example": "Carina"
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "",
+            "example": "AniraC"
+          },
+          "email": {
+            "type": "string",
+            "description": "",
+            "example": "adresse@email.ch"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "description": "",
+            "example": "unMotDePasse32"
+          },
+          "age": {
+            "type": "number",
+            "description": "",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 25
+          },
+          "ville": {
+            "type": "string",
+            "description": "",
+            "example": "Genève"
           }
         }
       },
-        "DresseurSupprime":{
-          "description": "Le dresseur a été supprimé.",
-          "content": {
-            "text/plain": {
-              "example": "Le dresseur a été supprimé."
-            }
-          }
-        },
-        "DresseurEstPasAffiche":{
-          "description": "Le dresseur n'a pas été affiché.",
-          "content":{
-              "text/plain":{
-              "example": "Le dresseur ne s'affiche pas."
-            }
-          }
-        },
-        "connexionErreur":{
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Connexion échouée, veuillez retenter."
-            }
-          }
-        },
-        "connexionEchouee": {
-          "description": "Mots de passe ou pseudo incorrect",
-          "content":{
-              "text/plain":{
-              "example": "Mots de passe ou pseudo incorrect."
-            }
-          }
-        },
-        "connexion": {
-          "type": "object",
-          "properties": {
-            "pseudo": {
-              "type": "string",
-              "description": "Le pseudo du dresseur",
-              "example": "Nerak"
-            },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "Le mot de passe du compte dresseur",
-              "example": "unMotDePasse88"
-            }
-          },
-          "required": ["pseudo", "mot_de_passe"]
-        },
-        "deconnexionReussie": {
-          "description": "Déconnexion réussie.",
-          "content":{
-              "text/plain":{
-              "example": "Déconnexion réussie."
-              }
-            }
-          },
-          "deconnexionEchouee": {
-            "description": "Déconnexion échouée.",
-            "content":{
-              "text/plain":{
-              "example": "Échec de la déconnexion. Une erreur interne s'est produite. Veuillez contacter le support technique pour plus d'assistance."
-              }
-            }
-          },
-        "connexionReussie": {
-          "type": "object",
-          "example": "Connexion réussie"
-          },
-        
-        "Dresseur": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "nom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Fonseca"
-            },
-            "prenom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Carina"
-            },
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "AniraC"
-            },
-            "email": {
-              "type": "string",
-              "description": "",
-              "example": "adresse@email.ch"
-            },
-            "age": {
-              "type": "integer",
-              "description": "",
-              "minimum": 1,
-              "maximum": 200,
-              "example": 25
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "maxlength": 60,
-              "example": "Genève"
-            },
-            "image":{
-              "type": "string",
-              "description": "",
-              "example": "https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg"
-          }
-          },
-          "required": [
-            "id",
-            "nom",
-            "prenom",
-            "pseudo",
-            "email",
-            "mot_de_passe",
-            "age",
-            "ville"
-          ]
-        },
-        "DresseurData": {
-          "type": "object",
-          "properties": {
-            "nom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Fonseca"
-            },
-            "prenom": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "Carina"
-            },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse32"
-            },
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "maxlength": 40,
-              "example": "AniraC"
-            },
-            "email": {
-              "type": "string",
-              "description": "",
-              "example": "adresse@email.ch"
-            },
-            "age": {
-              "type": "number",
-              "description": "",
-              "minimum": 1,
-              "maximum": 200,
-              "example": 25
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "maxlength": 60,
-              "example": "Genève"
-            } 
-          },
-          "required": ["prenom", "nom","pseudo", "email", "age", "ville"]
-        
-        },
-        "DresseurDataPartiel": {
-          "type": "object",
-          "properties": {
-            "nom": {
-              "type": "string",
-              "description": "",
-              "minlength": 3,
-              "maxlength": 40,
-              "example": "Fonseca"
-            },
-            "prenom": {
-              "type": "string",
-              "description": "",
-              "minlength": 3,
-              "maxlength": 15,
-              "example": "Carina"
-            },
-            "pseudo": {
-              "type": "string",
-              "description": "",
-              "example": "AniraC"
-            },
-            "email": {
-              "type": "string",
-              "description": "",
-              "example": "adresse@email.ch"
-            },
-            "mot_de_passe": {
-              "type": "string",
-              "description": "",
-              "example": "unMotDePasse32"
-            },
-            "age": {
-              "type": "number",
-              "description": "",
-              "minimum": 0,
-              "maximum": 100,
-              "example": 25
-            },
-            "ville": {
-              "type": "string",
-              "description": "",
-              "example": "Genève"
-            }
-          }
-        },
         "Carte": {
           "type": "object",
           "properties": {
@@ -2090,54 +2181,46 @@
       }
     }
         },
-        "Message": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "",
-              "example": "7fe91a9a41bc839033eedf0f"
-            },
-            "date": {
-              "type": "string",
-              "description": "",
-              "format": "data-time",
-              "example": "2020-01-02T10:00:00.000Z"
-            },
-            "contenu": {
-              "type": "string",
-              "description": "",
-              "example": "Salut!"
-            },
-            "expéditeur": {
-              "type": "string",
-              "description": "Celui qui envoie le message.",
-              "example": "Nerak"
-            },
-            "destinataire": {
-              "type": "string",
-              "description": "Celui qui reçoit le message.",
-              "example": "Salocin"
-            }
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "example": "7fe91a9a41bc839033eedf0f"
           },
-          "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
-        }   
-      },
-
-      "securitySchemes": {
-        "authConnexion": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
-        }
-      },
-      "securityDefinitions": {
-        "JWT": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "access_token"
-        }
+          "date": {
+            "type": "string",
+            "description": "",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
+          },
+          "contenu": {
+            "type": "string",
+            "description": "",
+            "example": "Salut!"
+          },
+          "expéditeur": {
+            "type": "string",
+            "description": "Celui qui envoie le message.",
+            "example": "Nerak"
+          },
+          "destinataire": {
+            "type": "string",
+            "description": "Celui qui reçoit le message.",
+            "example": "Salocin"
+          }
+        },
+        "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
+      }   
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
+}
 
