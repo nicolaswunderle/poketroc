@@ -4,7 +4,7 @@ import logger from "morgan";
 import mongoose from "mongoose";
 import swaggerUi from 'swagger-ui-express';
 
-// import openApiDocument from './openapi.json' assert { type: "json" };
+import openApiDocument from './openapi.json' assert { type: "json" };
 import { databaseUrl } from './config.js';
 //Router
 import indexRouter from "./routes/index.js";
@@ -18,7 +18,7 @@ const app = express();
 
 
 // Serve the Swagger UI documentation.
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // Log requests (except in test mode).
 if (process.env.NODE_ENV !== 'test') { 
@@ -44,9 +44,13 @@ app.use('/api/dresseurs', function (err, req, res, next) {
     const rep = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
     res.status(409).send(rep);
   }
+  if (err.code === 16755) {
+    const rep = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
+    res.status(422).send(rep);
+  }
   // Si c'est une erreur de validation mongoose
   if (err.name === "ValidationError") {
-    res.status(400).send(err.message);
+    res.status(422).send(err.message);
   }
   next();
 });
