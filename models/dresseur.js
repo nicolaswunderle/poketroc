@@ -79,7 +79,7 @@ dresseurSchema.index({ localisation: '2dsphere' });
 
 // Validate a GeoJSON coordinates array (longitude, latitude and optional altitude).
 function validateGeoJsonCoordinates(value) {
-    return Array.isArray(value) && value.length >= 2 && value.length <= 3 && isLatitude(value[0]) && isLongitude(value[1]);
+    return Array.isArray(value) && value.length == 2 && isLatitude(value[0]) && isLongitude(value[1]);
 }
 
 function isLatitude(value) {

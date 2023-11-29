@@ -74,7 +74,39 @@ export function loadPaginationFromParams(req, res, next) {
 export function editPermissionDresseur(req, res, next) {
   // il faut que la personne qui est chargée soit la même que celle authentifiée
   if (req.params.dresseurId !== req.currentUserId) {
-    return res.status(401).send(`Vous n'avez pas les autorisations pour modifier un autre compte`);
+    return res.status(403).send(`Vous n'avez pas les autorisations pour modifier un autre compte`);
+  }
+  next();
+}
+
+export function loadLocationFromParams(req, res, next) {
+  const localisation = req.query.localisation;
+  if (localisation) {
+    let localisationArray = [];
+    try {
+      localisationArray = JSON.parse(localisation);
+    } catch {
+      res.status(400).send("Le tableau n'est pas valide.");
+    }
+    if (Array.isArray(localisationArray)) {
+      if (localisationArray.length == 2) {
+        if (typeof localisationArray[0] === "number" && typeof localisationArray[1] === "number") {
+          if ((localisationArray[0] >= -90 && localisationArray[0] <= 90) && (localisationArray[1] >= -180 && localisationArray[1] <= 180)) {
+            req.localisation = localisationArray;
+          } else {
+            return res.status(400).send("Le première coordonnée doit être en -90 et 90 et la deuxième entre -180 et 180.")
+          }
+        } else {
+          return res.status(400).send("Les coordonnées ne sont pas des nombres.")
+        }
+      } else {
+        return res.status(400).send("Le tableau de coordonnées doit contenir deux coordonées.")
+      }
+    } else {
+      return res.status(400).send("Le paramètre localisation n'est pas un tableau.")
+    }
+  } else {
+    return res.status(400).send("Il manque le paramètre localisation.");
   }
   next();
 }

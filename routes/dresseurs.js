@@ -6,7 +6,7 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
-import { authenticate, loadPaginationFromParams, loadDresseurFromParams, editPermissionDresseur } from "./utils.js";
+import { authenticate, loadLocationFromParams, loadPaginationFromParams, loadDresseurFromParams, editPermissionDresseur } from "./utils.js";
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -39,11 +39,11 @@ router.post("/", function (req, res, next) {
 });
 
 // Affiche tous les dresseurs à proximité
-router.get("/", authenticate, loadPaginationFromParams, function (req, res, next) {
+router.get("/", authenticate, loadLocationFromParams, loadPaginationFromParams, function (req, res, next) {
 
   const page = req.page;
   const pagesize = req.pagesize;
-  const localisation = JSON.parse(req.query.localisation);
+  const localisation = req.localisation;
 
   if (!localisation) return res.status(401).send("Il manque les coordonnées de la localisation.");
 
@@ -57,8 +57,8 @@ router.get("/", authenticate, loadPaginationFromParams, function (req, res, next
       }
     }
   })
-  // .skip((page - 1) * pagesize)
-  // .limit(pagesize)
+  .skip((page - 1) * pagesize)
+  .limit(pagesize)
   .exec()
   .then(dresseurs => {
     if (!dresseurs) return res.status(401).send("Aucun dresseur n'a été trouvé.");
