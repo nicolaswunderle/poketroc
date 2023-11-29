@@ -30,7 +30,7 @@ const messageSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-messageSchema.index({ date: 1, dresseur_id: 1, echange_id: 1}, { unique: true });
+messageSchema.index({ createdAt: 1, dresseur_id: 1, echange_id: 1}, { unique: true });
 
 messageSchema.set("toJSON", {
     transform: transformJsonDresseur

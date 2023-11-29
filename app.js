@@ -8,9 +8,9 @@ import { databaseUrl } from "./config.js";
 //Router
 import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
-import thingsRouter from "./routes/things.js";
 import cartesRouter from "./routes/cartes.js";
 import messagesRouter from "./routes/messages.js";
+import echangesRouter from "./routes/echanges.js";
 
 // Connect to the database (can be overriden from environment)
 mongoose.connect(databaseUrl);
@@ -30,9 +30,9 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api", indexRouter);
 app.use("/api/dresseurs", dresseursRouter);
-app.use("/api/things", thingsRouter);
 app.use("/api/cartes", cartesRouter);
 app.use("/api/messages", messagesRouter);
+app.use("/api/echanges", echangesRouter);
 
 
 // catch 404 and forward to error handler
@@ -40,45 +40,57 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
-app.use("/api/dresseurs", function (err, req, res, next) {
-  if (err.code === 11000) {
-    const rep = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
-    res.status(409).send(rep);
+
+app.use('/api', function (err, req, res, next) {
+  // Log the error on stderr
+  console.warn(err);
+
+  // Respond with 422 Unprocessable Entity if it's a Mongoose validation error
+  if (err.name == 'ValidationError' && !err.status) {
+    err.status = 422;
   }
+
+  // lors d'une erreur 11000 de mongoose
+  if (err.code === 11000) {
+    err.status = 409;
+    switch (req.path) {
+      case '/dresseurs':
+        err.message = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
+      break;
+      case '/messages':
+        err.message = `Deux messages ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_id et echange_id`;
+      break;
+      case '/cartes':
+        err.message = `Deux cartes ne peuvent pas avoir la même valeur pour les champs id_api, etat, desc_etat, type et dresseur_id.`;
+      break;
+      case '/echanges':
+        err.message = `Deux échanges ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_cree_id et dresseur_concerne_id`;
+      break;
+    }
+    
+  }
+
+  // lors d'une erreur 11000 de mongoose
   if (err.code === 16755) {
-    const rep = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
-    res.status(422).send(rep);
+    err.status = 422;
+    err.message = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
   }
-  // Si c'est une erreur de validation mongoose
-  if (err.name === "ValidationError") {
-    res.status(422).send(err.message);
-  }
-  res.send({error: err});
-  next();
-});
 
-app.use("/api/messages", function (err, req, res, next) {
-  if (err.code === 11000) {
-    const rep = `Le destinataire et l'expediteur ne peuvent pas envoyer un message exactement à la même date.`;
-    res.status(409).send(rep);
-  }
-  // Si c'est une erreur de validation mongoose
-  if (err.name === "ValidationError") {
-    res.status(422).send(err.message);
-  }
-  next();
-});
+  // Set the response status code
+  res.status(err.status || 500);
 
-app.use('/api/cartes', function (err, req, res, next) {
-  if (err.code === 11000) {
-    const rep = `La carte ne peut pas avoir le même id_api, etat, desc_etat, type et dresseur_id.`;
-    res.status(409).send(rep);
+  // Send the error message in the response
+  const response = {
+    message: err.message
+  };
+
+  // If it's a validation error, also send the errors details from Mongoose
+  if (err.status == 422) {
+    response.errors = err.errors;
   }
-  // Si c'est une erreur de validation mongoose
-  if (err.name === "ValidationError") {
-    res.status(422).send(err.message);
-  }
-  next();
+
+  // Send the error response
+  res.send(response.message);
 });
 
 // error handler

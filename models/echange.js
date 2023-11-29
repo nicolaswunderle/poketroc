@@ -16,7 +16,11 @@ const echangeSchema = new Schema({
     },
     dresseur_concerne_id: {
         type: Schema.Types.ObjectId,
-        ref: 'Dresseur'
+        ref: 'Dresseur',
+        validate: {
+            validator: validateDresseurConcerneId,
+            message: "dresseur_concerne_id ne peut pas avoir la même valeur que dresseur_cree_id"
+        }
     },
     createdAt: {
         type: Date,
@@ -29,7 +33,12 @@ const echangeSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-echangeSchema.index({ date: 1, dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
+echangeSchema.index({ createdAt: 1, dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
+
+// dresseur_concerne_id ne peut pas être identique à dresseur_cree_id
+function validateDresseurConcerneId (value) {
+    return this.dresseur_cree_id.toString() !== value.toString();
+}
 
 echangeSchema.set("toJSON", {
     transform: transformJsonDresseur
