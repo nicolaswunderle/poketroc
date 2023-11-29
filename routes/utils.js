@@ -55,6 +55,22 @@ export function loadDresseurFromParams(req, res, next) {
     .catch(err => next(err));
 }
 
+export function loadPaginationFromParams(req, res, next) {
+  const page = Math.trunc(Number(req.query.page)) ? Math.trunc(Number(req.query.page)) : 1;
+  const pagesize = Math.trunc(Number(req.query.pagesize)) ? Math.trunc(Number(req.query.pagesize)) : 30;
+  if (page >= 1) {
+    req.page = page;
+  } else {
+    return res.status(401).send("Le numéro de page ne peut pas être en dessous de 1.");
+  }
+  if (pagesize > 1 || pagesize < 30) {
+    req.pagesize = pagesize;
+  } else {
+    return res.status(401).send("La taille de page ne peut pas être en dessous de 1 et au dessus de 30.");
+  }
+  next();
+}
+
 export function editPermissionDresseur(req, res, next) {
   // il faut que la personne qui est chargée soit la même que celle authentifiée
   if (req.params.dresseurId !== req.currentUserId) {
