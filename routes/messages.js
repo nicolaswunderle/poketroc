@@ -25,4 +25,11 @@ router.delete("/:messageId", function (req, res, next) {
         res.status(204).send("Le message à été supprimé");
       })
       .catch(next);
-  });
+});
+
+// Afficher une conversation
+router.get("/:echangeId", function (req, res, next){
+    res.status(200).send(req.message);
+    next();
+})
+export default router;
