@@ -342,7 +342,7 @@
         }
       }      
     },
-    "dresseurs/{dresseurId}": {
+    "/dresseurs/{dresseurId}": {
       "get": {
         "summary": "Afficher le dresseur",
         "tags": ["dresseur"],
@@ -797,77 +797,15 @@
         }
       }
     },
-    "/messages/{echangeId}":{
-      "get": {
-          "summary": "Afficger une discussion",
-          "tags": ["message"],
-          "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "Identifiant de la carte",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Discution affiché",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Message"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/DiscutionIntrouvable"
-          }
-        }
-      }
-    },
-    "/messages/{messageId}": {
-      "delete": {
-        "summary": "Supprimer un message",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "Identifiant du message",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Le message à été supprimé",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "example": "Le message à été supprimé"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/MessageIntrouvable"
-          }
-        }
-      }
-    },
-    "messages": {
+    "/messages": {
       "post": {
         "summary": "Créer un message",
         "tags": ["message"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -896,8 +834,83 @@
           }
         }
       }
-    }
+    },
+    "/messages/{messageId}": {
+      "delete": {
+        "summary": "Supprimer un message",
+        "tags": ["message"],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "Identifiant du message",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Le message à été supprimé",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "example": "Le message à été supprimé"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/MessageIntrouvable"
+          }
+        }
+      }
+    },
+    "/messages/{echangeId}": {
+      "get" : {
+        "summary": "Affiche tous les messages d’un échange",
+        "tags": ["message"],
+        "parameters": [
+          {
+            "name": "echangeId",
+            "in": "path",
+            "description": "Identifiant de l'échange",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Les messages de l'échange sont affichés.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/DiscutionIntrouvable"
+          }
+        }
+      }
+    }   
   },
+
   "components": {
     "responses": {
       "DresseurValidationErreur": {
