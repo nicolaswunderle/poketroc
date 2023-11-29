@@ -6,7 +6,7 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
-import { authenticate, loadDresseurFromParams, editPermissionDresseur } from "./utils.js";
+import { authenticate, loadPaginationFromParams, loadDresseurFromParams, editPermissionDresseur } from "./utils.js";
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -39,19 +39,33 @@ router.post("/", function (req, res, next) {
 });
 
 // Affiche tous les dresseurs à proximité
-router.get("/", authenticate, function (req, res, next) {
-  res.status(200).send({ localisation: req.query.localisation, page: req.query.page, pagesize: req.query.pagesize});
-  next();
-//   db.places.find(
-//     {
-//       location:
-//         { $near:
-//            {
-//              $geometry: { type: "Point",  coordinates: [ -73.9667, 40.78 ] }
-//            }
-//         }
-//     }
-//  )
+router.get("/", authenticate, loadPaginationFromParams, function (req, res, next) {
+
+  const page = req.page;
+  const pagesize = req.pagesize;
+  const localisation = JSON.parse(req.query.localisation);
+
+  if (!localisation) return res.status(401).send("Il manque les coordonnées de la localisation.");
+
+  Dresseur.find({
+    localisation: { 
+      $near:{ 
+        $geometry: { 
+          type: "Point",
+          coordinates: localisation
+        } 
+      }
+    }
+  })
+  // .skip((page - 1) * pagesize)
+  // .limit(pagesize)
+  .exec()
+  .then(dresseurs => {
+    if (!dresseurs) return res.status(401).send("Aucun dresseur n'a été trouvé.");
+    res.status(200).send(dresseurs);
+  })
+  .catch(next)
+
 });
 
 // Affiche un dresseur
@@ -116,28 +130,30 @@ router.delete("/:dresseurId", authenticate, loadDresseurFromParams, editPermissi
 
 // Permet de se connecter
 router.post("/connexion", function (req, res, next) {
+  if (!req.body.pseudo) return res.status(401).send("Il manque le pseudo");
+  if (!req.body.mot_de_passe) return res.status(401).send("Il manque le mot de passse");
   Dresseur.findOne({ pseudo: req.body.pseudo })
       .exec()
       .then(dresseur => {
-          if (!dresseur) return res.sendStatus(401); // Unauthorized
-          if (!req.body.mot_de_passe) return res.sendStatus(401); // Unauthorized
-          return bcrypt.compare(req.body.mot_de_passe, dresseur.mot_de_passe)
-              .then(valid => {
-                if (!valid) return res.sendStatus(401); // Unauthorized
-                // Login is valid...
-                // Create the payload for the JWT including the user ID and expiration
-                const payload = {
-                  sub: dresseur._id.toString(),
-                  // UNIX timstamp representing a date in 7 days.
-                  exp: Math.floor(Date.now() / 1000) + 7 * 24 * 3600,
-                };
-                // Create and sign a token.
-                signJwt(payload, jwtSecret).then(token => {
-                    res.status(201).send({ token });
-                });
-                  
-
-              });
+        if (!dresseur) return res.status(401).send(`Aucun dresseur ne correpsond à l'id ${req.body.pseudo}`);
+        return { valid: bcrypt.compare(req.body.mot_de_passe, dresseur.mot_de_passe), dresseur: dresseur };
+      })
+      .then(({valid, dresseur}) => {
+        if (!valid) return res.status(401).send("Le mot de passe n'est pas valide");
+        // Login is valid...
+        // Create the payload for the JWT including the user ID and expiration
+        const payload = {
+          sub: dresseur._id.toString(),
+          // UNIX timstamp representing a date in 7 days.
+          exp: Math.floor(Date.now() / 1000) + 7 * 24 * 3600,
+        };
+        // Create and sign a token.
+        return signJwt(payload, jwtSecret);
+          
+      })
+      .then(token => {
+        if (!token) return res.status(401).send("Le token n'a pas pu être généré");
+        res.status(201).send({ token });
       })
       .catch(next);
 });

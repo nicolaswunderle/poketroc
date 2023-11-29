@@ -3,8 +3,7 @@ import createError from "http-errors";
 import logger from "morgan";
 import mongoose from "mongoose";
 import swaggerUi from 'swagger-ui-express';
-
-import openApiDocument from './openapi.json' assert { type: "json" };
+//import openApiDocument from './openapi.json' assert { type: "json" };
 import { databaseUrl } from './config.js';
 //Router
 import indexRouter from "./routes/index.js";
@@ -18,7 +17,7 @@ const app = express();
 
 
 // Serve the Swagger UI documentation.
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // Log requests (except in test mode).
 if (process.env.NODE_ENV !== 'test') { 
@@ -47,6 +46,19 @@ app.use('/api/dresseurs', function (err, req, res, next) {
   if (err.code === 16755) {
     const rep = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
     res.status(422).send(rep);
+  }
+  // Si c'est une erreur de validation mongoose
+  if (err.name === "ValidationError") {
+    res.status(422).send(err.message);
+  }
+  res.send(err);
+  next();
+});
+
+app.use('/api/messages', function (err, req, res, next) {
+  if (err.code === 11000) {
+    const rep = `Le destinataire et l'expediteur ne peuvent pas envoyer un message exactement à la même date.`;
+    res.status(409).send(rep);
   }
   // Si c'est une erreur de validation mongoose
   if (err.name === "ValidationError") {
