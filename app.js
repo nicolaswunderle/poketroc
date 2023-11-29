@@ -52,13 +52,25 @@ app.use('/api/dresseurs', function (err, req, res, next) {
   if (err.name === "ValidationError") {
     res.status(422).send(err.message);
   }
-  res.send(err);
+  res.send({error: err});
   next();
 });
 
 app.use('/api/messages', function (err, req, res, next) {
   if (err.code === 11000) {
     const rep = `Le destinataire et l'expediteur ne peuvent pas envoyer un message exactement à la même date.`;
+    res.status(409).send(rep);
+  }
+  // Si c'est une erreur de validation mongoose
+  if (err.name === "ValidationError") {
+    res.status(422).send(err.message);
+  }
+  next();
+});
+
+app.use('/api/cartes', function (err, req, res, next) {
+  if (err.code === 11000) {
+    const rep = `La carte ne peut pas avoir le même id_api, etat, desc_etat, type et dresseur_id.`;
     res.status(409).send(rep);
   }
   // Si c'est une erreur de validation mongoose

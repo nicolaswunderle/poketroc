@@ -4,10 +4,6 @@ const Schema = mongoose.Schema;
 
 // crée le schéma échange
 const echangeSchema = new Schema({
-    date: {
-        type: Date,
-        required: [true, "La date de l'échange est obligatoire."]
-    },
     etat: {
         type: String,
         enum: ['accepte', 'attente', 'refuse'],
@@ -40,7 +36,6 @@ echangeSchema.set("toJSON", {
 });
  
 function transformJsonDresseur(doc, json, options) {
-    delete json.createdAt;
     delete json.updatedAt;
     delete json.__v;
     return json;

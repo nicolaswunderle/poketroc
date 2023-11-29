@@ -4,10 +4,6 @@ const Schema = mongoose.Schema;
 
 // crée le schéma message
 const messageSchema = new Schema({
-    date: {
-        type: Date,
-        required: [true, "La date du message est obligatoire."]
-    },
     contenu: {
         type: String,
         required: [true, "Le contenu du message est obligatoire."],
@@ -41,7 +37,6 @@ messageSchema.set("toJSON", {
 });
  
 function transformJsonDresseur(doc, json, options) {
-    delete json.createdAt;
     delete json.updatedAt;
     delete json.__v;
     return json;
