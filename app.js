@@ -10,6 +10,7 @@ import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
 import thingsRouter from "./routes/things.js";
 import cartesRouter from "./routes/cartes.js";
+import messagesRouter from "./routes/messages.js";
 
 // Connect to the database (can be overriden from environment)
 mongoose.connect(databaseUrl);
@@ -31,6 +32,8 @@ app.use("/api", indexRouter);
 app.use("/api/dresseurs", dresseursRouter);
 app.use("/api/things", thingsRouter);
 app.use("/api/cartes", cartesRouter);
+app.use("/api/messages", messagesRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
