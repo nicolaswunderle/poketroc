@@ -1,7 +1,7 @@
 import debugFactory from "debug";
 import express from "express";
 import Carte from "../models/carte.js";
-import { authenticate, loadPaginationFromParams } from "./utils.js";
+import { authenticate } from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
 const router = express.Router();
