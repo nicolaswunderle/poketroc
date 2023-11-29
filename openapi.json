@@ -436,6 +436,9 @@
           },
           "404": {
             "$ref": "#/components/responses/ModificationErreur"
+          },
+          "422": {
+            "$ref": "#/components/responses/DresseurValidationErreurPatch"
           }
         }
       },
@@ -529,6 +532,11 @@
       "post": {
         "summary": "Créer un échange",
         "tags": ["échange"],
+         "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -550,179 +558,7 @@
             }
           },
           "422": {
-            "description": "L'échange n'a pas été crée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/EchangeValidationErreur"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/echanges/{echangeId}": {
-      "get": {
-        "summary": "Afficher un échange",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "Identifiant de l'échange.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "L'échange est affiché.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "L'échange n'est pas affiché.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/EchangePasAffiche"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modifier quelques informations d'un échange",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "Identifiant de l'échange.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EchangeData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "L'échange a été modifié.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "L'échange n'a pas pu être modifié.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/EchangePasModifie"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "L'échange n'a pas pu être modifié.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/EchangeValidationErreur"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Supprimer un échange",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "L'échange a été supprimé avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/EchangeSupprime"
-                },
-                "404": {
-                  "description": "L'échange n'a pas été supprimé.",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "$ref": "#/components/responses/EchangePasSupprime"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/echanges/{dresseurId}": {
-      "get": {
-        "summary": "Afficher tous les échanges du dresseur",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "dresseurId",
-            "in": "path",
-            "description": "Identifiant du dresseur",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Les échanges sont affichés.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Les échanges ne sont pas affichés.",
-            "$ref": "#/components/responses/EchangesPasAffiche"
+            "$ref": "#/components/responses/EchangeValidationErreur"   
           }
         }
       }
@@ -731,6 +567,11 @@
       "get": {
         "summary": "Afficher tous les échanges proposés",
         "tags": ["échange"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "tri",
@@ -771,18 +612,170 @@
                 }
               }
             }
+          }         
+        }
+      }
+    },
+    "/echanges/{echangeId}": {
+      "get": {
+        "summary": "Afficher un échange",
+        "tags": ["échange"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "echangeId",
+            "in": "path",
+            "description": "Identifiant de l'échange.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "L'échange est affiché.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
+              }
+            }
+          },
+          "404": {       
+            "$ref": "#/components/responses/EchangePasAffiche"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifier quelques informations d'un échange",
+        "tags": ["échange"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "echangeId",
+            "in": "path",
+            "description": "Identifiant de l'échange.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EchangeData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "L'échange a été modifié.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
+              }
+            }
           },
           "404": {
-            "description": "La liste des échanges proposés n'est pas affichée.",
-            "$ref": "#/components/responses/EchangesPasTrouves"
+            "$ref": "#/components/responses/EchangePasModifie"
+
+          },
+          "422": {
+            "$ref": "#/components/responses/EchangeModificationErreur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un échange",
+        "tags": ["échange"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "echangeId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+           "$ref": "#/components/responses/EchangeSupprime"
+          },
+        "404": {
+           "$ref": "#/components/responses/EchangePasSupprime"
           }
         }
       }
     },
+    "/echanges/{dresseurId}": {
+      "get": {
+        "summary": "Afficher tous les échanges du dresseur",
+        "tags": ["échange"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Les échanges sont affichés.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Echange"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/EchangesPasAffiche"   
+          }
+        }
+      }
+    },
+    
     "/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
       "get": {
         "summary": "Afficher les échanges du dresseur en fonction de l'état",
         "tags": ["échange"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "dresseurId",
@@ -939,6 +932,54 @@
   "components": {
     "responses": {
       "EchangesPasAffiche": {
+        "description": "Dresseur pas trouvé.",
+        "content": {
+          "text/plain": {
+            "example": "Le dresseur avec l'ID 7be91a9a41bc839033eedf0k n'a pas été trouvé."
+          }
+        }
+      },
+      "EchangePasSupprime": {
+        "description": "L'échange n'a pas été supprimé.",
+        "content": {
+          "text/plain": {
+            "example": "L'échange n'a pas été supprimé."
+          }
+        }
+      },
+      "EchangeSupprime": {
+        "description": "L'échange a été supprimé avec succès.",
+        "content": {
+          "text/plain": {
+            "example": "L'échange a été supprimé avec succès."
+          }
+        }
+      },
+      "EchangePasModifie": {
+        "description": "L'échange n'a pas été modifié.",
+        "content": {
+          "text/plain": {
+            "example": "L'échange n'a pas été modifié."
+          }
+        }
+      },
+      "EchangeModificationErreur": {
+        "description": "L'échange n'a pas pu être modifié.",
+        "content": {
+          "text/plain": {
+            "example": "L'échange n'a pas pu être modifié."
+          }
+        }
+      },
+      "EchangeValidationErreur": {
+        "description": "L'échange n'a pas été crée car dresseur non trouvé.",
+        "content": {
+          "text/plain": {
+            "example": "L'échange n'a pas été créé, le dresseur avec l'ID 7be91a9a41bc839033eedf0k n'a pas été trouvé."
+          }
+        }
+      },
+      "EchangePasAffiche": {
         "description": "Les échanges ne sont pas affichés.",
         "content": {
           "text/plain": {
@@ -946,11 +987,19 @@
           }
         }
       },
+      "DresseurValidationErreurPatch":{
+        "description": "Erreur de validation",
+        "content": {
+          "text/plain": {
+            "example": "Erreur de validation lors de la modification du dresseur."
+          }
+        }
+      },
       "DresseurValidationErreur": {
         "description": "Echec de l'inscription.",
         "content": {
           "text/plain": {
-            "example": "Inscription échouée."
+            "example": "Dresseur validation failed: mot_de_passe: Le mot de passe du dresseur est obligatoire."
           }
         }
       },
