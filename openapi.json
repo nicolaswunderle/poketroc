@@ -342,7 +342,7 @@
         }
       }      
     },
-    "dresseurs/{dresseurId}": {
+    "/dresseurs/{dresseurId}": {
       "get": {
         "summary": "Afficher le dresseur",
         "tags": ["dresseur"],
@@ -495,468 +495,6 @@
           },
           "404": {
             "$ref": "#/components/responses/deconnexionEchouee"
-          }
-        }
-      }
-    },
-   
-    "/echanges": {
-      "post": {
-        "summary": "Créer un échange",
-        "tags": ["échange"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EchangeData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "L'échange a été crée avec succès.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "L'échange n'a pas été crée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/echanges/{echangeId}": {
-      "get": {
-        "summary": "Afficher un échange",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "Identifiant de l'échange.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "L'échange est affiché.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "L'échange n'est pas affiché.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EchangePasAffiche"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modifier quelques informations d'un échange",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "Identifiant de l'échange.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EchangeData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "L'échange a été modifié.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "L'échange n'a pas pu être modifié.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EchangePasModifie"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "L'échange n'a pas pu être modifié.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EchangeValidationErreur"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Supprimer un échange",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "echangeId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "L'échange a été supprimé avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EchangeSupprime"
-                },
-                "404": {
-                  "description": "L'échange n'a pas été supprimé.",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "$ref": "#/components/schemas/EchangePasSupprime"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/echanges/{dresseurId}": {
-      "get": {
-        "summary": "Afficher tous les échanges du dresseur",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "dresseurId",
-            "in": "path",
-            "description": "Identifiant du dresseur",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Les échanges sont affichés.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Les échanges ne sont pas affichés.",
-            "$ref": "#/components/responses/EchangesPasAffiche"
-          }
-        }
-      }
-    },
-    "/echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}": {
-      "get": {
-        "summary": "Afficher tous les échanges proposés",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "tri",
-            "in": "query",
-            "description": "Critère de tri des échanges (nouveaute, pertinence)",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["nouveaute", "pertinence"]
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Numéro de la pages",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "Taille de la page",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "La liste des échanges proposés est affichée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "La liste des échanges proposés n'est pas affichée.",
-            "$ref": "#/components/responses/EchangesPasTrouves"
-          }
-        }
-      }
-    },
-    "/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
-      "get": {
-        "summary": "Afficher les échanges du dresseur en fonction de l'état",
-        "tags": ["échange"],
-        "parameters": [
-          {
-            "name": "dresseurId",
-            "in": "query",
-            "description": "Identifiant du dresseur",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "état",
-            "in": "query",
-            "description": "État des échanges (accepte, attente, refuse)",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["accepte", "attente", "refuse"]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "La Liste des échanges du dresseur en fonction de l'état.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Echange"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "La Liste des échanges du dresseur en fonction de l'état n'est pas affichée.",
-            "$ref": "#/components/responses/EchangesPasAffiche"
-          }
-        }
-      }
-    },
-
-
-
-
-    "messages/{echangeId}": {
-      "get": {
-        "summary": "Afficher tous les messages d'un échange-----------------------------------------------------------",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "Conversation d'un échange.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Message trouvé.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Message non trouvé."
-          }
-        }
-      },
-      "/messages/{messageId}": {
-        "delete": {
-          "summary": "Supprimer un message",
-          "tags": ["message"],
-          "parameters": [
-            {
-              "name": "messageId",
-              "in": "path",
-              "description": "Identifiant du message",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Le message à été supprimé",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "example": "Le message à été supprimé"
-                  }
-                }
-              }
-            },
-            "404": {
-              "$ref": "#/components/responses/MessageIntrouvable"
-            }
-          }
-        }
-      },
-      "messages": {
-        "post": {
-          "summary": "Créer un message",
-          "tags": ["message"],
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Message créé avec succès.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Message"
-                  }
-                }
-              }
-            },
-            "404": {
-              "$ref": "#/components/responses/MessageErreur"
-            },
-            "422": {
-              "$ref": "#/components/responses/DestinataireErreur"
-            }
-          }
-        }
-      }
-    },
-
-    "/{dresseur.id}/deck": {
-      "get": {
-        "summary": "Afficher le deck du dresseur",
-        "tags": ["carte"],
-        "parameters": [
-          {
-            "name": "num_carte",
-            "in": "query",
-            "description": "",
-            "schema": {
-              "type": "integer",
-              "example": 114,
-              "minimum": 0,
-              "maximum": 1000
-            }
-          },
-          {
-            "name": "quantite",
-            "in": "query",
-            "description": "",
-            "schema": {
-              "type": "integer",
-              "example": 1
-            }
-          },
-          {
-            "name": "série",
-            "in": "query",
-            "description": "",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "écarlate et violet",
-                "épée et bouclier",
-                "soleil et lune",
-                "xy",
-                "noir et blanc"
-              ],
-              "example": "xy"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Carte"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/DeckErreur"
           }
         }
       }
@@ -1259,95 +797,16 @@
         }
       }
     },
+
     "/messages": {
       "post": {
         "summary": "Créer un message",
         "tags": ["message"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Message"
-              }
-            }
-          }
-        },
-        "parameters": [
+        "security": [
           {
-            "name": "page",
-            "in": "query",
-            "description": "Numéro de la page",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "Taille de la page",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
+            "BearerAuth": []
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Discution affiché",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Message"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/DiscutionIntrouvable"
-          }
-        }
-      }
-    },
-    "/messages/{messageId}": {
-      "delete": {
-        "summary": "Supprimer un message",
-        "tags": ["message"],
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "Identifiant du message",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Le message à été supprimé",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "example": "Le message à été supprimé"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/MessageIntrouvable"
-          }
-        }
-      }
-    },
-    "messages": {
-      "post": {
-        "summary": "Créer un message",
-        "tags": ["message"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1376,8 +835,83 @@
           }
         }
       }
-    }
+    },
+    "/messages/{messageId}": {
+      "delete": {
+        "summary": "Supprimer un message",
+        "tags": ["message"],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "Identifiant du message",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Le message à été supprimé",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "example": "Le message à été supprimé"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/MessageIntrouvable"
+          }
+        }
+      }
+    },
+    "/messages/{echangeId}": {
+      "get" : {
+        "summary": "Afficher affiche tous les messages d’un échange ",
+        "tags": ["message"],
+        "parameters": [
+          {
+            "name": "echangeId",
+            "in": "path",
+            "description": "Identifiant de l'échange",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Les messages de l'échange sont affichés.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/DiscutionIntrouvable"
+          }
+        }
+      }
+    }   
   },
+
   "components": {
     "responses": {
       "DresseurValidationErreur": {
