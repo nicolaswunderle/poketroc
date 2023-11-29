@@ -38,6 +38,22 @@ router.post("/", function (req, res, next) {
     
 });
 
+// Affiche tous les dresseurs à proximité
+router.get("/", authenticate, function (req, res, next) {
+  res.status(200).send({ localisation: req.query.localisation, page: req.query.page, pagesize: req.query.pagesize});
+  next();
+//   db.places.find(
+//     {
+//       location:
+//         { $near:
+//            {
+//              $geometry: { type: "Point",  coordinates: [ -73.9667, 40.78 ] }
+//            }
+//         }
+//     }
+//  )
+});
+
 // Affiche un dresseur
 router.get("/:dresseurId", authenticate, loadDresseurFromParams, function (req, res, next) {
   res.status(200).send(req.dresseur);
