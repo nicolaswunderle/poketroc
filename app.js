@@ -9,6 +9,7 @@ import { databaseUrl } from './config.js';
 import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
 import thingsRouter from "./routes/things.js";
+import messagesRouter from "./routes/messages.js";
 
 // Connect to the database (can be overriden from environment)
 mongoose.connect(databaseUrl);
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api", indexRouter);
 app.use("/api/dresseurs", dresseursRouter);
 app.use("/api/things", thingsRouter);
+app.use("/api/messages", messagesRouter);
 
 
 
