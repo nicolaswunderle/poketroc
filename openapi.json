@@ -30,6 +30,11 @@
       "post": {
         "summary": "Créer une carte",
         "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -67,6 +72,11 @@
       "get": {
         "summary": "Afficher carte dresseur",
         "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "carteId",
@@ -104,6 +114,11 @@
       "patch": {
         "summary": "Modifier partiellement la carte du dresseur",
         "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "carteId",
@@ -150,6 +165,11 @@
       "delete": {
         "summary": "Supprimer la carte",
         "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "carteId",
@@ -189,6 +209,11 @@
       "get": {
         "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
         "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "dresseurId",
