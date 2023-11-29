@@ -1377,36 +1377,18 @@
         }
       }
     },
-    "/messages": {
-      "post": {
-        "summary": "Créer un message",
-        "tags": ["message"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Message"
-              }
-            }
-          }
-        },
-        "parameters": [
+    "/messages/{echangeId}":{
+      "get": {
+          "summary": "Afficger une discussion",
+          "tags": ["message"],
+          "parameters": [
           {
-            "name": "page",
-            "in": "query",
-            "description": "Numéro de la page",
-            "required": false,
+            "name": "echangeId",
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
             "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "Taille de la page",
-            "required": false,
-            "schema": {
-              "type": "integer"
+              "type": "string"
             }
           }
         ],
