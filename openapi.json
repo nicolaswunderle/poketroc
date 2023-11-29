@@ -810,7 +810,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Message"
+                "$ref": "#/components/schemas/MessageData"
               }
             }
           }
@@ -904,7 +904,7 @@
             }
           },
           "404": {
-            "$ref": "#/components/responses/DiscutionIntrouvable"
+            "$ref": "#/components/responses/DiscussionIntrouvable"
           }
         }
       }
@@ -913,6 +913,14 @@
 
   "components": {
     "responses": {
+      "EchangesPasAffiche": {
+        "description": "Les échanges ne sont pas affichés.",
+        "content": {
+          "text/plain": {
+            "example": "Les échanges ne sont pas affichés."
+          }
+        }
+      },
       "DresseurValidationErreur": {
         "description": "Echec de l'inscription.",
         "content": {
@@ -998,18 +1006,10 @@
         }
       },
       "DresseurIntrouvable": {
-        "description": "Le dresseur est introuvable",
+        "description": "Le dresseur est introuvable.",
         "content": {
           "text/plain": {
-            "example": "Ce dresseur est introuvable"
-          }
-        }
-      },
-      "DeckErreur": {
-        "description": "Erreur dans l'affichage du deck",
-        "content": {
-          "text/plain": {
-            "example": "Une erreur est survenu dans l'affichage de votre deck"
+            "example": "Ce dresseur est introuvable."
           }
         }
       },
@@ -1017,7 +1017,7 @@
         "description": "Destinataire introuvable.",
         "content": {
           "text/plain": {
-            "example": "Le destinataire n'a pas été trouvé"
+            "example": "Le destinataire n'a pas été trouvé."
           }
         }
       },
@@ -1025,7 +1025,7 @@
         "description": "Le message n'a pas été créée",
         "content": {
           "text/plain": {
-            "example": "Le message n'a pas pu être créée"
+            "example": "Le message n'a pas pu être créée."
           }
         }
       },
@@ -1037,11 +1037,11 @@
           }
         }
       },
-      "DiscutionIntrouvable": {
-        "description": "Discution introuvable",
+      "DiscussionIntrouvable": {
+        "description": "Discussion introuvable.",
         "content": {
           "text/plain": {
-            "example": "La discution est introuvable"
+            "example": "La discussion est introuvable."
           }
         }
       }
@@ -1538,34 +1538,63 @@
       "Message": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "description": "",
-            "example": "7fe91a9a41bc839033eedf0f"
-          },
           "date": {
-            "type": "string",
-            "description": "",
+            "type": "date",
+            "description": "La date du message.",
             "format": "data-time",
             "example": "2020-01-02T10:00:00.000Z"
           },
           "contenu": {
             "type": "string",
-            "description": "",
+            "description": "Le contenu du message.",
             "example": "Salut!"
           },
-          "expéditeur": {
-            "type": "string",
-            "description": "Celui qui envoie le message.",
-            "example": "Nerak"
+          "dresseur_id": {
+            "type": "Schema.Types.ObjectId",
+            "description": "L'id du dresseur.",
+            "example": "7be91a9a41bc839033eedf0k"
           },
-          "destinataire": {
-            "type": "string",
-            "description": "Celui qui reçoit le message.",
-            "example": "Salocin"
+          "echange_id": {
+            "type": "Schema.Types.ObjectId",
+            "description": "Id de l'échange.",
+            "example": "04657"
+          },
+          "createdAt": {
+            "type": "date",
+            "description": "Date de la créaction.",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "date",
+            "description": "Mise à jour de la date.",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
           }
         },
-        "required": ["id", "date", "contenu", "destinataire", "expéditeur"]
+        "required": [ "date", "contenu", "dresseur_id", "echange_id","createdAt", "updatedAt"]
+      },
+      "MessageData": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "date",
+            "description": "La date du message.",
+            "format": "data-time",
+            "example": "2020-01-02T10:00:00.000Z"
+          },
+          "contenu": {
+            "type": "string",
+            "description": "Le contenu du message.",
+            "example": "Salut!"
+          },
+          "dresseur_id": {
+            "type": "Schema.Types.ObjectId",
+            "description": "L'id du dresseur.",
+            "example": "7be91a9a41bc839033eedf0k"
+          }
+        },
+        "required": [ "date", "contenu", "dresseur_id", "echange_id","createdAt", "updatedAt"]
       }
     },
     "securitySchemes": {
