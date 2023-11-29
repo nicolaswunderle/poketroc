@@ -51,6 +51,19 @@ app.use('/api/dresseurs', function (err, req, res, next) {
   if (err.name === "ValidationError") {
     res.status(422).send(err.message);
   }
+  res.send(err);
+  next();
+});
+
+app.use('/api/messages', function (err, req, res, next) {
+  if (err.code === 11000) {
+    const rep = `Le destinataire et l'expediteur ne peuvent pas envoyer un message exactement à la même date.`;
+    res.status(409).send(rep);
+  }
+  // Si c'est une erreur de validation mongoose
+  if (err.name === "ValidationError") {
+    res.status(422).send(err.message);
+  }
   next();
 });
 
