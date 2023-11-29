@@ -1444,7 +1444,7 @@
         }
       }
     },
-    "messages": {
+    "/messages": {
       "post": {
         "summary": "Créer un message",
         "tags": ["message"],
