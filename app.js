@@ -10,6 +10,7 @@ import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
 import thingsRouter from "./routes/things.js";
 import messagesRouter from "./routes/messages.js";
+import echangesRouter from "./routes/echanges.js";
 
 // Connect to the database (can be overriden from environment)
 mongoose.connect(databaseUrl);
@@ -32,6 +33,7 @@ app.use("/api", indexRouter);
 app.use("/api/dresseurs", dresseursRouter);
 app.use("/api/things", thingsRouter);
 app.use("/api/messages", messagesRouter);
+app.use("/api/echanges", echangesRouter);
 
 
 
@@ -62,6 +64,14 @@ app.use('/api/messages', function (err, req, res, next) {
     const rep = `Le destinataire et l'expediteur ne peuvent pas envoyer un message exactement à la même date.`;
     res.status(409).send(rep);
   }
+  // Si c'est une erreur de validation mongoose
+  if (err.name === "ValidationError") {
+    res.status(422).send(err.message);
+  }
+  next();
+});
+
+app.use('/api/echanges', function (err, req, res, next) {
   // Si c'est une erreur de validation mongoose
   if (err.name === "ValidationError") {
     res.status(422).send(err.message);

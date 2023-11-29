@@ -26,6 +26,7 @@
     "ws": "^8.14.2"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-import-attributes": "^7.23.3",
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "jest": "^29.7.0",
