@@ -104,4 +104,29 @@ app.use(function (err, req, res, next) {
   res.send(err.message);
 });
 
+//Configurer les websockets
+const http = require("http");
+const socketIO = require("socket.io");
+
+const server = http.createServer(app);
+const io = socketIO(server);
+
+
+
+io.on("connection", (socket) => {
+  console.log("Nouvelle connexion WebSocket");
+  // Gérer les évenements
+  socket.on("example-event", (data) =>{
+   console.log("Reçu depuis le client : ",data);
+   // Envoyer une réponse au client 
+    socket.emit("response-event", "Données reçues avec succès");
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Serveur démarré sur le port ${PORT}`);
+});
+
 export default app;

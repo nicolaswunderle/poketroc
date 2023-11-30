@@ -5,7 +5,6 @@ import {
   getPaginationParameters,
   authenticate,
   requireJson,
-  loadDresseurFromParams,
   supChampsCarte,
 } from "./utils.js";
 
@@ -17,7 +16,6 @@ router.post(
   "/",
   requireJson,
   authenticate,
-  loadDresseurFromJWT,
   supChampsCarte,
   function (req, res, next) {
     const body = req.body;
