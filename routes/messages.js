@@ -1,7 +1,7 @@
 import debugFactory from 'debug';
 import express from "express";
 import Message from "../models/message.js";
-import { requireJson, authenticate } from "./utils.js";
+import { requireJson, authenticate, loadEchangeFromParams } from "./utils.js";
 
 const debug = debugFactory('poketroc:messages');
 const router = express.Router();
@@ -18,20 +18,29 @@ router.post("/", function (req, res, next) {
 });
 
 //Supprimer un message
-router.delete("/:messageId", authenticate, function (req, res, next) {
-    Message.deleteOne({ _id: req.message.id })
+router.delete("/:messageId", function (req, res, next) {
+  const messageId = req.params.messageId;
+    Message.deleteOne({ _id: messageId })
       .exec()
       .then(message => {
         if (!message) return res.status(404).send("Le message à supprimer n'existe pas"); // Unauthorized
-        res.sendStatus(204);
+        res.sendStatus(204).send("Le message à été supprimé");
         next();
       })
       .catch(next);
 });
 
 // Afficher une conversation
-router.get("/:echangeId",authenticate, function (req, res, next){
-    res.status(200).send(req.message);
+router.get("/:echangeId", loadEchangeFromParams, function (req, res, next){
+  const echangeId = req.params.echangeId;
+  Message.find()
+    .then((messages) => {
+      messages.forEach((message) => {
+        if(message.echange_id === echangeId){
+          res.status(200).send(message);
+        }
+      })
+    })
     next();
 })
 
