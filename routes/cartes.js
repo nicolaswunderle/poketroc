@@ -5,7 +5,6 @@ import {
   getPaginationParameters,
   authenticate,
   requireJson,
-  loadDresseurFromParams,
   supChampsCarte,
 } from "./utils.js";
 
@@ -17,11 +16,10 @@ router.post(
   "/",
   requireJson,
   authenticate,
-  loadDresseurFromJWT,
   supChampsCarte,
   function (req, res, next) {
     const body = req.body;
-    body.dresseur_id = req.dresseur._id;
+    body.dresseur_id = req.dresseurCon._id;
     const nouvelleCarte = new Carte(req.body);
     nouvelleCarte
       .save()
