@@ -11,13 +11,13 @@ servers:
   - url: https://poketroc.onrender.com/api
 tags:
   - name: dresseur
-    description: ''
+    description: 'Données dresseur'
   - name: carte
-    description: ''
+    description: 'Données carte'
   - name: échange
-    description: ''
+    description: 'Echange entre dresseur'
   - name: message
-    description: ''
+    description: 'Message pour échange'
 paths:
   /dresseurs:
     post:
@@ -98,7 +98,6 @@ paths:
           $ref: '#/components/responses/DresseurEstPasAffiche'
     patch:
       summary: Modifier partiellement les informations du dresseur
-      in: path
       tags:
         - dresseur
       security:
@@ -118,7 +117,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DresseurDataPartiel'
         '404':
-          $ref: '#/components/responses/ModificationErreur'
+          $ref: '#/components/responses/ModificationDresseurErreur'
         '422':
           $ref: '#/components/responses/DresseurValidationErreurPatch'
     delete:
@@ -151,11 +150,7 @@ paths:
               $ref: '#/components/schemas/connexion'
       responses:
         '201':
-          description: Connexion réussie
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/connexionReussie'
+          $ref: '#/components/responses/connexionReussie'
         '401':
           $ref: '#/components/responses/connexionEchouee'
         '422':
@@ -166,14 +161,12 @@ paths:
         - dresseur
       security:
         - BearerAuth: []
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '204':
           description: Déconnexion réussie
         '404':
           $ref: '#/components/responses/deconnexionEchouee'
+ 
   /cartes:
     post:
       summary: Créer une carte
@@ -197,7 +190,7 @@ paths:
           $ref: '#/components/responses/CarteValidationErreur'
   /cartes/{carteId}:
     get:
-      summary: Afficher carte dresseur
+      summary: Afficher carte
       tags:
         - carte
       security:
@@ -217,10 +210,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Carte'
         '404':
-          description: La carte n'est pas affichée.
           $ref: '#/components/responses/CartePasAffichee'
     patch:
-      summary: Modifier partiellement la carte du dresseur
+      summary: Modifier partiellement la carte
       tags:
         - carte
       security:
@@ -302,8 +294,7 @@ paths:
       responses:
         '200':
           description: >-
-            Liste des cartes du dresseur avec le statut spécifié est affichée
-            corectement.
+            Liste des cartes dresseurId, avec statut spécifié, affichée
           content:
             application/json:
               schema:
@@ -312,6 +303,7 @@ paths:
                   $ref: '#/components/schemas/Carte'
         '404':
           $ref: '#/components/responses/ListeCartePasAffichee'
+ 
   /echanges:
     post:
       summary: Créer un échange
@@ -430,7 +422,7 @@ paths:
       parameters:
         - name: echangeId
           in: path
-          description: ''
+          description: Id de l'échange
           required: true
           schema:
             type: string
@@ -493,11 +485,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Echange'
-        '404':
-          description: >-
-            La Liste des échanges du dresseur en fonction de l'état n'est pas
-            affichée.
+        '404':  
           $ref: '#/components/responses/EchangesPasAffiche'
+  
   /messages:
     post:
       summary: Créer un message
@@ -537,11 +527,11 @@ paths:
         - BearerAuth: []
       responses:
         '204':
-          description: Le message à été supprimé
+          description: MessageId supprimé
           content:
             text/plain:
               schema:
-                example: Le message à été supprimé
+                example: Le messageId 7be91a9a41bc839033eedf0k à été supprimé.
         '404':
           $ref: '#/components/responses/MessageIntrouvable'
   /messages/{echangeId}:
@@ -560,57 +550,26 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: Les messages de l'échange sont affichés.
+          description: Messages de l'échangeId affichés
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
         '404':
           $ref: '#/components/responses/DiscussionIntrouvable'
+
 components:
   responses:
-    EchangesPasAffiche:
-      description: Dresseur pas trouvé.
+    ModificationDresseurErreur:
+      description: Erreur modification dresseur
       content:
         text/plain:
-          example: Le dresseur avec l'ID 7be91a9a41bc839033eedf0k n'a pas été trouvé.
-    EchangePasSupprime:
-      description: L'échange n'a pas été supprimé.
-      content:
-        text/plain:
-          example: L'échange n'a pas été supprimé.
-    EchangeSupprime:
-      description: L'échange a été supprimé avec succès.
-      content:
-        text/plain:
-          example: L'échange a été supprimé avec succès.
-    EchangePasModifie:
-      description: L'échange n'a pas été modifié.
-      content:
-        text/plain:
-          example: L'échange n'a pas été modifié.
-    EchangeModificationErreur:
-      description: L'échange n'a pas pu être modifié.
-      content:
-        text/plain:
-          example: L'échange n'a pas pu être modifié.
-    EchangeValidationErreur:
-      description: L'échange n'a pas été crée car dresseur non trouvé.
-      content:
-        text/plain:
-          example: >-
-            L'échange n'a pas été créé, le dresseur avec l'ID
-            7be91a9a41bc839033eedf0k n'a pas été trouvé.
-    EchangePasAffiche:
-      description: Les échanges ne sont pas affichés.
-      content:
-        text/plain:
-          example: Les échanges ne sont pas affichés.
+          example: Le dresseurId 7be91a9a41bc839033eedf0k n'a pas été trouvé, modification invalide.
     DresseurValidationErreurPatch:
       description: Erreur de validation
       content:
         text/plain:
-          example: Erreur de validation lors de la modification du dresseur.
+          example: Erreur de validation lors de la modification du dresseurId 7be91a9a41bc839033eedf0k.
     DresseurValidationErreur:
       description: Echec de l'inscription.
       content:
@@ -618,53 +577,22 @@ components:
           example: >-
             Dresseur validation failed: mot_de_passe: Le mot de passe du
             dresseur est obligatoire.
-    CarteValidationErreur:
-      description: Erreur de validation lors de la création.
-      content:
-        application/json:
-          example: Une erreur de validation est survenue, la carte n'a pas été créée.
-    CartePasAffichee:
-      description: La carte n'est pas affichée.
-      content:
-        text/plain:
-          example: La carteId 'aaab' n'a pas pu s'afficher.
-    CartePasModifiee:
-      description: La carteId n'a pas été trouvée.
-      content:
-        text/plain:
-          example: >-
-            La carteId 'aaab' n'a pas été trouvée et n'a donc pas pu être
-            modifiée.
-    CarteSupprimee:
-      description: La carte a été correctement supprimée.
-      content:
-        text/plain:
-          example: La carteId 'aaab' a été supprimée.
-    CartePasSupprimee:
-      description: La carte n'a pas été supprimée.
-      content:
-        text/plain:
-          example: La carteId 'aaab' n'a pas été supprimée.
-    ListeCartePasAffichee:
-      description: Liste des cartes du dresseur avec le statut spécifié n'est pas affichée.
-      content:
-        text/plain:
-          example: >-
-            La liste des cartes du dresseurId 7be91a9a41bc839033eedf0k avec le
-            statut choisi n'a pas pu s'afficher.
+    
     connexionReussie:
-      type: object
-      example: Connexion réussie
-    connexionErreur:
-      description: Mots de passe ou pseudo incorrect
+      description: Connexion réussie.
       content:
         text/plain:
-          example: Connexion échouée, veuillez retenter.
+          example: Connexion au compte dresseurId 7be91a9a41bc839033eedf0k réussie.
+    connexionErreur:
+      description: Erreur de validation de connexion
+      content:
+        text/plain:
+          example: Erreur de validation, connexion échouée.
     connexionEchouee:
       description: Mots de passe ou pseudo incorrect
       content:
         text/plain:
-          example: Mots de passe ou pseudo incorrect.
+          example: Mots de passe ou pseudo incorrect, connexion échouée.
     deconnexionReussie:
       description: Déconnexion réussie.
       content:
@@ -681,7 +609,7 @@ components:
       description: Le dresseur n'a pas été affiché.
       content:
         text/plain:
-          example: Le dresseur ne s'affiche pas.
+          example: 'Le dresseurId 7fe91a9a41bc839033eedf0f n''a pas été trouvé.'
     ErreurConnexion:
       description: Erreur de connexion.
       content:
@@ -696,27 +624,102 @@ components:
       description: Le dresseur est introuvable.
       content:
         text/plain:
-          example: Ce dresseur est introuvable.
+          example: Le dresseurId 7be91a9a41bc839033eedf0k est introuvable.
     DestinataireErreur:
-      description: Destinataire introuvable.
+      description: Destinataire introuvable
       content:
         text/plain:
-          example: Le destinataire n'a pas été trouvé.
+          example: Le dresseurId 7be91a9a41bc839033eedf0k  introuvable, message impossible.
+    
+    CarteValidationErreur:
+      description: Erreur de validation lors de la création.
+      content:
+        application/json:
+          example: Une erreur de validation est survenue, la carte n'a pas été créée.
+    CartePasAffichee:
+      description: CarteId introuvable.
+      content:
+        text/plain:
+          example: La carteId 'aaab' introuvable, affichage impossible.
+    CartePasModifiee:
+      description: La carteId n'a pas été trouvée.
+      content:
+        text/plain:
+          example: >-
+            La carteId 'aaab' n'a pas été trouvée et n'a donc pas pu être
+            modifiée.
+    CarteSupprimee:
+      description: CarteId supprimée
+      content:
+        text/plain:
+          example: La carteId 'aaab' a été supprimée.
+    CartePasSupprimee:
+      description: CarteId introuvable.
+      content:
+        text/plain:
+          example: CarteId 'aaab' introuvable, suppression impossible.
+    ListeCartePasAffichee:
+      description: DresseurId introuvable
+      content:
+        text/plain:
+          example: >-
+            DresseurId 7be91a9a41bc839033eedf0k introuvable, la liste des cartes avec le
+            statut choisi ne peut pas être affichée.
+ 
+    EchangesPasAffiche:
+      description: Dresseur pas trouvé.
+      content:
+        text/plain:
+          example: Le dresseur avec l'ID 7be91a9a41bc839033eedf0k n'a pas été trouvé.
+    EchangePasSupprime:
+      description: EchangeId introuvable
+      content:
+        text/plain:
+          example: L'échangeId 7fe91a9a41bc839033eedf0f introuvable, suppression impossible.
+    EchangeSupprime:
+      description: L'échange a été supprimé avec succès.
+      content:
+        text/plain:
+          example: L'échangeId 7fe91a9a41bc839033eedf0f a été supprimé avec succès.
+    EchangePasModifie:
+      description: EchangeId introuvable.
+      content:
+        text/plain:
+          example: EchangeId 7fe91a9a41bc839033eedf0f introuvable, modification impossible.
+    EchangeModificationErreur:
+      description: Erreur validation
+      content:
+        text/plain:
+          example: Erreur de validation, modification de l'échangeId 7fe91a9a41bc839033eedf0f impossible
+    EchangeValidationErreur:
+      description: L'échange n'a pas été crée car dresseur non trouvé.
+      content:
+        text/plain:
+          example: >-
+            L'échange n'a pas été créé, le dresseur avec l'ID
+            7be91a9a41bc839033eedf0k n'a pas été trouvé.
+    EchangePasAffiche:
+      description: EchangeId introuvable
+      content:
+        text/plain:
+          example: EchangeId 7fe91a9a41bc839033eedf0f introuvable, affichage impossible.
+    
     MessageErreur:
-      description: Le message n'a pas été créée
+      description: Le message n'a pas été créé
       content:
         text/plain:
-          example: Le message n'a pas pu être créée.
+          example: Le message n'a pas pu être créé
     MessageIntrouvable:
       description: Message introuvable
       content:
         text/plain:
-          example: Le message est introuvable
+          example: Le messageId 7be91a9a41bc839033eedf0k est introuvable.
     DiscussionIntrouvable:
-      description: Discussion introuvable.
+      description: EchangeId introuvable
       content:
         text/plain:
-          example: La discussion est introuvable.
+          example: Messages de l'échangeId 04657 introuvables.
+  
   schemas:
     connexion:
       type: object
@@ -725,56 +728,66 @@ components:
           type: string
           maxlength: 40
           unique: true
-          description: ''
+          description: 'pseudo du dresseur'
           example: Nerak
         mot_de_passe:
           type: string
-          description: ''
+          description: 'mot de passe du dresseur'
           example: unMotDePasse88
       required:
         - pseudo
-        - mot_de_passe
+        - mot_de_passe   
     Dresseur:
       type: object
       properties:
         id:
           type: string
-          description: ''
-          example: 7fe91a9a41bc839033eedf0f
+          description: 'identifiant du dresseur'
+          example: 7be91a9a41bc839033eedf0k
         nom:
           type: string
-          description: ''
+          description: 'nom du dresseur'
           maxlength: 40
-          example: Fonseca
+          example: Bonfils
         prenom:
           type: string
-          description: ''
+          description: 'prénom du dresseur'
           maxlength: 40
-          example: Carina
+          example: Karen
         pseudo:
           type: string
-          description: ''
+          description: 'pseudo du dresseur'
           maxlength: 40
-          example: AniraC
+          example: Nerak
         email:
           type: string
-          description: ''
+          description: 'email du dresseur'
           example: adresse@email.ch
         age:
           type: integer
-          description: ''
+          description: 'âge du dresseur'
           minimum: 1
           maximum: 200
           example: 25
         localisation:
-          type: Point
-          description: ''
-          example: '[ -73.856077, 40.848447 ]'
-        image:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ['Point']
+              description: Type de localisation.
+            coordinates:
+              type: array
+              items:
+                type: number
+              description: Coordonnées géographiques (longitude, latitude).
+              example: '[ -73.856077, 40.848447 ]'
+        url_image_profil:
           type: string
-          description: ''
+          description: 'image du profil dresseur'
           example: >-
             https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg
+      
       required:
         - id
         - nom
@@ -789,38 +802,52 @@ components:
       properties:
         nom:
           type: string
-          description: ''
+          description: 'nom du dresseur'
           maxlength: 40
-          example: Fonseca
+          example: Bonfils
         prenom:
           type: string
-          description: ''
+          description: 'prénom du dresseur'
           maxlength: 40
-          example: Carina
+          example: Karen
         mot_de_passe:
           type: string
-          description: ''
+          description: 'mot de passe du dresseur'
           example: unMotDePasse32
         pseudo:
           type: string
-          description: ''
+          description: 'pseudo du dresseur'
           unique: true
           maxlength: 40
-          example: AniraC
+          example: Nerak
         email:
           type: string
-          description: ''
+          description: 'email du dresseur'
           example: adresse@email.ch
         age:
           type: number
-          description: ''
+          description: 'âge du dresseur'
           minimum: 1
           maximum: 200
           example: 25
         localisation:
-          type: Point
-          description: ''
-          example: '[ -73.856077, 40.848447 ]'
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ['Point']
+              description: Type de localisation.
+            coordinates:
+              type: array
+              items:
+                type: number
+              description: Coordonnées géographiques (longitude, latitude).
+              example: '[ -73.856077, 40.848447 ]'
+        url_image_profil:
+          type: string
+          description: 'image du prrofil dresseur'
+          example: >-
+            https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg
       required:
         - prenom
         - nom
@@ -833,38 +860,52 @@ components:
       properties:
         nom:
           type: string
-          description: ''
-          minlength: 3
+          description: 'nom du dresseur'
           maxlength: 40
-          example: Fonseca
+          example: Bonfils
         prenom:
           type: string
-          description: ''
-          minlength: 3
-          maxlength: 15
-          example: Carina
+          description: 'prénom du dresseur'
+          maxlength: 40
+          example: Karen
         pseudo:
           type: string
-          description: ''
-          example: AniraC
+          description: 'pseudo du dresseur'
+          maxlength: 40
+          example: Nerak
         email:
           type: string
-          description: ''
+          description: 'email du dresseur'
           example: adresse@email.ch
         mot_de_passe:
           type: string
-          description: ''
+          description: 'mot de passe du dresseur'
           example: unMotDePasse32
         age:
           type: number
-          description: ''
+          description: 'âge du dresseur'
           minimum: 1
           maximum: 200
           example: 25
         localisation:
-          type: Point
-          description: ''
-          example: '[ -73.856077, 40.848447 ]'
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ['Point']
+              description: Type de localisation.
+            coordinates:
+              type: array
+              items:
+                type: number
+              description: Coordonnées géographiques (longitude, latitude).
+              example: '[ -73.856077, 40.848447 ]'
+        url_image_profil:
+          type: string
+          description: 'image du profil dresseur'
+          example: >-
+            https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg
+    
     Carte:
       type: object
       properties:
@@ -915,7 +956,7 @@ components:
           description: La quantité de la carte
           minimum: 1
           maximum: 1000
-          example: 1
+          example: 7
         dresseur_id:
           type: string
           description: L'identifiant unique d'un dresseur qui possède la carte
@@ -978,7 +1019,7 @@ components:
           description: La quantité de la carte
           minimum: 1
           maximum: 1000
-          example: 1
+          example: 7
         dresseur_id:
           type: string
           description: L'identifiant unique d'un dresseur qui possède la carte
@@ -1033,7 +1074,7 @@ components:
           description: La quantité de la carte
           minimum: 1
           maximum: 1000
-          example: 1
+          example: 7
         dresseur_id:
           type: string
           description: L'identifiant unique d'un dresseur qui possède la carte
@@ -1063,6 +1104,7 @@ components:
         - id
         - echange_id
         - carte_id
+    
     Echange:
       type: object
       properties:
@@ -1072,7 +1114,7 @@ components:
           example: 7fe91a9a41bc839033eedf0f
         date:
           type: string
-          description: ''
+          description: date de l'échange
           format: data-time
           example: '2023-01-01T00:00:00Z'
           unique: true
@@ -1090,7 +1132,7 @@ components:
           unique: true
         dresseur:
           type: string
-          description: ''
+          description: 'dresseur'
           $ref: '#/components/schemas/Dresseur'
         dresseur_concerne_id:
           type: string
@@ -1106,7 +1148,7 @@ components:
       properties:
         date:
           type: string
-          description: ''
+          description: date de l'échange
           format: data-time
           example: '2023-01-01T00:00:00Z'
           unique: true
@@ -1135,7 +1177,7 @@ components:
       properties:
         date:
           type: string
-          description: ''
+          description: date de l'échange
           format: data-time
           example: '2023-01-01T00:00:00Z'
           unique: true
@@ -1154,11 +1196,12 @@ components:
         dresseur_concerne_id:
           type: string
           description: L'identifiant unique du dresseur concerné par l'échange
+    
     Message:
       type: object
       properties:
         date:
-          type: date
+          type: string
           description: La date du message.
           format: data-time
           example: '2020-01-02T10:00:00.000Z'
@@ -1167,20 +1210,20 @@ components:
           description: Le contenu du message.
           example: Salut!
         dresseur_id:
-          type: Schema.Types.ObjectId
+          type: string
           description: L'id du dresseur.
           example: 7be91a9a41bc839033eedf0k
         echange_id:
-          type: Schema.Types.ObjectId
+          type: string
           description: Id de l'échange.
           example: '04657'
         createdAt:
-          type: date
+          type: string
           description: Date de la créaction.
           format: data-time
           example: '2020-01-02T10:00:00.000Z'
         updatedAt:
-          type: date
+          type: string
           description: Mise à jour de la date.
           format: data-time
           example: '2020-01-02T10:00:00.000Z'
@@ -1195,7 +1238,7 @@ components:
       type: object
       properties:
         date:
-          type: date
+          type: string
           description: La date du message.
           format: data-time
           example: '2020-01-02T10:00:00.000Z'
@@ -1204,7 +1247,7 @@ components:
           description: Le contenu du message.
           example: Salut!
         dresseur_id:
-          type: Schema.Types.ObjectId
+          type: string
           description: L'id du dresseur.
           example: 7be91a9a41bc839033eedf0k
       required:
@@ -1214,6 +1257,7 @@ components:
         - echange_id
         - createdAt
         - updatedAt
+  
   securitySchemes:
     BearerAuth:
       type: http
