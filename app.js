@@ -118,8 +118,8 @@ io.on("connection", (socket) => {
   // Gérer les évenements
   socket.on("example-event", (data) =>{
    console.log("Reçu depuis le client : ",data);
-   // Envoyer une réponse au client 
-    socket.emit("response-event", "Données reçues avec succès");
+   // Envoyer une réponse au client   
+    socket.emit("example-event", "Données à envoyer au serveur");
   });
 });
 

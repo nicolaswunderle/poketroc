@@ -1,7 +1,7 @@
 import { WebSocketServer } from "ws";
 import si from "systeminformation";
 
-const WSS = new WebSocketServer({ port: 8080 });
+const WSS = new WebSocketServer({ port: 3000 });
 
 WSS.on('connection', function connection(ws) {
   console.log('Nouvelle connexion WebSocket');
