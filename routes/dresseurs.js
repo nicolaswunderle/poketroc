@@ -6,7 +6,7 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
-import { authenticate, loadLocationFromParams, getPaginationParameters, loadDresseurFromParams, editPermissionDresseur, requireJson } from "./utils.js";
+import { authenticate, loadLocationFromParams, getPaginationParameters, loadDresseurFromParams, supChampsDresseur, editPermissionDresseur, requireJson } from "./utils.js";
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 const signJwt = promisify(jwt.sign);
 
 // Créer un dresseur
-router.post("/", requireJson, function (req, res, next) {
+router.post("/", requireJson, supChampsDresseur, function (req, res, next) {
   const mdpBrut = req.body.mot_de_passe;
   const nouveauDresseur = new Dresseur(req.body);
 
