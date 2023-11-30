@@ -5,29 +5,73 @@ import { cleanUpDatabase } from "./utils.js";
 
 beforeEach(cleanUpDatabase);
 
-describe("Tests des routes pour les cartes", () => {
-  //créer un dresseur
+beforeEach(async function () {
+  [nicolasWunderle] = await Promise.all([
+    Dresseur.create({
+      pseudo: "nicorhzuwr",
+      mot_de_passe: "vivelaprog",
+    }),
+  ]);
+});
+/*
+beforeEach(async () => {
+  // Créez un dresseur directement dans le fichier de test
+  const nicolasWunderle = await Dresseur.create({
+    email: "nicolas.wunderle@gmail.com",
+    password: "vivelaprog",
+    // ... autres propriétés du dresseur
+  });
+*/
+const response = await supertest(app).post("/api/dresseur/login").send({
+  pseudo: "nicorhzuwr",
+  mot_de_passe: "vivelaprog",
+});
 
-  //se connecter en tant que dresseur
-  let carteId; // Vous utiliserez cet ID dans les tests
+token = response.body.token;
+
+let token;
+let carteId;
+
+describe("Tests des routes pour les cartes", () => {
+  it("Devrait créer une nouvelle carte", async () => {
+    const response = await supertest(app)
+      .post("/api/carte")
+      .send({
+        id_api: "yourhb_id",
+        etat: "neuve",
+        desc_etat: "Description de l'état",
+        type: "normale",
+        statut: "collectee",
+        quantite: 3,
+        dresseur_id: "656776bf963e32e19a34787c",
+      })
+      .set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode).toBe(201);
+    carteId = response.body._id;
+  });
 
   // Test de création d'une carte
   it("Devrait créer une nouvelle carte", async () => {
     const response = await supertest(app)
       .post("/api/carte")
       .send({
-        // Vos données de carte ici
+        id_api: "yourpi_id",
+        etat: "neuve",
+        desc_etat: "Description de l'état",
+        type: "normale",
+        statut: "collectee",
+        quantite: 3,
       })
-      .set("Authorization", "Bearer VOTRE_JWT_TOKEN"); // Assurez-vous de remplacer VOTRE_JWT_TOKEN par un vrai token valide
+      .set("Authorization", `Bearer ${token}`);
     expect(response.statusCode).toBe(201);
-    carteId = response.body._id; // Sauvegardez l'ID de la carte créée pour les tests ultérieurs
+    carteId = response.body._id;
   });
 
   // Test d'affichage d'une carte
   it("Devrait afficher une carte spécifique", async () => {
     const response = await supertest(app)
       .get(`/api/carte/${carteId}`)
-      .set("Authorization", "Bearer VOTRE_JWT_TOKEN");
+      .set("Authorization", `Bearer ${token}`);
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("_id", carteId);
   });
@@ -36,20 +80,17 @@ describe("Tests des routes pour les cartes", () => {
   it("Devrait modifier une carte existante", async () => {
     const response = await supertest(app)
       .patch(`/api/carte/${carteId}`)
-      .send({
-        // Vos données de mise à jour ici
-      })
-      .set("Authorization", "Bearer VOTRE_JWT_TOKEN");
+      .send({})
+      .set("Authorization", `Bearer ${token}`);
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("_id", carteId);
-    // Ajoutez d'autres assertions en fonction de vos besoins
   });
 
   // Test de suppression d'une carte
   it("Devrait supprimer une carte spécifique", async () => {
     const response = await supertest(app)
       .delete(`/api/carte/${carteId}`)
-      .set("Authorization", "Bearer VOTRE_JWT_TOKEN");
+      .set("Authorization", `Bearer ${token}`);
     expect(response.statusCode).toBe(204);
   });
 
@@ -57,9 +98,8 @@ describe("Tests des routes pour les cartes", () => {
   it("Devrait afficher toutes les cartes", async () => {
     const response = await supertest(app)
       .get("/api/carte")
-      .set("Authorization", "Bearer VOTRE_JWT_TOKEN");
+      .set("Authorization", `Bearer ${token}`);
     expect(response.statusCode).toBe(200);
-    // Ajoutez d'autres assertions en fonction de vos besoins
   });
 });
 
