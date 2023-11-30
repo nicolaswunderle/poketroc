@@ -70,11 +70,12 @@ const dresseurSchema = new Schema({
     },
     mot_de_passe: {
         type: String,
-        required: [true, "Le mot de passe du dresseur est obligatoire."],
+        required: [true, "Le mot de passe du dresseur est obligatoire."]
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+        immutable: [true, "La date de création du dresseur n'est pas modifiable."]
     },
     updatedAt: {
         type: Date,
@@ -101,10 +102,10 @@ function isLongitude(value) {
 
 
 dresseurSchema.set("toJSON", {
-    transform: transformJsonDresseur
+    transform: transformJson
 });
  
-function transformJsonDresseur(doc, json, options) {
+function transformJson(doc, json, options) {
     // Enlève le mot de passe hashé lorsqu'on génère le JSON
     delete json.mot_de_passe;
     delete json.createdAt;

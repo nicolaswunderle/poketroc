@@ -7,12 +7,14 @@ const echConCarSchema = new Schema({
     carte_id: {
         type: Schema.Types.ObjectId,
         ref: 'Carte',
-        required: [true, "L'id de la carte qui va être échangée est obligatoire."]
+        required: [true, "L'id de la carte qui va être échangée est obligatoire."],
+        immutable: [true, "L'id de la carte n'est pas modifiable."]
     },
     echange_id: {
         type: Schema.Types.ObjectId,
         ref: 'Echange',
-        required: [true, "L'id de l'échange qui va concerner une ou plusieurs cartes est obligatoire."]
+        required: [true, "L'id de l'échange qui va concerner une ou plusieurs cartes est obligatoire."],
+        immutable: [true, "L'id de l'échange n'est pas modifiable."]
     },
     createdAt: {
         type: Date,
@@ -28,10 +30,10 @@ const echConCarSchema = new Schema({
 echConCarSchema.index({ carte_id: 1, echange_id: 1 }, { unique: true });
 
 echConCarSchema.set("toJSON", {
-    transform: transformJsonDresseur
+    transform: transformJson
 });
  
-function transformJsonDresseur(doc, json, options) {
+function transformJson(doc, json, options) {
     delete json.createdAt;
     delete json.updatedAt;
     delete json.__v;

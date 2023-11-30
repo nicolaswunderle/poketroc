@@ -16,7 +16,8 @@ const echangeSchema = new Schema({
     dresseur_cree_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur',
-        required: [true, "L'id du dresseur qui crée l'échange est obligatoire."]
+        required: [true, "L'id du dresseur qui crée l'échange est obligatoire."],
+        immutable: [true, "L'id du dresseur qui crée l'échange n'est pas modifiable."]
     },
     dresseur_concerne_id: {
         type: Schema.Types.ObjectId,
@@ -25,11 +26,12 @@ const echangeSchema = new Schema({
         validate: {
             validator: validateDresseurConcerneId,
             message: "dresseur_concerne_id ne peut pas avoir la même valeur que dresseur_cree_id"
-        }
+        },
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+        immutable: [true, "La date de création de l'échange n'est pas modifiable."]
     },
     updatedAt: {
         type: Date,
@@ -38,18 +40,18 @@ const echangeSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-echangeSchema.index({dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
+echangeSchema.index({createdAt: 1, dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
 
 // dresseur_concerne_id ne peut pas être identique à dresseur_cree_id
 function validateDresseurConcerneId (value) {
-    return this.dresseur_cree_id.toString() !== value.toString();
+    if (value !== null) return this.dresseur_cree_id.toString() !== value.toString();
 }
 
 echangeSchema.set("toJSON", {
-    transform: transformJsonDresseur
+    transform: transformJson
 });
  
-function transformJsonDresseur(doc, json, options) {
+function transformJson(doc, json, options) {
     delete json.updatedAt;
     delete json.__v;
     return json;
