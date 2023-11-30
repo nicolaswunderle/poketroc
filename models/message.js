@@ -13,16 +13,19 @@ const messageSchema = new Schema({
     dresseur_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur',
-        required: [true, "L'id du dresseur du message est obligatoire."]
+        required: [true, "L'id du dresseur du message est obligatoire."],
+        immutable: [true, "L'id du dresseur du message n'est pas modifiable."]
     },
     echange_id: {
         type: Schema.Types.ObjectId,
         ref: 'Echange',
-        required: [true, "L'id de l'échange du message est obligatoire."]
+        required: [true, "L'id de l'échange du message est obligatoire."],
+        immutable: [true, "L'id de l'échange du message n'est pas modifiable."]
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+        immutable: [true, "La date de création du message n'est pas modifiable."]
     },
     updatedAt: {
         type: Date,
@@ -34,10 +37,10 @@ const messageSchema = new Schema({
 messageSchema.index({ createdAt: 1, dresseur_id: 1, echange_id: 1}, { unique: true });
 
 messageSchema.set("toJSON", {
-    transform: transformJsonDresseur
+    transform: transformJson
 });
  
-function transformJsonDresseur(doc, json, options) {
+function transformJson(doc, json, options) {
     delete json.updatedAt;
     delete json.__v;
     return json;

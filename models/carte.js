@@ -7,6 +7,7 @@ const carteSchema = new Schema({
     id_api: {
         type: String,
         required: [true, "L'identifiant API de la carte est obligatoire."],
+        immutable: [true, "L'identifiant API de la carte ne peut pas être modifié."],
         trim: true
     },
     etat: {
@@ -54,7 +55,8 @@ const carteSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+        immutable: [true, "La date de création de la carte n'est pas modifiable."]
     },
     updatedAt: {
         type: Date,
@@ -66,10 +68,10 @@ const carteSchema = new Schema({
 carteSchema.index({ id_api: 1, etat: 1, desc_etat: 1, type: 1, dresseur_id: 1 }, { unique: true });
 
 carteSchema.set("toJSON", {
-    transform: transformJsonDresseur
+    transform: transformJson
 });
  
-function transformJsonDresseur(doc, json, options) {
+function transformJson(doc, json, options) {
     delete json.createdAt;
     delete json.updatedAt;
     delete json.__v;
