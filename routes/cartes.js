@@ -14,12 +14,13 @@ router.post("/", authenticate, function (req, res, next) {
     .save()
     .then((carteSauve) => {
       res.status(201).send(carteSauve);
+      next();
     })
     .catch(next);
 });
 
 // Afficher une carte
-router.get("/:carteId", function (req, res, next) {
+router.get("/:carteId", authenticate, function (req, res, next) {
   const carteId = req.params.carteId;
 
   Carte.findById(carteId)
@@ -34,7 +35,7 @@ router.get("/:carteId", function (req, res, next) {
 });
 
 // Modifier une carte
-router.patch("/:carteId", function (req, res, next) {
+router.patch("/:carteId", authenticate, function (req, res, next) {
   const carteId = req.params.carteId;
   const majCarte = req.body;
 
@@ -68,7 +69,7 @@ router.patch("/:carteId", function (req, res, next) {
 });
 
 // Supprimer une carte
-router.delete("/:carteId", function (req, res, next) {
+router.delete("/:carteId", authenticate, function (req, res, next) {
   const carteId = req.params.carteId;
 
   Carte.deleteOne({ _id: carteId })
