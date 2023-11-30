@@ -8,7 +8,7 @@ beforeEach(cleanUpDatabase);
 // Créer un échange
 describe('POST /api/echanges', () => {
   const echangeData = {
-    etat: 'attente!',
+    etat: 'attente',
     dresseur_cree_id: '7fe91a9a41bc839033eedf0f',
     dresseur_concerne_id: '7fe91a9a41bc839033eedf1f',
     createdAt: '2020-01-02T10:00:00.000Z',

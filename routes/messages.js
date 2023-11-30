@@ -1,6 +1,7 @@
 import debugFactory from 'debug';
 import express from "express";
 import Message from "../models/message.js";
+import { requireJson, authenticate } from "./utils.js";
 
 const debug = debugFactory('poketroc:messages');
 const router = express.Router();
@@ -9,15 +10,15 @@ const router = express.Router();
 router.post("/", function (req, res, next) {
   const nouveauMessage = new Message(req.body);
 
-    nouveauMessage.save().then(messageSauve => {   
-      res.status(201).send(messageSauve);
-    })
-    .catch(next);
+  nouveauMessage.save().then(messageSauve => {   
+    res.status(201).send(messageSauve);
+  })
+  .catch(next);
     
 });
 
 //Supprimer un message
-router.delete("/:messageId", function (req, res, next) {
+router.delete("/:messageId", authenticate, function (req, res, next) {
     Message.deleteOne({ _id: req.message.id })
       .exec()
       .then(message => {
@@ -29,8 +30,9 @@ router.delete("/:messageId", function (req, res, next) {
 });
 
 // Afficher une conversation
-router.get("/:echangeId", function (req, res, next){
+router.get("/:echangeId",authenticate, function (req, res, next){
     res.status(200).send(req.message);
     next();
 })
+
 export default router;

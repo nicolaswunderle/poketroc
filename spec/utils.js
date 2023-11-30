@@ -6,6 +6,6 @@ export const cleanUpDatabase = async function() {
     await Promise.all([
         Dresseur.deleteMany(),
         Message.deleteMany(),
-        Echange.deleteMany()
+        Echange.deleteMany(),
     ]);
 };
