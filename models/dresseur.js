@@ -7,24 +7,28 @@ const dresseurSchema = new Schema({
     prenom: {
         type: String,
         required: [true, "Le prénom du dresseur est obligatoire."],
-        maxlength: [40, "Le prénom du dresseur doit être plus court ou égal à 40 caractères."]
+        maxlength: [40, "Le prénom du dresseur doit être plus court ou égal à 40 caractères."],
+        trim: true
     },
     nom: {
         type: String,
         required: [true, "Le nom du dresseur est obligatoire."],
-        maxlength: [40, "Le nom du dresseur doit être plus court ou égal à 40 caractères."]
+        maxlength: [40, "Le nom du dresseur doit être plus court ou égal à 40 caractères."],
+        trim: true
     },
     pseudo: {
         type: String,
         required: [true, "Le pseudo du dresseur est obligatoire."],
         maxlength: [40, "Le pseudo du dresseur doit être plus court ou égal à 40 caractères."],
         unique: true,
+        trim: true
     },
     email: {
         type: String,
         required: [true, "L'adresse email du dresseur est obligatoire."],
+        match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "L'adresse email du dresseur n'est pas valide."],
         lowercase: true,
-        match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "L'adresse email du dresseur n'est pas valide."]
+        trim: true
     },
     age: {
         type: Number,
@@ -36,7 +40,11 @@ const dresseurSchema = new Schema({
         type: {
             type: String,
             required: true,
-            enum: [ 'Point' ]
+            enum: {
+                values: [ 'Point' ],
+                message: "Le type de la localisation d'une carte ne peut être que Point"
+            },
+            trim: true
         },
         coordinates: {
             type: [ Number ],
@@ -49,7 +57,8 @@ const dresseurSchema = new Schema({
     },
     url_image_profil: {
         type: String,
-        default: 'asset/image_profil_defaut.jpeg'
+        default: 'asset/image_profil_defaut.jpeg',
+        trim: true
     },
     en_ligne: {
         type: Boolean,

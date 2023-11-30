@@ -6,8 +6,12 @@ const Schema = mongoose.Schema;
 const echangeSchema = new Schema({
     etat: {
         type: String,
-        enum: ['accepte', 'attente', 'refuse'],
-        default: 'attente'
+        enum: {
+            values: ['accepte', 'attente', 'refuse'],
+            message: "L'état d'un échange doit être soit accepte, attente ou refuse."
+        },
+        default: 'attente',
+        trim: true
     },
     dresseur_cree_id: {
         type: Schema.Types.ObjectId,
@@ -17,6 +21,7 @@ const echangeSchema = new Schema({
     dresseur_concerne_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur',
+        default: null,
         validate: {
             validator: validateDresseurConcerneId,
             message: "dresseur_concerne_id ne peut pas avoir la même valeur que dresseur_cree_id"
@@ -33,7 +38,7 @@ const echangeSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-echangeSchema.index({ createdAt: 1, dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
+echangeSchema.index({dresseur_cree_id: 1, dresseur_concerne_id: 1 }, { unique: true });
 
 // dresseur_concerne_id ne peut pas être identique à dresseur_cree_id
 function validateDresseurConcerneId (value) {
