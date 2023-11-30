@@ -1,24 +1,37 @@
 import debugFactory from "debug";
 import express from "express";
 import Carte from "../models/carte.js";
-import { authenticate } from "./utils.js";
-import { getPaginationParameters } from "./utils.js";
+import {
+  getPaginationParameters,
+  authenticate,
+  requireJson,
+  loadDresseurFromParams,
+  supChampsCarte,
+} from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
 const router = express.Router();
 
 // Créer une carte
-router.post("/", authenticate, function (req, res, next) {
-  //res.send("TODO");
-  const nouvelleCarte = new Carte(req.body);
-  nouvelleCarte
-    .save()
-    .then((carteSauve) => {
-      res.status(201).send(carteSauve);
-      next();
-    })
-    .catch(next);
-});
+router.post(
+  "/",
+  requireJson,
+  authenticate,
+  loadDresseurFromJWT,
+  supChampsCarte,
+  function (req, res, next) {
+    const body = req.body;
+    body.dresseur_id = req.dresseur._id;
+    const nouvelleCarte = new Carte(req.body);
+    nouvelleCarte
+      .save()
+      .then((carteSauve) => {
+        res.status(201).send(carteSauve);
+        next();
+      })
+      .catch(next);
+  }
+);
 
 // Afficher une carte
 router.get("/:carteId", authenticate, function (req, res, next) {
@@ -86,8 +99,8 @@ router.delete("/:carteId", authenticate, function (req, res, next) {
 });
 
 // Afficher toutes les cartes
-//est-ce que l'url est juste ?
-router.get("/", authenticate, function (req, res, next) {
+
+router.get("/{dresseurId}", authenticate, function (req, res, next) {
   const { page, pageSize } = getPaginationParameters(req);
   Carte.find()
     .skip((page - 1) * pageSize)

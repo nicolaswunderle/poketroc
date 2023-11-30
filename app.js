@@ -3,8 +3,8 @@ import createError from "http-errors";
 import logger from "morgan";
 import mongoose from "mongoose";
 import swaggerUi from "swagger-ui-express";
-import fs from 'fs';
-import yaml from 'js-yaml';
+import fs from "fs";
+import yaml from "js-yaml";
 import { databaseUrl } from "./config.js";
 //Router
 import indexRouter from "./routes/index.js";
@@ -19,7 +19,7 @@ mongoose.connect(databaseUrl);
 const app = express();
 
 // Parse the OpenAPI document.
-const openApiDocument = yaml.load(fs.readFileSync('./openapi.yml'));
+const openApiDocument = yaml.load(fs.readFileSync("./openapi.yml"));
 // Serve the Swagger UI documentation.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
@@ -37,19 +37,17 @@ app.use("/api/cartes", cartesRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/api/echanges", echangesRouter);
 
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-
-app.use('/api', function (err, req, res, next) {
+app.use("/api", function (err, req, res, next) {
   // Log the error on stderr
-  console.warn(err);
+  //console.warn(err);
 
   // Respond with 422 Unprocessable Entity if it's a Mongoose validation error
-  if (err.name == 'ValidationError' && !err.status) {
+  if (err.name == "ValidationError" && !err.status) {
     err.status = 422;
   }
 
@@ -57,20 +55,19 @@ app.use('/api', function (err, req, res, next) {
   if (err.code === 11000) {
     err.status = 409;
     switch (req.path) {
-      case '/dresseurs':
+      case "/dresseurs":
         err.message = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
-      break;
-      case '/messages':
+        break;
+      case "/messages":
         err.message = `Deux messages ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_id et echange_id`;
-      break;
-      case '/cartes':
+        break;
+      case "/cartes":
         err.message = `Deux cartes ne peuvent pas avoir la même valeur pour les champs id_api, etat, desc_etat, type et dresseur_id.`;
-      break;
-      case '/echanges':
+        break;
+      case "/echanges":
         err.message = `Deux échanges ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_cree_id et dresseur_concerne_id`;
-      break;
+        break;
     }
-    
   }
 
   // lors d'une erreur 11000 de mongoose
@@ -84,7 +81,7 @@ app.use('/api', function (err, req, res, next) {
 
   // Send the error message in the response
   const response = {
-    message: err.message
+    message: err.message,
   };
 
   // If it's a validation error, also send the errors details from Mongoose
