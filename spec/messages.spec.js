@@ -10,7 +10,7 @@ beforeEach(cleanUpDatabase);
 // Créer un message
 describe('POST /api/messages', () => {
   const messageData = {
-    date: '2020-01-02T10:00:00.000Z',
+    createdAt: '2020-01-02T10:00:00.000Z',
     contenu: 'Salut!',
     dresseur_id: '7fe91a9a41bc839033eedf0f',
     echange_id: '7fe91a9a41bc839033eedf1f'
@@ -27,9 +27,9 @@ describe('POST /api/messages', () => {
 
     // Assertions
     expect(responseBody).toBeObject();
-    expect(responseBody).toContainAllKeys(['date', 'contenu', 'dresseur_id', 'echange_id', '_id']);
+    expect(responseBody).toContainAllKeys(['createdAt', 'contenu', 'dresseur_id', 'echange_id', '_id']);
     expect(responseBody._id).toMatch(/^[0-9a-f]{24}$/); // Assuming it's an ObjectID
-    expect(responseBody.date).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    expect(responseBody.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     Object.keys(responseBody).forEach((key) => {
       if(key !== "_id") {
         expect(responseBody[key]).toEqual(messageData[key]);
@@ -97,9 +97,9 @@ describe('GET /messages/{echangeId}', () => {
 
             expect(responseBody).toBeArray();
             responseBody.forEach(message => {
-              expect(message).toContainAllKeys(['date', 'contenu', 'dresseur_id', 'echange_id', '_id']);
+              expect(message).toContainAllKeys(['createdAt', 'contenu', 'dresseur_id', 'echange_id', '_id']);
               expect(message._id).toMatch(/^[0-9a-f]{24}$/); // Assuming it's an ObjectID
-              expect(message.date).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+              expect(message.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
             });
           }
         });

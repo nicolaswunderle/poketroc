@@ -1,9 +1,8 @@
 import debugFactory from 'debug';
 import express from "express";
 import Echange from "../models/echange.js";
-import { authenticate, requireJson } from "./utils.js";
 
-const debug = debugFactory('poketroc:echanges');
+const debug = debugFactory('poketroc:messages');
 const router = express.Router();
 
 // Créer un échange
@@ -15,7 +14,6 @@ const router = express.Router();
 //         next();
 //     })
 //     .catch(next);
-    
 // });
 
 
@@ -41,10 +39,6 @@ router.post("/", requireJson, authenticate, async function (req, res, next) {
     next(error);
   }
 });
-
-
-
-
 
 // LA CONTRAINTE d'unicité ne marche pas
 

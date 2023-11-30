@@ -4,7 +4,6 @@ import logger from "morgan";
 import mongoose from "mongoose";
 import fs from 'fs';
 import yaml from 'js-yaml';
-import swaggerUi from "swagger-ui-express";
 import { databaseUrl } from "./config.js";
 //Router
 import indexRouter from "./routes/index.js";
