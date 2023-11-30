@@ -18,7 +18,7 @@ router.post("/", function (req, res, next) {
 });
 
 //Supprimer un message
-router.delete("/:messageId", function (req, res, next) {
+router.delete("/:messageId",authenticate, function (req, res, next) {
   const messageId = req.params.messageId;
     Message.deleteOne({ _id: messageId })
       .exec()
@@ -31,7 +31,7 @@ router.delete("/:messageId", function (req, res, next) {
 });
 
 // Afficher une conversation
-router.get("/:echangeId", loadEchangeFromParams, function (req, res, next){
+router.get("/:echangeId",authenticate, loadEchangeFromParams, function (req, res, next){
   const echangeId = req.params.echangeId;
   Message.find()
     .then((messages) => {

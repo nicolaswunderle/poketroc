@@ -4,7 +4,7 @@ import { promisify } from "util";
 import { jwtSecret } from "../config.js";
 import Dresseur from "../models/dresseur.js";
 import Echange from "../models/echange.js";
-import Carte from "../models/carte.js";
+//import Carte from "../models/carte.js";
 import Message from "../models/message.js";
 
 const verifyJwt = promisify(jwt.verify);
@@ -162,21 +162,6 @@ export function getPaginationParameters(req) {
   }
 
   return { page, pageSize };
-}
-
-export function loadEchangeFromParams(req, res, next) {
-  const echangeId = req.params.echangeId;
-  // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(echangeId)) return res.status(400).send("L'id de l'échange est invalide.");
-
-  Echange.findById(echangeId)
-    .exec()
-    .then(echange => {
-      if (!echange) return res.status(404).send(`Aucun échange ne possède l'id ${echangeId}`);
-      req.echange = echange;
-      next();
-    })
-    .catch(next);
 }
 
 export function loadMessageFromParams(req, res, next) {

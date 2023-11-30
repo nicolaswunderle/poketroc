@@ -113,17 +113,32 @@ test('POST /api/dresseurs', async () => {
 
 // Afficher le dresseur
 describe('GET /dresseurs/{dresseurId}', () => {
+    const dresseurData = {
+        prenom: 'John',
+        nom: 'Doe',
+        pseudo: 'johndoe',
+        email: 'john.doe@example.com',
+        age: 25,
+        localisation: {
+          type: 'Point',
+          coordinates: [0, 0]
+        },
+        url_image_profil: 'path/to/image.jpg',
+        en_ligne: true,
+        deck_visible: false,
+        mot_de_passe: 'securePassword'
+      };
     it('should retrieve the user profil', async () => {
         const dresseur = await Dresseur.find({});
         if (dresseur.length>0){
             const response = supertest(app)
             .get(`api/dresseur/${dresseur[0]._id}`)
             .expect(201)
-            .expect('Content-Type', /json/)
+            .expect('Content-Type', /json/);
 
             const responseBody = response.body;
             expect(responseBody).toBeObject();
-            expect(responseBody).toContainAllKeys(['_id', 'prenom', 'nom', 'pseudo', 'email', 'age', 'localisation', 'url_image_profil', 'en_ligne', 'deck_visible']);
+            expect(responseBody).toContainAllKeys(['_id','prenom', 'nom', 'pseudo', 'email', 'age', 'localisation', 'url_image_profil', 'en_ligne', 'deck_visible']);
             expect(body._id).toMatch(/^[0-9a-f]{24}$/);
             expect(body.age).toBeNumber();
             expect(body.localisation).toBeObject();
@@ -131,32 +146,92 @@ describe('GET /dresseurs/{dresseurId}', () => {
             expect(body.localisation.coordinates).toBeArray();
             expect(body.localisation.coordinates[0]).toBeNumber();
             expect(body.localisation.coordinates[1]).toBeNumber();
-            expect(body.en_ligne).toBeBoolean();
             expect(body.deck_visible).toBeBoolean();
+            expect(body).toEqual();
+        } else {
+            // Assuming your API returns a 401 response for an unprocessable entity
+            await supertest(app)
+              .get(`/api/dresseurs/${dresseurData._id}`)
+              .send(`Le dresseurId ${dresseurData._id} n'a pas été trouvé.`)
+              .expect(401);
         }
     })
 })
 
 // Modifier un dresseur
 describe('PATCH /dresseurs/{dresseurId}', () => {
+    const dresseurData = {
+        prenom: 'John',
+        nom: 'Doe',
+        pseudo: 'johndoe',
+        email: 'john.doe@example.com',
+        age: 25,
+        localisation: {
+          type: 'Point',
+          coordinates: [0, 0]
+        },
+        url_image_profil: 'path/to/image.jpg',
+        en_ligne: true,
+        deck_visible: false,
+        mot_de_passe: 'securePassword'
+      };
 
-      it('should update a dresseur successfully', async () => {
-        const dresseur = await Dresseur.find();
-        const response = await supertest(app)
-          .patch(`/api/dresseurs/${dresseur._id}`)
-          .expect(401)
-          .expect('Content-Type', /json/);
+    it('should update a dresseur successfully', async () => {
+        const createdDresseur = await Dresseur(dresseurData);
+        
+        if (dresseurData.en_ligne === true){
 
-          const body = response.body;
-          expect(body).toBeObject();
-          expect(body).toContainAllKeys(['_id', 'prenom', 'nom', 'pseudo', 'email', 'age', 'url_image_profil', 'deck_visible']);
-          expect(body._id).toMatch(/^[0-9a-f]{24}$/);
-          expect(body.age).toBeNumber();
-          expect(body.deck_visible).toBeBoolean();
-      });
+            const updatedDresseurData = [
+                {
+                prenom: 'Jane',
+                nom: 'Smith',
+                pseudo: 'janesmith',
+                age: 30,
+                localisation: {
+                  type: 'Point',
+                  coordinates: [1, 1]
+                },
+                url_image_profil: 'path/to/newimage.jpg',
+                en_ligne: false,
+                deck_visible: true,
+                mot_de_passe: 'newSecurePassword'
+            }];
 
+            const response = await supertest(app)
+              .patch(`/api/dresseurs/${createdDresseur._id}`)
+              .send(updatedDresseurData)
+              .expect(200)
+              .expect('Content-Type', /json/);
 
-      // Ajoutez d'autres tests selon vos besoins
+            const updatedDresseur = response.body;
+
+            // Assertions
+            expect(updatedDresseur).toBeObject();
+            expect(updatedDresseur).toContainAllKeys(['prenom', 'nom', 'pseudo', 'age', 'url_image_profil', 'deck_visible', 'mot_de_passe', 'updatedAt']);
+
+            // Check specific fields
+            expect(updatedDresseur.prenom).toEqual(updatedDresseurData.prenom);
+            expect(updatedDresseur.nom).toEqual(updatedDresseurData.nom);
+            expect(updatedDresseur.pseudo).toEqual(updatedDresseurData.pseudo);
+            expect(updatedDresseur.age).toEqual(updatedDresseurData.age);
+            expect(updatedDresseur.localisation).toEqual(updatedDresseurData.localisation);
+            expect(updatedDresseur.url_image_profil).toEqual(updatedDresseurData.url_image_profil);
+            expect(updatedDresseur.en_ligne).toEqual(updatedDresseurData.en_ligne);
+            expect(updatedDresseur.deck_visible).toEqual(updatedDresseurData.deck_visible);
+
+            // Check if the password has been hashed
+            expect(updatedDresseur.mot_de_passe).not.toEqual(updatedDresseurData.mot_de_passe);
+            expect(body).toEqual();
+        } else {
+            // Assuming your API returns a 422 response for an unprocessable entity
+            const invalidRecipientData = `Le dresseurId ${dresseurData._id} n'a pas été trouvé, modification invalide.`;
+            await supertest(app)
+              .patch('/api/dresseurs/{dresseurId}')
+              .send(invalidRecipientData)
+              .expect(404);
+        }
+        
+    });
 
 })
 
