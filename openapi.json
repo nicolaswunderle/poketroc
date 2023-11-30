@@ -26,260 +26,6 @@
     }
   ],
   "paths": {
-    "/cartes": {
-      "post": {
-        "summary": "Créer une carte",
-        "tags": ["carte"],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CarteData"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Création réussie.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Carte"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Échec de la création.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/CarteValidationErreur"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/cartes/{carteId}": {
-      "get": {
-        "summary": "Afficher carte dresseur",
-        "tags": ["carte"],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "carteId",
-            "in": "path",
-            "description": "Identifiant de la carte",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "La carte a été affichée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Carte"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "La carte n'est pas affichée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/CartePasAffichee"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modifier partiellement la carte du dresseur",
-        "tags": ["carte"],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "carteId",
-            "in": "path",
-            "description": "Identifiant de la carte",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CarteDataPartiel"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Modification réussie.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Carte"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "La carte n'a pas été modifiée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartePasModifiee"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Supprimer la carte",
-        "tags": ["carte"],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "carteId",
-            "in": "path",
-            "description": "Identifiant de la carte",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "La carte a été correctement supprimée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/CarteSupprimee"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "La carte n'a pas été supprimée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/CartePasSupprimee"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
-      "get": {
-        "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
-        "tags": ["carte"],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "dresseurId",
-            "in": "path",
-            "description": "Identifiant du dresseur",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "statut",
-            "in": "query",
-            "description": "Statut des cartes (collectee, souhaitee)",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["collectee", "souhaitee"]
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Numéro de la page",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "Taille de la page",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des cartes du dresseur avec le statut spécifié est affichée corectement.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Carte"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Liste des cartes du dresseur avec le statut spécifié n'est pas affichée.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/ListeCartePasAffichee"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     
     "/dresseurs": {
       "post": {
@@ -528,6 +274,220 @@
       }
     },
 
+    "/cartes": {
+      "post": {
+        "summary": "Créer une carte",
+        "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarteData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Création réussie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/CarteValidationErreur"
+          }
+        }
+      }
+    },
+    "/cartes/{carteId}": {
+      "get": {
+        "summary": "Afficher carte dresseur",
+        "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "carteId",
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La carte a été affichée.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La carte n'est pas affichée.",  
+              "$ref": "#/components/responses/CartePasAffichee"
+             }
+        }
+      },
+      "patch": {
+        "summary": "Modifier partiellement la carte du dresseur",
+        "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "carteId",
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarteDataPartiel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Modification réussie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          },
+          "404": {     
+            "$ref": "#/components/responses/CartePasModifiee"    
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer la carte",
+        "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "carteId",
+            "in": "path",
+            "description": "Identifiant de la carte",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/CarteSupprimee"  
+          },
+          "404": {    
+            "$ref": "#/components/responses/CartePasSupprimee" 
+          }
+        }
+      }
+    },
+    "/cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}": {
+      "get": {
+        "summary": "Afficher toutes les cartes du dresseur en fonction du statut.",
+        "tags": ["carte"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dresseurId",
+            "in": "path",
+            "description": "Identifiant du dresseur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statut",
+            "in": "query",
+            "description": "Statut des cartes (collectee, souhaitee)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["collectee", "souhaitee"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Taille de la page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cartes du dresseur avec le statut spécifié est affichée corectement.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Carte"
+                  }
+                }
+              }
+            }
+          },
+          "404": {      
+            "$ref": "#/components/responses/ListeCartePasAffichee" 
+          }
+        }
+      }
+    },
+
     "/echanges": {
       "post": {
         "summary": "Créer un échange",
@@ -766,7 +726,6 @@
         }
       }
     },
-    
     "/echanges/{dresseurId}?etat={accepte, attente, refuse}": {
       "get": {
         "summary": "Afficher les échanges du dresseur en fonction de l'état",
@@ -815,6 +774,7 @@
         }
       }
     },
+
     "/messages": {
       "post": {
         "summary": "Créer un message",
@@ -1004,10 +964,10 @@
         }
       },
       "CarteValidationErreur": {
-        "description": "Echec de la création.",
+        "description": "Erreur de validation lors de la création.",
         "content": {
-          "text/plain": {
-            "example": "La carte n'a pas été créée."
+          "application/json": {
+            "example": "Une erreur de validation est survenue, la carte n'a pas été créée."
           }
         }
       },
@@ -1015,7 +975,39 @@
         "description": "La carte n'est pas affichée.",
         "content": {
           "text/plain": {
-            "example": "La carte n'est pas affichée."
+            "example": "La carteId 'aaab' n'a pas pu s'afficher."
+          }
+        }
+      },
+      "CartePasModifiee": {
+        "description": "La carteId n'a pas été trouvée.",
+        "content": {
+          "text/plain": {
+            "example": "La carteId 'aaab' n'a pas été trouvée et n'a donc pas pu être modifiée."
+          }
+        }
+      },
+      "CarteSupprimee": {
+        "description": "La carte a été correctement supprimée.",
+        "content": {
+          "text/plain": {
+            "example": "La carteId 'aaab' a été supprimée."
+          }
+        }
+      },
+      "CartePasSupprimee": {
+        "description": "La carte n'a pas été supprimée.",
+        "content": {
+          "text/plain": {
+            "example": "La carteId 'aaab' n'a pas été supprimée."
+          }
+        }
+      },
+      "ListeCartePasAffichee": {
+        "description": "Liste des cartes du dresseur avec le statut spécifié n'est pas affichée.",
+        "content": {
+          "text/plain": {
+            "example": "La liste des cartes du dresseurId 7be91a9a41bc839033eedf0k avec le statut choisi n'a pas pu s'afficher."
           }
         }
       },
@@ -1434,7 +1426,7 @@
           "dresseur_id"
         ]
       },
-      "CarteDataPartial": {
+      "CarteDataPartiel": {
         "type": "object",
         "properties": {
           "etat": {
