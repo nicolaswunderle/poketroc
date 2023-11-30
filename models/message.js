@@ -7,7 +7,8 @@ const messageSchema = new Schema({
     contenu: {
         type: String,
         required: [true, "Le contenu du message est obligatoire."],
-        maxlength: [255, "Le contenu du message doit être plus court ou égal à 255 caractères."]
+        maxlength: [255, "Le contenu du message doit être plus court ou égal à 255 caractères."],
+        trim: true
     },
     dresseur_id: {
         type: Schema.Types.ObjectId,

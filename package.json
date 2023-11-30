@@ -6,18 +6,19 @@
   "scripts": {
     "start": "node ./bin/start",
     "dev": "nodemon",
-    "test": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest",
-    "cover": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest --coverage",
-    "para": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/.bin/jest --coverage --runInBand",
-    "testw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/jest/bin/jest.js",
-    "coverw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/jest/bin/jest.js --coverage",
-    "paraw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules --experimental-json-modules node_modules/jest/bin/jest.js --coverage --runInBand"
+    "test": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules node_modules/.bin/jest",
+    "cover": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules node_modules/.bin/jest --coverage",
+    "para": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules node_modules/.bin/jest --coverage --runInBand",
+    "testw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "coverw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "paraw": "cross-env DATABASE_URL=mongodb://127.0.0.1/poketroc-test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "debug": "~4.3.4",
     "express": "~4.18.2",
     "http-errors": "^2.0.0",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.2.0",
     "mongoose": "^8.0.0",

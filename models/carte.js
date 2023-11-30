@@ -6,26 +6,40 @@ const Schema = mongoose.Schema;
 const carteSchema = new Schema({
     id_api: {
         type: String,
-        required: [true, "L'identifiant API de la carte est obligatoire."]
+        required: [true, "L'identifiant API de la carte est obligatoire."],
+        trim: true
     },
     etat: {
         type: String,
         required: [true, "L'état de la carte est obligatoire."],
-        enum: ['neuve', 'excellente', 'très bonne', 'bonne', 'moyenne', 'mauvaise']
+        enum: {
+            values: ['neuve', 'excellente', 'très bonne', 'bonne', 'moyenne', 'mauvaise'],
+            message: "L'état de la carte doit être soit neuve, excellente, très bonne, bonne, moyenne ou mauvaise."
+        },
+        trim: true
     },
     desc_etat: {
         type: String,
-        maxlength: [255, "La description de l'état de la carte doit être plus courte ou égale à 255 caractères."]
+        maxlength: [255, "La description de l'état de la carte doit être plus courte ou égale à 255 caractères."],
+        trim: true
     },
     type: {
         type: String,
         required: [true, "Le type de la carte est obligatoire."],
-        enum: ['normale', 'reverse', 'holo']
+        enum: {
+            values: ['normale', 'reverse', 'holo'],
+            message: "Le type de la carte doit être soit normale, reverse ou holo."
+        },
+        trim: true
     },
     statut: {
         type: String,
         required: [true, "Le statut de la carte est obligatoire."],
-        enum: ['collectee', 'souhaitee']
+        enum: {
+            values: ['collectee', 'souhaitee'],
+            message: "Le statut de la carte doit être soit collectee ou souhaitee."
+        },
+        trim: true
     },
     quantite: {
         type: Number,

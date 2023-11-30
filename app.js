@@ -2,8 +2,8 @@ import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
 import mongoose from "mongoose";
-import swaggerUi from "swagger-ui-express";
-//import openApiDocument from "./openapi.json" assert { type: "json" };
+import fs from 'fs';
+import yaml from 'js-yaml';
 import { databaseUrl } from "./config.js";
 //Router
 import indexRouter from "./routes/index.js";
@@ -17,8 +17,10 @@ mongoose.connect(databaseUrl);
 
 const app = express();
 
+// Parse the OpenAPI document.
+const openApiDocument = yaml.load(fs.readFileSync('./openapi.yml'));
 // Serve the Swagger UI documentation.
-//app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // Log requests (except in test mode).
 if (process.env.NODE_ENV !== "test") {
