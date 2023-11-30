@@ -11,13 +11,13 @@ servers:
   - url: https://poketroc.onrender.com/api
 tags:
   - name: dresseur
-    description: 'Données dresseur'
+    description: "Données dresseur"
   - name: carte
-    description: 'Données carte'
+    description: "Données carte"
   - name: échange
-    description: 'Echange entre dresseur'
+    description: "Echange entre dresseur"
   - name: message
-    description: 'Message pour échange'
+    description: "Message pour échange"
 paths:
   /dresseurs:
     post:
@@ -28,16 +28,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DresseurData'
+              $ref: "#/components/schemas/DresseurData"
       responses:
-        '201':
+        "201":
           description: Inscription réussie
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dresseur'
-        '422':
-          $ref: '#/components/responses/DresseurValidationErreur'
+                $ref: "#/components/schemas/Dresseur"
+        "422":
+          $ref: "#/components/responses/DresseurValidationErreur"
   /dresseurs?localisation={coordonnéesGeographique}&page={number}&pageSize={number}:
     get:
       summary: Afficher les dresseurs par ordre de proximité
@@ -65,14 +65,14 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Liste des dresseurs proches est affichée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dresseur'
-        '503':
-          $ref: '#/components/responses/ErreurConnexion'
+                $ref: "#/components/schemas/Dresseur"
+        "503":
+          $ref: "#/components/responses/ErreurConnexion"
   /dresseurs/{dresseurId}:
     get:
       summary: Afficher le dresseur
@@ -88,14 +88,14 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Le dresseur est affiché
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DresseurDataPartiel'
-        '404':
-          $ref: '#/components/responses/DresseurEstPasAffiche'
+                $ref: "#/components/schemas/DresseurDataPartiel"
+        "404":
+          $ref: "#/components/responses/DresseurEstPasAffiche"
     patch:
       summary: Modifier partiellement les informations du dresseur
       tags:
@@ -110,16 +110,16 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Le dresseur a été modifié
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DresseurDataPartiel'
-        '404':
-          $ref: '#/components/responses/ModificationDresseurErreur'
-        '422':
-          $ref: '#/components/responses/DresseurValidationErreurPatch'
+                $ref: "#/components/schemas/DresseurDataPartiel"
+        "404":
+          $ref: "#/components/responses/ModificationDresseurErreur"
+        "422":
+          $ref: "#/components/responses/DresseurValidationErreurPatch"
     delete:
       summary: Supprimer le dresseur
       tags:
@@ -134,10 +134,10 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: Le dresseur a été supprimé
-        '404':
-          $ref: '#/components/responses/DresseurIntrouvable'
+        "404":
+          $ref: "#/components/responses/DresseurIntrouvable"
   /dresseurs/connexion:
     post:
       summary: Connexion au compte dresseur
@@ -147,14 +147,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/connexion'
+              $ref: "#/components/schemas/connexion"
       responses:
-        '201':
-          $ref: '#/components/responses/connexionReussie'
-        '401':
-          $ref: '#/components/responses/connexionEchouee'
-        '422':
-          $ref: '#/components/responses/connexionErreur'
+        "201":
+          $ref: "#/components/responses/connexionReussie"
+        "401":
+          $ref: "#/components/responses/connexionEchouee"
+        "422":
+          $ref: "#/components/responses/connexionErreur"
     delete:
       summary: Deconnexion au compte dresseur
       tags:
@@ -162,11 +162,11 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '204':
+        "204":
           description: Déconnexion réussie
-        '404':
-          $ref: '#/components/responses/deconnexionEchouee'
- 
+        "404":
+          $ref: "#/components/responses/deconnexionEchouee"
+
   /cartes:
     post:
       summary: Créer une carte
@@ -178,16 +178,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CarteData'
+              $ref: "#/components/schemas/CarteData"
       responses:
-        '201':
+        "201":
           description: Création réussie.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Carte'
-        '422':
-          $ref: '#/components/responses/CarteValidationErreur'
+                $ref: "#/components/schemas/Carte"
+        "422":
+          $ref: "#/components/responses/CarteValidationErreur"
   /cartes/{carteId}:
     get:
       summary: Afficher carte
@@ -203,14 +203,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: La carte a été affichée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Carte'
-        '404':
-          $ref: '#/components/responses/CartePasAffichee'
+                $ref: "#/components/schemas/Carte"
+        "404":
+          $ref: "#/components/responses/CartePasAffichee"
     patch:
       summary: Modifier partiellement la carte
       tags:
@@ -228,16 +228,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CarteDataPartiel'
+              $ref: "#/components/schemas/CarteDataPartiel"
       responses:
-        '200':
+        "200":
           description: Modification réussie.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Carte'
-        '404':
-          $ref: '#/components/responses/CartePasModifiee'
+                $ref: "#/components/schemas/Carte"
+        "404":
+          $ref: "#/components/responses/CartePasModifiee"
     delete:
       summary: Supprimer la carte
       tags:
@@ -252,10 +252,10 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          $ref: '#/components/responses/CarteSupprimee'
-        '404':
-          $ref: '#/components/responses/CartePasSupprimee'
+        "204":
+          $ref: "#/components/responses/CarteSupprimee"
+        "404":
+          $ref: "#/components/responses/CartePasSupprimee"
   /cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}:
     get:
       summary: Afficher toutes les cartes du dresseur en fonction du statut.
@@ -292,7 +292,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: >-
             Liste des cartes dresseurId, avec statut spécifié, affichée
           content:
@@ -300,10 +300,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Carte'
-        '404':
-          $ref: '#/components/responses/ListeCartePasAffichee'
- 
+                  $ref: "#/components/schemas/Carte"
+        "404":
+          $ref: "#/components/responses/ListeCartePasAffichee"
+
   /echanges:
     post:
       summary: Créer un échange
@@ -315,16 +315,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EchangeData'
+              $ref: "#/components/schemas/EchangeData"
       responses:
-        '201':
+        "201":
           description: L'échange a été crée avec succès.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Echange'
-        '422':
-          $ref: '#/components/responses/EchangeValidationErreur'
+                $ref: "#/components/schemas/Echange"
+        "422":
+          $ref: "#/components/responses/EchangeValidationErreur"
   /echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}:
     get:
       summary: Afficher tous les échanges proposés
@@ -355,12 +355,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: La liste des échanges proposés est affichée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Echange'
+                $ref: "#/components/schemas/Echange"
   /echanges/{echangeId}:
     get:
       summary: Afficher un échange
@@ -376,14 +376,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: L'échange est affiché.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Echange'
-        '404':
-          $ref: '#/components/responses/EchangePasAffiche'
+                $ref: "#/components/schemas/Echange"
+        "404":
+          $ref: "#/components/responses/EchangePasAffiche"
     patch:
       summary: Modifier quelques informations d'un échange
       tags:
@@ -401,18 +401,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EchangeData'
+              $ref: "#/components/schemas/EchangeData"
       responses:
-        '200':
+        "200":
           description: L'échange a été modifié.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Echange'
-        '404':
-          $ref: '#/components/responses/EchangePasModifie'
-        '422':
-          $ref: '#/components/responses/EchangeModificationErreur'
+                $ref: "#/components/schemas/Echange"
+        "404":
+          $ref: "#/components/responses/EchangePasModifie"
+        "422":
+          $ref: "#/components/responses/EchangeModificationErreur"
     delete:
       summary: Supprimer un échange
       tags:
@@ -427,10 +427,10 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          $ref: '#/components/responses/EchangeSupprime'
-        '404':
-          $ref: '#/components/responses/EchangePasSupprime'
+        "204":
+          $ref: "#/components/responses/EchangeSupprime"
+        "404":
+          $ref: "#/components/responses/EchangePasSupprime"
   /echanges/{dresseurId}:
     get:
       summary: Afficher tous les échanges du dresseur
@@ -446,14 +446,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Les échanges sont affichés.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Echange'
-        '404':
-          $ref: '#/components/responses/EchangesPasAffiche'
+                $ref: "#/components/schemas/Echange"
+        "404":
+          $ref: "#/components/responses/EchangesPasAffiche"
   /echanges/{dresseurId}?etat={accepte, attente, refuse}:
     get:
       summary: Afficher les échanges du dresseur en fonction de l'état
@@ -479,15 +479,15 @@ paths:
               - attente
               - refuse
       responses:
-        '200':
+        "200":
           description: La Liste des échanges du dresseur en fonction de l'état.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Echange'
-        '404':  
-          $ref: '#/components/responses/EchangesPasAffiche'
-  
+                $ref: "#/components/schemas/Echange"
+        "404":
+          $ref: "#/components/responses/EchangesPasAffiche"
+
   /messages:
     post:
       summary: Créer un message
@@ -499,18 +499,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageData'
+              $ref: "#/components/schemas/MessageData"
       responses:
-        '201':
+        "201":
           description: Message créé avec succès.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
-          $ref: '#/components/responses/MessageErreur'
-        '422':
-          $ref: '#/components/responses/DestinataireErreur'
+                $ref: "#/components/schemas/Message"
+        "404":
+          $ref: "#/components/responses/MessageErreur"
+        "422":
+          $ref: "#/components/responses/DestinataireErreur"
   /messages/{messageId}:
     delete:
       summary: Supprimer un message
@@ -526,14 +526,14 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '204':
+        "204":
           description: MessageId supprimé
           content:
             text/plain:
               schema:
                 example: Le messageId 7be91a9a41bc839033eedf0k à été supprimé.
-        '404':
-          $ref: '#/components/responses/MessageIntrouvable'
+        "404":
+          $ref: "#/components/responses/MessageIntrouvable"
   /messages/{echangeId}:
     get:
       summary: Affiche tous les messages d’un échange
@@ -549,14 +549,14 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Messages de l'échangeId affichés
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
-          $ref: '#/components/responses/DiscussionIntrouvable'
+                $ref: "#/components/schemas/Message"
+        "404":
+          $ref: "#/components/responses/DiscussionIntrouvable"
 
 components:
   responses:
@@ -577,7 +577,7 @@ components:
           example: >-
             Dresseur validation failed: mot_de_passe: Le mot de passe du
             dresseur est obligatoire.
-    
+
     connexionReussie:
       description: Connexion réussie.
       content:
@@ -609,12 +609,12 @@ components:
       description: Le dresseur n'a pas été affiché.
       content:
         text/plain:
-          example: 'Le dresseurId 7fe91a9a41bc839033eedf0f n''a pas été trouvé.'
+          example: "Le dresseurId 7fe91a9a41bc839033eedf0f n'a pas été trouvé."
     ErreurConnexion:
       description: Erreur de connexion.
       content:
         text/plain:
-          example: ' Le serveur n''est pas disponible en raison d''une surcharge temporaire ou de travaux de maintenance.'
+          example: " Le serveur n'est pas disponible en raison d'une surcharge temporaire ou de travaux de maintenance."
     ModificationErreur:
       description: La modification n'a pas été validé
       content:
@@ -630,7 +630,7 @@ components:
       content:
         text/plain:
           example: Le dresseurId 7be91a9a41bc839033eedf0k  introuvable, message impossible.
-    
+
     CarteValidationErreur:
       description: Erreur de validation lors de la création.
       content:
@@ -665,7 +665,7 @@ components:
           example: >-
             DresseurId 7be91a9a41bc839033eedf0k introuvable, la liste des cartes avec le
             statut choisi ne peut pas être affichée.
- 
+
     EchangesPasAffiche:
       description: Dresseur pas trouvé.
       content:
@@ -703,7 +703,7 @@ components:
       content:
         text/plain:
           example: EchangeId 7fe91a9a41bc839033eedf0f introuvable, affichage impossible.
-    
+
     MessageErreur:
       description: Le message n'a pas été créé
       content:
@@ -719,7 +719,7 @@ components:
       content:
         text/plain:
           example: Messages de l'échangeId 04657 introuvables.
-  
+
   schemas:
     connexion:
       type: object
@@ -728,44 +728,44 @@ components:
           type: string
           maxlength: 40
           unique: true
-          description: 'pseudo du dresseur'
+          description: "pseudo du dresseur"
           example: Nerak
         mot_de_passe:
           type: string
-          description: 'mot de passe du dresseur'
+          description: "mot de passe du dresseur"
           example: unMotDePasse88
       required:
         - pseudo
-        - mot_de_passe   
+        - mot_de_passe
     Dresseur:
       type: object
       properties:
         id:
           type: string
-          description: 'identifiant du dresseur'
+          description: "identifiant du dresseur"
           example: 7be91a9a41bc839033eedf0k
         nom:
           type: string
-          description: 'nom du dresseur'
+          description: "nom du dresseur"
           maxlength: 40
           example: Bonfils
         prenom:
           type: string
-          description: 'prénom du dresseur'
+          description: "prénom du dresseur"
           maxlength: 40
           example: Karen
         pseudo:
           type: string
-          description: 'pseudo du dresseur'
+          description: "pseudo du dresseur"
           maxlength: 40
           example: Nerak
         email:
           type: string
-          description: 'email du dresseur'
+          description: "email du dresseur"
           example: adresse@email.ch
         age:
           type: integer
-          description: 'âge du dresseur'
+          description: "âge du dresseur"
           minimum: 1
           maximum: 200
           example: 25
@@ -774,20 +774,20 @@ components:
           properties:
             type:
               type: string
-              enum: ['Point']
+              enum: ["Point"]
               description: Type de localisation.
             coordinates:
               type: array
               items:
                 type: number
               description: Coordonnées géographiques (longitude, latitude).
-              example: '[ -73.856077, 40.848447 ]'
+              example: "[ -73.856077, 40.848447 ]"
         url_image_profil:
           type: string
-          description: 'image du profil dresseur'
+          description: "image du profil dresseur"
           example: >-
             https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg
-      
+
       required:
         - id
         - nom
@@ -802,31 +802,31 @@ components:
       properties:
         nom:
           type: string
-          description: 'nom du dresseur'
+          description: "nom du dresseur"
           maxlength: 40
           example: Bonfils
         prenom:
           type: string
-          description: 'prénom du dresseur'
+          description: "prénom du dresseur"
           maxlength: 40
           example: Karen
         mot_de_passe:
           type: string
-          description: 'mot de passe du dresseur'
+          description: "mot de passe du dresseur"
           example: unMotDePasse32
         pseudo:
           type: string
-          description: 'pseudo du dresseur'
+          description: "pseudo du dresseur"
           unique: true
           maxlength: 40
           example: Nerak
         email:
           type: string
-          description: 'email du dresseur'
+          description: "email du dresseur"
           example: adresse@email.ch
         age:
           type: number
-          description: 'âge du dresseur'
+          description: "âge du dresseur"
           minimum: 1
           maximum: 200
           example: 25
@@ -835,17 +835,17 @@ components:
           properties:
             type:
               type: string
-              enum: ['Point']
+              enum: ["Point"]
               description: Type de localisation.
             coordinates:
               type: array
               items:
                 type: number
               description: Coordonnées géographiques (longitude, latitude).
-              example: '[ -73.856077, 40.848447 ]'
+              example: "[ -73.856077, 40.848447 ]"
         url_image_profil:
           type: string
-          description: 'image du prrofil dresseur'
+          description: "image du prrofil dresseur"
           example: >-
             https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg
       required:
@@ -860,30 +860,30 @@ components:
       properties:
         nom:
           type: string
-          description: 'nom du dresseur'
+          description: "nom du dresseur"
           maxlength: 40
           example: Bonfils
         prenom:
           type: string
-          description: 'prénom du dresseur'
+          description: "prénom du dresseur"
           maxlength: 40
           example: Karen
         pseudo:
           type: string
-          description: 'pseudo du dresseur'
+          description: "pseudo du dresseur"
           maxlength: 40
           example: Nerak
         email:
           type: string
-          description: 'email du dresseur'
+          description: "email du dresseur"
           example: adresse@email.ch
         mot_de_passe:
           type: string
-          description: 'mot de passe du dresseur'
+          description: "mot de passe du dresseur"
           example: unMotDePasse32
         age:
           type: number
-          description: 'âge du dresseur'
+          description: "âge du dresseur"
           minimum: 1
           maximum: 200
           example: 25
@@ -892,31 +892,31 @@ components:
           properties:
             type:
               type: string
-              enum: ['Point']
+              enum: ["Point"]
               description: Type de localisation.
             coordinates:
               type: array
               items:
                 type: number
               description: Coordonnées géographiques (longitude, latitude).
-              example: '[ -73.856077, 40.848447 ]'
+              example: "[ -73.856077, 40.848447 ]"
         url_image_profil:
           type: string
-          description: 'image du profil dresseur'
+          description: "image du profil dresseur"
           example: >-
             https://p1.hiclipart.com/preview/553/126/513/pikachu-i-choose-you-pikachu-icon-png-icon.jpg
-    
+
     Carte:
       type: object
       properties:
         id:
           type: string
           description: L'identifiant unique de la carte
-          example: 7xy10-117
+          example: 7be91a9a41bc839033eedf0k
         id_api:
           type: string
           description: L'identifiant de l'api
-          example: aaab
+          example: 7xy10-117
           unique: true
         etat:
           type: string
@@ -963,7 +963,7 @@ components:
           example: 7fe91a9a41bc839033eedf0f
         dresseur:
           type: string
-          $ref: '#/components/schemas/Dresseur'
+          $ref: "#/components/schemas/Dresseur"
       required:
         - id
         - id_api
@@ -979,7 +979,7 @@ components:
         id_api:
           type: string
           description: L'identifiant de l'api
-          example: aaab
+          example: 7xy10-117
           unique: true
         etat:
           type: string
@@ -1091,7 +1091,7 @@ components:
           unique: true
         echange:
           type: string
-          $ref: '#/components/schemas/Echange'
+          $ref: "#/components/schemas/Echange"
         carte_id:
           type: string
           description: L'identifiant unique de la carte qui va être échangé
@@ -1099,12 +1099,12 @@ components:
           unique: true
         carte:
           type: string
-          $ref: '#/components/schemas/Carte'
+          $ref: "#/components/schemas/Carte"
       required:
         - id
         - echange_id
         - carte_id
-    
+
     Echange:
       type: object
       properties:
@@ -1116,7 +1116,7 @@ components:
           type: string
           description: date de l'échange
           format: data-time
-          example: '2023-01-01T00:00:00Z'
+          example: "2023-01-01T00:00:00Z"
           unique: true
         etat:
           type: string
@@ -1132,8 +1132,8 @@ components:
           unique: true
         dresseur:
           type: string
-          description: 'dresseur'
-          $ref: '#/components/schemas/Dresseur'
+          description: "dresseur"
+          $ref: "#/components/schemas/Dresseur"
         dresseur_concerne_id:
           type: string
           description: L'identifiant unique du dresseur concerné par l'échange
@@ -1150,7 +1150,7 @@ components:
           type: string
           description: date de l'échange
           format: data-time
-          example: '2023-01-01T00:00:00Z'
+          example: "2023-01-01T00:00:00Z"
           unique: true
         etat:
           type: string
@@ -1179,7 +1179,7 @@ components:
           type: string
           description: date de l'échange
           format: data-time
-          example: '2023-01-01T00:00:00Z'
+          example: "2023-01-01T00:00:00Z"
           unique: true
         etat:
           type: string
@@ -1196,7 +1196,7 @@ components:
         dresseur_concerne_id:
           type: string
           description: L'identifiant unique du dresseur concerné par l'échange
-    
+
     Message:
       type: object
       properties:
@@ -1204,7 +1204,7 @@ components:
           type: string
           description: La date du message.
           format: data-time
-          example: '2020-01-02T10:00:00.000Z'
+          example: "2020-01-02T10:00:00.000Z"
         contenu:
           type: string
           description: Le contenu du message.
@@ -1216,17 +1216,17 @@ components:
         echange_id:
           type: string
           description: Id de l'échange.
-          example: '04657'
+          example: "04657"
         createdAt:
           type: string
           description: Date de la créaction.
           format: data-time
-          example: '2020-01-02T10:00:00.000Z'
+          example: "2020-01-02T10:00:00.000Z"
         updatedAt:
           type: string
           description: Mise à jour de la date.
           format: data-time
-          example: '2020-01-02T10:00:00.000Z'
+          example: "2020-01-02T10:00:00.000Z"
       required:
         - date
         - contenu
@@ -1241,7 +1241,7 @@ components:
           type: string
           description: La date du message.
           format: data-time
-          example: '2020-01-02T10:00:00.000Z'
+          example: "2020-01-02T10:00:00.000Z"
         contenu:
           type: string
           description: Le contenu du message.
@@ -1257,7 +1257,7 @@ components:
         - echange_id
         - createdAt
         - updatedAt
-  
+
   securitySchemes:
     BearerAuth:
       type: http
