@@ -81,13 +81,13 @@ describe('GET /messages/{echangeId}', () => {
     it('should retrieve the list of messages', async () => {
       
       const messages = await Message.find({});
-      const echange = await Echange.find({});
+      const echanges = await Echange.find({});
 
       if(messages.length > 0){
         createdMessageEchangeId = messages[0].echange_id;
-        if(createdMessageEchangeId === echange._id) {
+        if(createdMessageEchangeId === echanges._id) {
           const response = supertest(app)
-          .get(`api/message/${echange._id}`)
+          .get(`api/message/${echanges._id}`)
           .expect(201)
           .expect('Content-Type', /json/);
           const responseBody = response.body;
