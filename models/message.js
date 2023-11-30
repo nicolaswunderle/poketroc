@@ -4,10 +4,6 @@ const Schema = mongoose.Schema;
 
 // crée le schéma message
 const messageSchema = new Schema({
-    date: {
-        type: Date,
-        required: [true, "La date du message est obligatoire."]
-    },
     contenu: {
         type: String,
         required: [true, "Le contenu du message est obligatoire."],
@@ -34,14 +30,13 @@ const messageSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-messageSchema.index({ date: 1, dresseur_id: 1, echange_id: 1}, { unique: true });
+messageSchema.index({ createdAt: 1, dresseur_id: 1, echange_id: 1}, { unique: true });
 
 messageSchema.set("toJSON", {
     transform: transformJsonDresseur
 });
  
 function transformJsonDresseur(doc, json, options) {
-    delete json.createdAt;
     delete json.updatedAt;
     delete json.__v;
     return json;

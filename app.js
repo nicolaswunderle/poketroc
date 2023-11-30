@@ -2,13 +2,13 @@ import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
 import mongoose from "mongoose";
-import swaggerUi from 'swagger-ui-express';
-import openApiDocument from './openapi.json' assert { type: "json" };
-import { databaseUrl } from './config.js';
+import swaggerUi from "swagger-ui-express";
+import openApiDocument from "./openapi.json" assert { type: "json" };
+import { databaseUrl } from "./config.js";
 //Router
 import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
-import thingsRouter from "./routes/things.js";
+import cartesRouter from "./routes/cartes.js";
 import messagesRouter from "./routes/messages.js";
 import echangesRouter from "./routes/echanges.js";
 
@@ -17,13 +17,12 @@ mongoose.connect(databaseUrl);
 
 const app = express();
 
-
 // Serve the Swagger UI documentation.
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // Log requests (except in test mode).
-if (process.env.NODE_ENV !== 'test') { 
-  app.use(logger('dev'));
+if (process.env.NODE_ENV !== "test") {
+  app.use(logger("dev"));
 }
 
 app.use(express.json());
@@ -31,10 +30,9 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api", indexRouter);
 app.use("/api/dresseurs", dresseursRouter);
-app.use("/api/things", thingsRouter);
+app.use("/api/cartes", cartesRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/api/echanges", echangesRouter);
-
 
 
 // catch 404 and forward to error handler
@@ -42,33 +40,57 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
-app.use('/api/dresseurs', function (err, req, res, next) {
-  if (err.code === 11000) {
-    const rep = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
-    res.status(409).send(rep);
-  }
-  if (err.code === 16755) {
-    const rep = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
-    res.status(422).send(rep);
-  }
-  // Si c'est une erreur de validation mongoose
-  if (err.name === "ValidationError") {
-    res.status(422).send(err.message);
-  }
-  res.send(err);
-  next();
-});
 
-app.use('/api/messages', function (err, req, res, next) {
+app.use('/api', function (err, req, res, next) {
+  // Log the error on stderr
+  console.warn(err);
+
+  // Respond with 422 Unprocessable Entity if it's a Mongoose validation error
+  if (err.name == 'ValidationError' && !err.status) {
+    err.status = 422;
+  }
+
+  // lors d'une erreur 11000 de mongoose
   if (err.code === 11000) {
-    const rep = `Le destinataire et l'expediteur ne peuvent pas envoyer un message exactement à la même date.`;
-    res.status(409).send(rep);
+    err.status = 409;
+    switch (req.path) {
+      case '/dresseurs':
+        err.message = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
+      break;
+      case '/messages':
+        err.message = `Deux messages ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_id et echange_id`;
+      break;
+      case '/cartes':
+        err.message = `Deux cartes ne peuvent pas avoir la même valeur pour les champs id_api, etat, desc_etat, type et dresseur_id.`;
+      break;
+      case '/echanges':
+        err.message = `Deux échanges ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_cree_id et dresseur_concerne_id`;
+      break;
+    }
+    
   }
-  // Si c'est une erreur de validation mongoose
-  if (err.name === "ValidationError") {
-    res.status(422).send(err.message);
+
+  // lors d'une erreur 11000 de mongoose
+  if (err.code === 16755) {
+    err.status = 422;
+    err.message = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
   }
-  next();
+
+  // Set the response status code
+  res.status(err.status || 500);
+
+  // Send the error message in the response
+  const response = {
+    message: err.message
+  };
+
+  // If it's a validation error, also send the errors details from Mongoose
+  if (err.status == 422) {
+    response.errors = err.errors;
+  }
+
+  // Send the error response
+  res.send(response.message);
 });
 
 app.use('/api/echanges', function (err, req, res, next) {

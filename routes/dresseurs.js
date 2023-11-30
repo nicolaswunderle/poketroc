@@ -6,7 +6,7 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
-import { authenticate, loadPaginationFromParams, loadDresseurFromParams, editPermissionDresseur } from "./utils.js";
+import { authenticate, loadLocationFromParams, getPaginationParameters, loadDresseurFromParams, editPermissionDresseur, requireJson } from "./utils.js";
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 const signJwt = promisify(jwt.sign);
 
 // Créer un dresseur
-router.post("/", function (req, res, next) {
+router.post("/", requireJson, function (req, res, next) {
   const mdpBrut = req.body.mot_de_passe;
   const nouveauDresseur = new Dresseur(req.body);
 
@@ -26,12 +26,14 @@ router.post("/", function (req, res, next) {
       })
       .then(dresseurSauve => {   
         res.status(201).send(dresseurSauve);
+        next();
       })
       .catch(next);
   } else {
     // ne va jamais créer le dressseur car il manque le mot de passe mais permet d'avoir toutes les erreurs de validation si d'autres champs ne sont pas valides
     nouveauDresseur.save().then(dresseurSauve => {   
       res.status(201).send(dresseurSauve);
+      next();
     })
     .catch(next);
   }
@@ -39,13 +41,12 @@ router.post("/", function (req, res, next) {
 });
 
 // Affiche tous les dresseurs à proximité
-router.get("/", authenticate, loadPaginationFromParams, function (req, res, next) {
+router.get("/", authenticate, loadLocationFromParams, function (req, res, next) {
 
-  const page = req.page;
-  const pagesize = req.pagesize;
-  const localisation = JSON.parse(req.query.localisation);
+  const { page, pageSize } = getPaginationParameters(req);
+  const localisation = req.localisation;
 
-  if (!localisation) return res.status(401).send("Il manque les coordonnées de la localisation.");
+  if (!localisation) return res.status(400).send("Il manque les coordonnées de la localisation.");
 
   Dresseur.find({
     localisation: { 
@@ -57,12 +58,12 @@ router.get("/", authenticate, loadPaginationFromParams, function (req, res, next
       }
     }
   })
-  // .skip((page - 1) * pagesize)
-  // .limit(pagesize)
+  .skip((page - 1) * pageSize)
+  .limit(pageSize)
   .exec()
   .then(dresseurs => {
-    if (!dresseurs) return res.status(401).send("Aucun dresseur n'a été trouvé.");
     res.status(200).send(dresseurs);
+    next();
   })
   .catch(next)
 
@@ -101,11 +102,13 @@ router.patch("/:dresseurId", authenticate, loadDresseurFromParams, editPermissio
         })
         .then(dresseurSauve => {   
           res.status(200).send(dresseurSauve);
+          next();
         })
         .catch(next);
     } else {
       dresseur.save().then(dresseurSauve => {   
         res.status(200).send(dresseurSauve);
+        next();
       })
       .catch(next);
     }
@@ -121,21 +124,21 @@ router.patch("/:dresseurId", authenticate, loadDresseurFromParams, editPermissio
 router.delete("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
   Dresseur.deleteOne({ _id: req.dresseur.id })
     .exec()
-    .then(valid => {
-      if (!valid) return res.sendStatus(401); // Unauthorized
-      res.status(204).send(`Le dresseur avec l'id ${req.dresseur.id} a été supprimé.`);
+    .then(() => {
+      res.sendStatus(204);
+      next();
     })
     .catch(next);
 });
 
 // Permet de se connecter
-router.post("/connexion", function (req, res, next) {
-  if (!req.body.pseudo) return res.status(401).send("Il manque le pseudo");
-  if (!req.body.mot_de_passe) return res.status(401).send("Il manque le mot de passse");
+router.post("/connexion", requireJson, function (req, res, next) {
+  if (!req.body.pseudo) return res.status(400).send("Il manque le pseudo");
+  if (!req.body.mot_de_passe) return res.status(400).send("Il manque le mot de passse");
   Dresseur.findOne({ pseudo: req.body.pseudo })
       .exec()
       .then(dresseur => {
-        if (!dresseur) return res.status(401).send(`Aucun dresseur ne correpsond à l'id ${req.body.pseudo}`);
+        if (!dresseur) return res.status(404).send(`Aucun dresseur ne correpsond à l'id ${req.body.pseudo}`);
         return { valid: bcrypt.compare(req.body.mot_de_passe, dresseur.mot_de_passe), dresseur: dresseur };
       })
       .then(({valid, dresseur}) => {
@@ -152,8 +155,8 @@ router.post("/connexion", function (req, res, next) {
           
       })
       .then(token => {
-        if (!token) return res.status(401).send("Le token n'a pas pu être généré");
         res.status(201).send({ token });
+        next();
       })
       .catch(next);
 });
@@ -161,7 +164,7 @@ router.post("/connexion", function (req, res, next) {
 // Permet de se déconnecter
 router.delete("/connexion", authenticate, function (req, res, next) {
   // si la personne est connectée et que son id est valide
-  res.status(204).send(`La connexion pour l'utilisateur avec l'id ${req.currentUserId} a bien été fermée.`);
+  res.sendStatus(204);
   next();
 });
 
