@@ -15,3 +15,4 @@ router.post("/", function (req, res, next) {
     .catch(next);
     
 });
+export default router;
