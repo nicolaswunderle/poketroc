@@ -2,6 +2,7 @@ import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
 import mongoose from "mongoose";
+import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
 import yaml from 'js-yaml';
 import { databaseUrl } from "./config.js";
