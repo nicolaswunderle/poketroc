@@ -3,7 +3,7 @@ import createError from "http-errors";
 import logger from "morgan";
 import mongoose from "mongoose";
 import swaggerUi from "swagger-ui-express";
-import openApiDocument from "./openapi.json" assert { type: "json" };
+//import openApiDocument from "./openapi.json" assert { type: "json" };
 import { databaseUrl } from "./config.js";
 //Router
 import indexRouter from "./routes/index.js";
@@ -18,7 +18,7 @@ mongoose.connect(databaseUrl);
 const app = express();
 
 // Serve the Swagger UI documentation.
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
+//app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // Log requests (except in test mode).
 if (process.env.NODE_ENV !== "test") {
@@ -91,14 +91,6 @@ app.use('/api', function (err, req, res, next) {
 
   // Send the error response
   res.send(response.message);
-});
-
-app.use('/api/echanges', function (err, req, res, next) {
-  // Si c'est une erreur de validation mongoose
-  if (err.name === "ValidationError") {
-    res.status(422).send(err.message);
-  }
-  next();
 });
 
 // error handler

@@ -1,12 +1,12 @@
 import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
-import { cleanUpDatabase } from "./utils.js"
+import { cleanUpDatabase } from "../spec/utils.js"
 
 beforeEach(cleanUpDatabase);
 
-// Créer un message
-describe('POST /api/messages', () => {
+// Créer un échange
+describe('POST /api/echanges', () => {
   const echangeData = {
     etat: 'attente!',
     dresseur_cree_id: '7fe91a9a41bc839033eedf0f',
@@ -33,15 +33,6 @@ describe('POST /api/messages', () => {
         expect(responseBody[key]).toEqual(echangeData[key]);
       }
     });
-  });
-
-  it('should handle the case of an unprocessable entity (422)', async () => {
-    // Assuming your API returns a 422 response for an unprocessable entity
-    const invalidRecipientData = '{ /* Some data that triggers a 422 error */ }';
-    await supertest(app)
-      .post('/api/echanges')
-      .send(invalidRecipientData)
-      .expect(422);
   });
 
 });

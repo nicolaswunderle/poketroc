@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/", function (req, res, next) {
   const nouvelEchange = new Echange(req.body);
 
-  nouvelEchange.save().then(echangeSauve => {   
+  nouvelEchange.save().then((echangeSauve) => {   
       res.status(201).send(echangeSauve);
     })
     .catch(next);
