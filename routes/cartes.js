@@ -2,6 +2,7 @@ import debugFactory from "debug";
 import express from "express";
 import Carte from "../models/carte.js";
 import { authenticate } from "./utils.js";
+import { getPaginationParameters } from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
 const router = express.Router();
@@ -22,7 +23,7 @@ router.post("/", authenticate, function (req, res, next) {
 // Afficher une carte
 router.get("/:carteId", authenticate, function (req, res, next) {
   const carteId = req.params.carteId;
-
+  const { page, pageSize } = getPaginationParameters(req);
   Carte.findById(carteId)
     .exec()
     .then((carte) => {
@@ -31,6 +32,7 @@ router.get("/:carteId", authenticate, function (req, res, next) {
       }
       res.status(200).send(carte);
     })
+
     .catch(next);
 });
 
@@ -80,6 +82,22 @@ router.delete("/:carteId", authenticate, function (req, res, next) {
       }
       res.status(204).send("Carte supprimée avec succès");
     })
+    .catch(next);
+});
+
+// Afficher toutes les cartes
+//est-ce que l'url est juste ?
+router.get("/", authenticate, function (req, res, next) {
+  const { page, pageSize } = getPaginationParameters(req);
+  Carte.find()
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
+    .exec()
+    .then((cartes) => {
+      res.status(200).send(cartes);
+    })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
     .catch(next);
 });
 
