@@ -18,7 +18,7 @@ const router = express.Router();
 // });
 
 
-router.post("/", requireJson, authenticate, async function (req, res, next) {
+router.post("/", requireJson, async function (req, res, next) {
   const { dresseur_cree_id, dresseur_concerne_id } = req.body;
 
   try {
