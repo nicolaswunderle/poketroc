@@ -7,7 +7,7 @@
 import app from "../app.js";
 import createDebugger from "debug";
 import http from "http";
-import { createWebSocketServer } from '../messaging.js';
+import { createWebSocketServer } from '../websocket.js';
 import { port } from "../config.js";
 
 

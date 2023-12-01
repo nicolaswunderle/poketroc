@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
 import { authenticate, loadLocationFromParams, getPaginationParameters, loadDresseurFromParams, supChampsDresseur, editPermissionDresseur, requireJson } from "./utils.js";
+import { broadcastMessage } from '../websocket.js';
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -26,6 +27,7 @@ router.post("/", requireJson, supChampsDresseur, function (req, res, next) {
       })
       .then(dresseurSauve => {   
         res.status(201).send(dresseurSauve);
+        broadcastMessage({nouveauDresseur: dresseurSauve});
         next();
       })
       .catch(next);

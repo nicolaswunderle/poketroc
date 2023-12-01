@@ -87,6 +87,7 @@ export function loadEchangeFromParams(req, res, next) {
 }
 
 export function supChampsEchange(req, res, next) {
+  if (req.body.dresseur_cree_id) delete req.body.dresseur_cree_id;
   if (req.body.etat) delete req.body.etat;
   if (req.body.createdAt) delete req.body.createdAt;
   if (req.body.updatedAt) delete req.body.updatedAt;
