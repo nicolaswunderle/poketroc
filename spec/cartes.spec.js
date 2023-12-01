@@ -10,20 +10,19 @@ let carteId;
 
 describe("POST /api/cartes", () => {
   let johnDoe;
-  beforeEach(async function() {
-    johnDoe = await Dresseur.create({ 
-      prenom: "John", 
-      nom: "Doe", 
-      pseudo: "Jo", 
-      email: "john.doe@gmail.com", 
-      age: 24, 
-      localisation: { 
-        type: "Point", 
-        coordinates: [ -74 , 7 ] 
-      }, 
-      mot_de_passe: "johdoe"
-    })
-
+  beforeEach(async function () {
+    johnDoe = await Dresseur.create({
+      prenom: "John",
+      nom: "Doe",
+      pseudo: "Jo",
+      email: "john.doe@gmail.com",
+      age: 24,
+      localisation: {
+        type: "Point",
+        coordinates: [-74, 7],
+      },
+      mot_de_passe: "johdoe",
+    });
   });
   it("Devrait créer une nouvelle carte", async () => {
     const token = await generateValidJwt(johnDoe);
@@ -40,20 +39,18 @@ describe("POST /api/cartes", () => {
         dresseur_id: johnDoe.id,
       })
       .expect(201)
-      .expect('Content-Type', /json/);
-      
-      const body = response.body;
-      expect(body).toBeObject();
+      .expect("Content-Type", /json/);
 
-      carteId = body._id;
+    const body = response.body;
+    expect(body).toBeObject();
 
+    carteId = body._id;
   });
 
   it("Devrait pas créer une nouvelle carte", async () => {
     const response = await supertest(app)
       .post("/api/cartes")
       .send({
-        etat: "neuve",
         desc_etat: "Description de l'état",
         type: "normale",
         statut: "collectee",
@@ -69,20 +66,19 @@ describe("POST /api/cartes", () => {
 // Test d'affichage d'une carte
 describe("GET /api/cartes/:carteId", function () {
   it("Devrait afficher une carte spécifique", async () => {
-
     const response = await supertest(app)
-    .get(`/api/cartes/${carteId}`)
-    // .set("Authorization", `Bearer ${token}`)
-    .expect(200)
-    .expect("Content-Type", /json/);
-    
+      .get(`/api/cartes/${carteId}`)
+      // .set("Authorization", `Bearer ${token}`)
+      .expect(200)
+      .expect("Content-Type", /json/);
+
     expect(response.body).toHaveProperty("_id", carteId);
   });
   it("Devrait pas afficher une carte spécifique", async () => {
     const response = await supertest(app).get(`/api/cartes/${carteId}`);
     // .set("Authorization", `Bearer ${token}`);
     expect(404);
-    expect("Content-Type", "text/plain");
+    expect("Content-Type", /json/);
   });
 });
 // Test de modification d'une carte
@@ -93,7 +89,6 @@ describe("PATCH /api/cartes/:carteId", function () {
       .send({});
     // .set("Authorization", `Bearer ${token}`);
     expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
-    //expect erreurs
     expect(response.body).toHaveProperty("_id", carteId);
   });
   it("Devrait pas modifier une carte existante", async () => {
