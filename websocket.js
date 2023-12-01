@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { jwtSecret } from "./config.js";
 import Dresseur from "./models/dresseur.js";
 import Echange from "./models/echange.js";
+import Message from "./models/message.js";
 import { getDresseurAProximite } from './services/dresseurService.js';
 
 const verifyJwt = promisify(jwt.verify);
@@ -83,6 +84,7 @@ function onMessageReceived(ws, message) {
       });
   } else if (type === 'getMessagesOfEchange') {
     let dresseurId;
+    if (!token) return ws.send(JSON.stringify({ error: 'Il manque le token' }));
     verifyJwt(token, jwtSecret)
       .then(payload => {
         if (!mongoose.Types.ObjectId.isValid(payload.sub)) return ws.send(JSON.stringify({ error: "L'id du dresseur dans le JWT est invalide." }));
@@ -92,16 +94,28 @@ function onMessageReceived(ws, message) {
       })
       .then(dresseur => {
         if(!dresseur) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} ne correspond à aucun dresseur`}));
+        if(!echangeId) return ws.send(JSON.stringify({ error: 'Il manque le champs echangeId' }));
+        if (!mongoose.Types.ObjectId.isValid(echangeId)) return ws.send(JSON.stringify({ error: "L'id de l'échange est invalide." }));
         return Echange.findById(echangeId);
       })
       .then(echange => {
-      if(!echange) return ws.send(JSON.stringify({ error: `L'id ${echangeId} ne correspond à aucun échange`}));
-      return echange.dresseur_concerne_id;
-      }).then(dresseur_concerne_id => {
-        if(!(dresseur_concerne_id === dresseurId)) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} n'est conserné par aucun échange`}));
-        return
+        if(!echange) return ws.send(JSON.stringify({ error: `L'id ${echangeId} ne correspond à aucun échange`}));
+        return echange.dresseur_cree_id == dresseurId;
       })
-    return ws.send("salut");
+      .then(echangeValid => {
+        if(!echangeValid) return ws.send(JSON.stringify({ error: `Le dresseur n'a pas créé cet échange`}));
+        return Message.find()
+          .where("dresseur_id")
+          .equals(dresseurId)
+          .where("echange_id")
+          .equals(echangeId)
+      })
+      .then(messages => {
+        return ws.send(JSON.stringify({messages}));
+      })
+      .catch(error => {
+        return ws.send(JSON.stringify({ error: error.message }));
+      });
   }
   
   
