@@ -38,41 +38,6 @@ paths:
                 $ref: "#/components/schemas/Dresseur"
         "422":
           $ref: "#/components/responses/DresseurValidationErreur"
-  /dresseurs?localisation={coordonnéesGeographique}&page={number}&pageSize={number}:
-    get:
-      summary: Afficher les dresseurs par ordre de proximité
-      tags:
-        - dresseur
-      parameters:
-        - name: coordonnéesGeographique
-          in: path
-          description: Coordonnées géographiques du dresseur
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: query
-          description: Numéro de la page
-          required: false
-          schema:
-            type: integer
-        - name: pageSize
-          in: query
-          description: Taille de la page
-          required: false
-          schema:
-            type: integer
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Liste des dresseurs proches est affichée.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Dresseur"
-        "503":
-          $ref: "#/components/responses/ErreurConnexion"
   /dresseurs/{dresseurId}:
     get:
       summary: Afficher le dresseur
@@ -258,7 +223,7 @@ paths:
           $ref: "#/components/responses/CarteSupprimee"
         "404":
           $ref: "#/components/responses/CartePasSupprimee"
-  /cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}:
+  /cartes/{dresseurId}:
     get:
       summary: Afficher toutes les cartes du dresseur en fonction du statut.
       tags:
@@ -327,7 +292,7 @@ paths:
                 $ref: "#/components/schemas/Echange"
         "422":
           $ref: "#/components/responses/EchangeValidationErreur"
-  /echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}:
+  /echanges/proposes:
     get:
       summary: Afficher tous les échanges proposés
       tags:
@@ -434,29 +399,6 @@ paths:
         "404":
           $ref: "#/components/responses/EchangePasSupprime"
   /echanges/{dresseurId}:
-    get:
-      summary: Afficher tous les échanges du dresseur
-      tags:
-        - échange
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: dresseurId
-          in: path
-          description: Identifiant du dresseur
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Les échanges sont affichés.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Echange"
-        "404":
-          $ref: "#/components/responses/EchangesPasAffiche"
-  /echanges/{dresseurId}?etat={accepte, attente, refuse}:
     get:
       summary: Afficher les échanges du dresseur en fonction de l'état
       tags:
