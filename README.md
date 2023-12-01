@@ -61,11 +61,12 @@ npm run coverage
  
 
 ## WebSocket
+
 Utilisez WebSocket pour recevoir des notifications en temps réel sur les joueurs à proximité et les demandes de messages.
 
 Il faut se connecter au ws://localhost:3000 
 
-Il y a deux façons de l'utiliser :envoyer un objet via un token et get un dresseur proximité :
+Il y a deux façons de l'utiliser : Envoyer un objet via un token et get un dresseur à proximité :
 
 1. Exemple :{type : 'getDresseurAProximite', 
             token : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NTZhNDlhODM0NmRmNjcyMGYwZWRjNzkiLCJleHAiOjE3MDIwNjkzMDcsImlhdCI6MTcwMTQ2NDUwN30.Gb3bfD6tw0tLCeUAn_AXYVnurWjP8Ugcd4OEENtk0r8', 
@@ -77,5 +78,7 @@ Lorsque un dresseur se connect, on reçoit son profil en entier.
             echangeId : '656a05bf928eaba27efa0b96'} 
 Donne la liste de tous les messages de cet échange. Lorsque le dresseur répond, on reçoit le nouveau message.
 
+
 ## Documentation API
+
 Consultez la documentation Swagger pour une liste complète des endpoints et modèles de données : [Swagger](https://poketroc.onrender.com/api-docs)
