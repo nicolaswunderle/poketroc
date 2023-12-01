@@ -7,7 +7,7 @@ export const getDresseurAProximite = async (localisation) => {
     try {
       localisationArray = JSON.parse(localisation);
     } catch (error) {
-      throw new Error("La localisation n'a pas pu être converti en tableau");
+      throw new Error("La localisation n'a pas pu être converti en tableau de nombre");
     }
     if (!Array.isArray(localisationArray)) throw new Error("La localisation n'est pas un tableau");
     if (localisationArray.length !== 2) throw new Error("La tableau localisation doit avoir deux données");
@@ -24,6 +24,8 @@ export const getDresseurAProximite = async (localisation) => {
         }
       }
     })
+    .where("en_ligne")
+    .equals(true)
   } catch (error) {
     throw new Error(error);
   }

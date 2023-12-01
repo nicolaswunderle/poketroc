@@ -1,17 +1,37 @@
 import supertest from "supertest";
 import app from "../app.js";
 import mongoose from "mongoose";
-import { cleanUpDatabase } from "./utils.js";
+import Dresseur from "../models/dresseur.js";
+import { cleanUpDatabase, generateValidJwt } from "./utils.js";
+
+let carteId;
+let token;
+let johnDoe;
 
 beforeEach(cleanUpDatabase);
 
-let carteId;
+describe("POST /api/cartes", () => {
+  beforeEach(async function() {
+    johnDoe = await Dresseur.create({ 
+      prenom: "John", 
+      nom: "Doe", 
+      pseudo: "Jo", 
+      email: "john.doe@gmail.com", 
+      age: 24, 
+      localisation: { 
+        type: "Point", 
+        coordinates: [ -74 , 7 ] 
+      }, 
+      mot_de_passe: "johdoe"
+    });
 
-// Test de création d'une carte
-describe("POST /api/cartes", function () {
+    token = await generateValidJwt(johnDoe);
+  });
+
   it("Devrait créer une nouvelle carte", async () => {
     const response = await supertest(app)
       .post("/api/cartes")
+      .set('Authorization', `Bearer ${token}`)
       .send({
         id_api: "yourpi_id",
         etat: "neuve",
@@ -21,9 +41,12 @@ describe("POST /api/cartes", function () {
         quantite: 3,
       })
       .expect(201)
-      .expect("Content-Type", "application/json");
-    //.set("Authorization", `Bearer ${token}`);
-    carteId = response.body._id;
+      .expect('Content-Type', /json/);
+    
+    const body = response.body;
+    expect(body).toBeObject();
+
+    carteId = body._id;
   });
 
   it("Devrait pas créer une nouvelle carte", async () => {
@@ -122,6 +145,10 @@ describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={numb
     expect("Content-Type", "text/plain");
   });
 });
+
+
+
+
 afterAll(async () => {
   await mongoose.disconnect();
 });
