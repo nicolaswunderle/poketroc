@@ -59,18 +59,75 @@ describe("POST /api/echanges", () => {
   });
 });
 
-// Test d'affichage des échanges
-describe("GET /api/cartes/:{dresseurId}", function () {
-  it("Devrait afficher toutes les cartes", async () => {
-    const response = await supertest(app).get("/api/cartes/:{dresseurId}");
-    //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
+// Test modification d'un échange
+describe("PATCH /api/echanges/:{echangeId}", () => {
+  it("Devrait modifier un échange", async () => {
+    const echange = await Echange.findById(echangeId);
+    let modification = false;
+
+    if (echange) {
+      const updatedEchangeData = { etat: "attente" };
+      const response = await supertest(app)
+        .patch(`/api/echanges/${echange._id}`)
+        .send(updatedEchangeData)
+        .expect(200)
+        .expect("Content-Type", /json/);
+
+      Object.keys(updatedEchangeData).forEach((cle) => {
+        if (
+          echange[cle] !== updatedEchangeData[cle] &&
+          ![
+            "_id",
+            "__v",
+            "createdAt",
+            "dresseur_cree_id",
+            "dresseur_concerne_id",
+          ].includes(cle)
+        ) {
+          modification = true;
+        }
+      });
+
+      expect(modification).toBeTruthy();
+    } else {
+      await supertest(app)
+        .patch(`/api/echanges/${echangeId}`)
+        .send({ message: `L'échange ${echangeId} n'a pas été trouvé.` })
+        .expect(422)
+        .expect("Content-Type", /json/);
+    }
   });
-  it("Devrait pas afficher toutes les cartes", async () => {
-    const response = await supertest(app).get("/api/cartes/:{dresseurId}");
+});
+
+// Test supprimer un échange
+describe("DELETE /api/echanges/:{echangeId}", () => {
+  it("Devrait supprimer un échange", async () => {
+    const response = await supertest(app)
+      .delete(`/api/echanges/${echangeId}`)
+      .expect(204);
+  });
+
+  it("Devrait pas supprimer un échange", async () => {
+    const response = await supertest(app)
+      .delete(`/api/echanges/${echangeId}`)
+      .expect(404)
+      .expect("Content-Type", /json/);
+  });
+});
+
+// Test d'affichage des échanges du dresseur en fonction de l'état
+describe("GET /api/echanges/:{dresseurId}", function () {
+  it("Devrait afficher les échanges du dresseur en fonction de l'état", async () => {
+    const response = await supertest(app).get("/api/echanges/:{dresseurId}");
     //.set("Authorization", `Bearer ${token}`);
-    expect(404);
-    expect("Content-Type", "text/plain");
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["content-type"]).toMatch(/json/);
+  });
+  it("Devrait retourner une erreur 404 si le dresseur n'existe pas", async () => {
+    const response = await supertest(app).get("/api/echanges/:{dresseurId}");
+    //.set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.headers["content-type"]).toMatch(/json/);
   });
 });
 afterAll(async () => {
