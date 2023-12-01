@@ -4,8 +4,11 @@ import mongoose from "mongoose"
 import { cleanUpDatabase } from "./utils.js"
 import Message from "../models/message.js"
 import Echange from "../models/echange.js"
-import { authenticate } from "../routes/utils.js"
+import message from "../models/message.js"
 
+let message_id = "";
+let dresseur_id = "";
+let echange_id = "";
 beforeEach(cleanUpDatabase);
 
 // Créer un message
@@ -18,7 +21,6 @@ describe('POST /api/messages', () => {
   };
 
   it('should create a message successfully', async () => {
-    if (authenticate){
       const response = await supertest(app)
         .post('/api/messages')
         .set('Authorization', `Bearer YOUR_AUTH_TOKEN`)
@@ -27,7 +29,7 @@ describe('POST /api/messages', () => {
         .expect('Content-Type', /json/);
   
       const responseBody = response.body;
-  
+      message_id = responseBody._id;
       // Assertions
       expect(responseBody).toBeObject();
       expect(responseBody).toContainAllKeys(['createdAt', 'contenu', 'dresseur_id', 'echange_id', '_id']);
@@ -39,17 +41,17 @@ describe('POST /api/messages', () => {
         }
       });
 
-    } else {
+       
+  });
       it('should handle the case of an unprocessable entity (422)', async () => {
         // Assuming your API returns a 422 response for an unprocessable entity
-        const invalidRecipientData = '{ /* Some data that triggers a 422 error */ }';
+        const invalidRecipientData = '';
         await supertest(app)
           .post('/api/messages')
           .send(invalidRecipientData)
           .expect(422);
       });
-    }
-  });
+     
 
 });
 
@@ -57,18 +59,20 @@ describe('POST /api/messages', () => {
 describe('DELETE /api/messages/{messageId}', () => {
   it('should delete a message successfully', async () => {
 
-    const messages = await Message.find({});
-    let createdMessageId;
+    const message = await Message.findById(message_id);
 
-    if(messages.length > 0){
-      createdMessageId = messages[0]._id;
-
-      const response = await supertest(app)
-      .delete(`/api/messages/${createdMessageId}`)
+    if(message){
+      await supertest(app)
+      .delete(`/api/messages/${message_id}`)
       .expect(204);
 
-      const deletedMessage = await Message.findById(createdMessageId);
-      expect(deletedMessage).toBeNull();
+      expect(message).toBeNull();
+    } else{
+        const invalidRecipientData = `Le message avec l'id ${message_id} n'existe pas`;
+        await supertest(app)
+          .delete(`/api/messages/${message_id}`)
+          .send(invalidRecipientData)
+          .expect(404);
     }
 
   });
@@ -80,22 +84,21 @@ describe('GET /messages/{echangeId}', () => {
     
     it('should retrieve the list of messages', async () => {
       
-      const messages = await Message.find({});
-      const echanges = await Echange.find({});
+      const message = await Message.findById(message_id);
 
-      if(messages.length > 0){
-        createdMessageEchangeId = messages[0].echange_id;
-        if(createdMessageEchangeId === echanges._id) {
+      if(message){
+        createdMessageEchangeId = message.echange_id;
+        if(createdMessageEchangeId === echange_id) {
           const response = supertest(app)
-          .get(`api/message/${echanges._id}`)
+          .get(`api/message/${echange_id}`)
           .expect(201)
           .expect('Content-Type', /json/);
           const responseBody = response.body;
           expect(responseBody).toBeArray();
-          responseBody.forEach(message => {
-            expect(message).toContainAllKeys(['createdAt', 'contenu', 'dresseur_id', 'echange_id', '_id']);
-            expect(message._id).toMatch(/^[0-9a-f]{24}$/); // Assuming it's an ObjectID
-            expect(message.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+          responseBody.forEach(el => {
+            expect(el).toContainAllKeys(['createdAt', 'contenu', 'dresseur_id', 'echange_id', '_id']);
+            expect(el._id).toMatch(/^[0-9a-f]{24}$/); // Assuming it's an ObjectID
+            expect(el.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
           });
         }
       }     
