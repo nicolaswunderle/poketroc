@@ -52,7 +52,7 @@ export function editPermissionDresseur(req, res, next) {
 export function loadDresseurFromParams(req, res, next) {
   const dresseurId = req.params.dresseurId;
   // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(dresseurId)) return res.status(400).send("L'id du dresseur est invalide.");
+  if (!mongoose.Types.ObjectId.isValid(dresseurId)) return res.status(400).send("L'id du dresseur dans les paraêmtress est invalide.");
 
   Dresseur.findById(dresseurId)
     .exec()
@@ -66,6 +66,7 @@ export function loadDresseurFromParams(req, res, next) {
 
 export function supChampsDresseur(req, res, next) {
   // on enlève les champs qui ne peuvent pas être créé par l'utilisateur
+  if (req.body.en_ligne) delete req.body.en_ligne;
   if (req.body.createdAt) delete req.body.createdAt;
   if (req.body.updatedAt) delete req.body.updatedAt;
   next();

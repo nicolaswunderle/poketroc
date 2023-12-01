@@ -70,7 +70,7 @@ app.use("/api", function (err, req, res, next) {
     }
   }
 
-  // lors d'une erreur 11000 de mongoose
+  // lors d'une erreur 16755 de mongoose
   if (err.code === 16755) {
     err.status = 422;
     err.message = `Impossible d'extraire les clés géographiques et les sommets en double : ${req.body.localisation.coordinates[0]} et ${req.body.localisation.coordinates[1]}.`;
