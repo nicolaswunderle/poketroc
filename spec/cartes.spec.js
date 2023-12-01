@@ -21,7 +21,7 @@ describe("POST /api/cartes", function () {
         quantite: 3,
       })
       .expect(201)
-      .expect("Content-Type", "application/json");
+      .expect("Content-Type", /json/);
     //.set("Authorization", `Bearer ${token}`);
     carteId = response.body._id;
   });
