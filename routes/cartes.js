@@ -10,29 +10,23 @@ import {
 
 const debug = debugFactory("poketroc:cartes");
 const router = express.Router();
-
+//autenticate
 // Créer une carte
-router.post(
-  "/",
-  requireJson,
-  authenticate,
-  supChampsCarte,
-  function (req, res, next) {
-    const body = req.body;
-    body.dresseur_id = req.dresseurCon._id;
-    const nouvelleCarte = new Carte(req.body);
-    nouvelleCarte
-      .save()
-      .then((carteSauve) => {
-        res.status(201).send(carteSauve);
-        next();
-      })
-      .catch(next);
-  }
-);
-
+router.post("/", requireJson, supChampsCarte, function (req, res, next) {
+  const body = req.body;
+  // body.dresseur_id = req.dresseurCon._id;
+  const nouvelleCarte = new Carte(req.body);
+  nouvelleCarte
+    .save()
+    .then((carteSauve) => {
+      res.status(201).send(carteSauve);
+      next();
+    })
+    .catch(next);
+});
+//enlever authenticate mais je la remets après
 // Afficher une carte
-router.get("/:carteId", authenticate, function (req, res, next) {
+router.get("/:carteId", function (req, res, next) {
   const carteId = req.params.carteId;
   const { page, pageSize } = getPaginationParameters(req);
   Carte.findById(carteId)
@@ -46,9 +40,9 @@ router.get("/:carteId", authenticate, function (req, res, next) {
 
     .catch(next);
 });
-
+//authenticate
 // Modifier une carte
-router.patch("/:carteId", authenticate, function (req, res, next) {
+router.patch("/:carteId", function (req, res, next) {
   const carteId = req.params.carteId;
   const majCarte = req.body;
 
@@ -80,9 +74,9 @@ router.patch("/:carteId", authenticate, function (req, res, next) {
     })
     .catch(next);
 });
-
+//autehnticate
 // Supprimer une carte
-router.delete("/:carteId", authenticate, function (req, res, next) {
+router.delete("/:carteId", function (req, res, next) {
   const carteId = req.params.carteId;
 
   Carte.deleteOne({ _id: carteId })
@@ -95,10 +89,10 @@ router.delete("/:carteId", authenticate, function (req, res, next) {
     })
     .catch(next);
 });
-
+//authenticate
 // Afficher toutes les cartes
 
-router.get("/{dresseurId}", authenticate, function (req, res, next) {
+router.get("/:{dresseurId}", function (req, res, next) {
   const { page, pageSize } = getPaginationParameters(req);
   Carte.find()
     .skip((page - 1) * pageSize)
