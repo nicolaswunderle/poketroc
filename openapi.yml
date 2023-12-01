@@ -223,7 +223,7 @@ paths:
           $ref: "#/components/responses/CarteSupprimee"
         "404":
           $ref: "#/components/responses/CartePasSupprimee"
-  /cartes/{dresseurId}:
+  /cartes/dresseur/{dresseurId}:
     get:
       summary: Afficher toutes les cartes du dresseur en fonction du statut.
       tags:
