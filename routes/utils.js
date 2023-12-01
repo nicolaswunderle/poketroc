@@ -4,7 +4,7 @@ import { promisify } from "util";
 import { jwtSecret } from "../config.js";
 import Dresseur from "../models/dresseur.js";
 import Echange from "../models/echange.js";
-import Carte from "../models/carte.js";
+//import Carte from "../models/carte.js";
 import Message from "../models/message.js";
 
 const verifyJwt = promisify(jwt.verify);
