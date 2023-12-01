@@ -8,34 +8,36 @@ const echConCarSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Carte',
         required: [true, "L'id de la carte qui va être échangée est obligatoire."],
-        immutable: [true, "L'id de la carte n'est pas modifiable."]
+        immutable: [true, "L'id de la carte n'est pas modifiable."],
+        validate: {
+            validator: validateCarteInEchange,
+            message: "Cette carte fait déjà parti d'un échange en attente."
+        },
     },
     echange_id: {
         type: Schema.Types.ObjectId,
         ref: 'Echange',
         required: [true, "L'id de l'échange qui va concerner une ou plusieurs cartes est obligatoire."],
         immutable: [true, "L'id de l'échange n'est pas modifiable."]
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
 echConCarSchema.index({ carte_id: 1, echange_id: 1 }, { unique: true });
 
+function validateCarteInEchange (value) {
+    this.constructor.find()
+        .exec()
+        .then(respons => {
+            return false
+        });
+}
+
 echConCarSchema.set("toJSON", {
     transform: transformJson
 });
  
 function transformJson(doc, json, options) {
-    delete json.createdAt;
-    delete json.updatedAt;
     delete json.__v;
     return json;
 }
