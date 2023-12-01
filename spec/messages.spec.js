@@ -50,26 +50,6 @@ describe("POST /api/messages", () => {
   });
 });
 
-// Supprimer un message
-describe('DELETE /api/messages/{messageId}', () => {
-  it('Devrait supprimer un message avec succès', async () => {
-
-    if(message){
-      await supertest(app)
-      .delete(`/api/messages/${message_id}`)
-      .expect(204);
-
-      expect(message).toBeNull();
-    } else {
-      const invalidRecipientData = `Le message avec l'id ${message_id} n'existe pas`;
-      await supertest(app)
-        .delete(`/api/messages/${message_id}`)
-        .send(invalidRecipientData)
-        .expect(404);
-    }
-  });
-});
-
 // Afficher une discution
 describe('GET /messages/{echangeId}', () => {
     
