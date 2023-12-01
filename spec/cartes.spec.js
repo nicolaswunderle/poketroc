@@ -9,7 +9,7 @@ let token;
 let johnDoe;
 
 beforeEach(cleanUpDatabase);
-
+//test création cartes
 describe("POST /api/cartes", () => {
   beforeEach(async function () {
     johnDoe = await Dresseur.create({
@@ -41,7 +41,7 @@ describe("POST /api/cartes", () => {
         quantite: 3,
       })
       .expect(201)
-      .expect("Content-Type", "application/json");
+      .expect("Content-Type", /json/);
     //.set("Authorization", `Bearer ${token}`);
     carteId = response.body._id;
   });
@@ -68,9 +68,7 @@ describe("GET /api/cartes/:carteId", function () {
   it("Devrait afficher une carte spécifique", async () => {
     const response = await supertest(app).get(`/api/cartes/${carteId}`);
     // .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode)
-      .toBe(200)
-      .expect("Content-Type", "application/json");
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
     expect(response.body).toHaveProperty("_id", carteId);
   });
   it("Devrait pas afficher une carte spécifique", async () => {
@@ -87,7 +85,7 @@ describe("PATCH /api/cartes/:carteId", function () {
       .patch(`/api/cartes/:carteId/${carteId}`)
       .send({});
     // .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
     //expect erreurs
     expect(response.body).toHaveProperty("_id", carteId);
   });
@@ -115,7 +113,7 @@ describe("DELETE /api/cartes/:carteId", function () {
       `/api/cartes/:carteId/${carteId}`
     );
     //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(204).expect("Content-Type", "text/plain");
+    expect(response.statusCode).toBe(204);
   });
   it("Devrait pas supprimer une carte spécifique", async () => {
     const response = await supertest(app).delete(
@@ -131,9 +129,7 @@ describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={numb
   it("Devrait afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");
     //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode)
-      .toBe(200)
-      .expect("Content-Type", "application/json");
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
   });
   it("Devrait pas afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");

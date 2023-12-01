@@ -530,10 +530,6 @@ paths:
       responses:
         "204":
           description: MessageId supprimé
-          content:
-            text/plain:
-              schema:
-                example: Le messageId 7be91a9a41bc839033eedf0k à été supprimé.
         "404":
           $ref: "#/components/responses/MessageIntrouvable"
   /messages/{echangeId}:
@@ -657,9 +653,6 @@ components:
           example: Erreur de modification de la carteId 'aaab'.
     CarteSupprimee:
       description: CarteId supprimée
-      content:
-        text/plain:
-          example: La carteId 'aaab' a été supprimée.
     CartePasSupprimee:
       description: CarteId introuvable.
       content:
@@ -685,9 +678,6 @@ components:
           example: L'échangeId 7fe91a9a41bc839033eedf0f introuvable, suppression impossible.
     EchangeSupprime:
       description: L'échange a été supprimé avec succès.
-      content:
-        text/plain:
-          example: L'échangeId 7fe91a9a41bc839033eedf0f a été supprimé avec succès.
     EchangePasModifie:
       description: EchangeId introuvable.
       content:
