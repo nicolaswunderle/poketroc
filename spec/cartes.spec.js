@@ -23,12 +23,13 @@ describe("POST /api/cartes", () => {
       }, 
       mot_de_passe: "johdoe"
     })
+
   });
   it("Devrait créer une nouvelle carte", async () => {
     const token = await generateValidJwt(johnDoe);
     const response = await supertest(app)
       .post("/api/cartes")
-      .set('Authorization', `Bearer ${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({
         id_api: "yourhb_id",
         etat: "neuve",
@@ -45,6 +46,7 @@ describe("POST /api/cartes", () => {
       expect(body).toBeObject();
 
       carteId = body._id;
+
   });
 
   it("Devrait pas créer une nouvelle carte", async () => {
@@ -67,6 +69,7 @@ describe("POST /api/cartes", () => {
 // Test d'affichage d'une carte
 describe("GET /api/cartes/:carteId", function () {
   it("Devrait afficher une carte spécifique", async () => {
+
     const response = await supertest(app)
     .get(`/api/cartes/${carteId}`)
     // .set("Authorization", `Bearer ${token}`)
@@ -89,7 +92,7 @@ describe("PATCH /api/cartes/:carteId", function () {
       .patch(`/api/cartes/:carteId/${carteId}`)
       .send({});
     // .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
     //expect erreurs
     expect(response.body).toHaveProperty("_id", carteId);
   });
@@ -117,7 +120,7 @@ describe("DELETE /api/cartes/:carteId", function () {
       `/api/cartes/:carteId/${carteId}`
     );
     //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(204).expect("Content-Type", "text/plain");
+    expect(response.statusCode).toBe(204);
   });
   it("Devrait pas supprimer une carte spécifique", async () => {
     const response = await supertest(app).delete(
@@ -133,9 +136,7 @@ describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={numb
   it("Devrait afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");
     //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode)
-      .toBe(200)
-      .expect("Content-Type", "application/json");
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
   });
   it("Devrait pas afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");
@@ -144,9 +145,6 @@ describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={numb
     expect("Content-Type", "text/plain");
   });
 });
-
-
-
 
 afterAll(async () => {
   await mongoose.disconnect();
