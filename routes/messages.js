@@ -24,7 +24,7 @@ router.delete("/:messageId",authenticate, function (req, res, next) {
       .exec()
       .then(message => {
         if (!message) return res.status(404).send("Le message à supprimer n'existe pas"); // Unauthorized
-        res.sendStatus(204).send("Le message à été supprimé");
+        res.sendStatus(204)
         next();
       })
       .catch(next);
