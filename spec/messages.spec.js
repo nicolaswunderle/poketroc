@@ -2,12 +2,9 @@ import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
 import { cleanUpDatabase } from "./utils.js"
-import Message from "../models/message.js"
-import Echange from "../models/echange.js"
-import message from "../models/message.js"
 
 let message_id = "";
-let dresseur_id = "";
+let message;
 let echange_id = "";
 beforeEach(cleanUpDatabase);
 
@@ -30,6 +27,7 @@ describe('POST /api/messages', () => {
   
       const responseBody = response.body;
       message_id = responseBody._id;
+      message = responseBody;
       // Assertions
       expect(responseBody).toBeObject();
       expect(responseBody).toContainAllKeys(['createdAt', 'contenu', 'dresseur_id', 'echange_id', '_id']);
@@ -59,8 +57,6 @@ describe('POST /api/messages', () => {
 describe('DELETE /api/messages/{messageId}', () => {
   it('should delete a message successfully', async () => {
 
-    const message = await Message.findById(message_id);
-
     if(message){
       await supertest(app)
       .delete(`/api/messages/${message_id}`)
@@ -83,13 +79,11 @@ describe('DELETE /api/messages/{messageId}', () => {
 describe('GET /messages/{echangeId}', () => {
     
     it('should retrieve the list of messages', async () => {
-      
-      const message = await Message.findById(message_id);
 
       if(message){
-        createdMessageEchangeId = message.echange_id;
+        const createdMessageEchangeId = message.echange_id;
         if(createdMessageEchangeId === echange_id) {
-          const response = supertest(app)
+          const response = await supertest(app)
           .get(`api/message/${echange_id}`)
           .expect(201)
           .expect('Content-Type', /json/);
