@@ -4,13 +4,12 @@ import mongoose from "mongoose";
 import Dresseur from "../models/dresseur.js";
 import { cleanUpDatabase, generateValidJwt } from "./utils.js";
 
-let carteId;
-let token;
-let johnDoe;
-
 beforeEach(cleanUpDatabase);
 
+let carteId;
+
 describe("POST /api/cartes", () => {
+  let johnDoe;
   beforeEach(async function() {
     johnDoe = await Dresseur.create({ 
       prenom: "John", 
@@ -23,30 +22,29 @@ describe("POST /api/cartes", () => {
         coordinates: [ -74 , 7 ] 
       }, 
       mot_de_passe: "johdoe"
-    });
-
-    token = await generateValidJwt(johnDoe);
+    })
   });
-
   it("Devrait créer une nouvelle carte", async () => {
+    const token = await generateValidJwt(johnDoe);
     const response = await supertest(app)
       .post("/api/cartes")
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id_api: "yourpi_id",
+        id_api: "yourhb_id",
         etat: "neuve",
         desc_etat: "Description de l'état",
         type: "normale",
         statut: "collectee",
         quantite: 3,
+        dresseur_id: johnDoe.id,
       })
       .expect(201)
       .expect('Content-Type', /json/);
-    
-    const body = response.body;
-    expect(body).toBeObject();
+      
+      const body = response.body;
+      expect(body).toBeObject();
 
-    carteId = body._id;
+      carteId = body._id;
   });
 
   it("Devrait pas créer une nouvelle carte", async () => {
@@ -69,11 +67,12 @@ describe("POST /api/cartes", () => {
 // Test d'affichage d'une carte
 describe("GET /api/cartes/:carteId", function () {
   it("Devrait afficher une carte spécifique", async () => {
-    const response = await supertest(app).get(`/api/cartes/${carteId}`);
-    // .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode)
-      .toBe(200)
-      .expect("Content-Type", "application/json");
+    const response = await supertest(app)
+    .get(`/api/cartes/${carteId}`)
+    // .set("Authorization", `Bearer ${token}`)
+    .expect(200)
+    .expect("Content-Type", /json/);
+    
     expect(response.body).toHaveProperty("_id", carteId);
   });
   it("Devrait pas afficher une carte spécifique", async () => {
