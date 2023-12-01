@@ -52,7 +52,7 @@ L'application est configurée via les variables d'environnement suivantes :
 
 Exécutez les tests unitaires et d'intégration :
 ```bash
-npm run test
+npm run test (npm run testw pour les utilsateurs de Windows)
 ```
 Exécuter les tests unitaires et d'intégration avec coverage :
 ```bash

@@ -292,42 +292,8 @@ paths:
                 $ref: "#/components/schemas/Echange"
         "422":
           $ref: "#/components/responses/EchangeValidationErreur"
-  /echanges/proposes:
-    get:
-      summary: Afficher tous les échanges proposés
-      tags:
-        - échange
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: tri
-          in: query
-          description: Critère de tri des échanges (nouveaute, pertinence)
-          required: false
-          schema:
-            type: string
-            enum:
-              - nouveaute
-              - pertinence
-        - name: page
-          in: query
-          description: Numéro de la pages
-          required: false
-          schema:
-            type: integer
-        - name: pageSize
-          in: query
-          description: Taille de la page
-          required: false
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: La liste des échanges proposés est affichée.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Echange"
+
+    
   /echanges/{echangeId}:
     get:
       summary: Afficher un échange
