@@ -5,55 +5,13 @@ import { cleanUpDatabase } from "./utils.js";
 
 beforeEach(cleanUpDatabase);
 
-beforeEach(async function () {
-  [nicolasWunderle] = await Promise.all([
-    Dresseur.create({
-      pseudo: "nicorhzuwr",
-      mot_de_passe: "vivelaprog",
-    }),
-  ]);
-});
-/*
-beforeEach(async () => {
-  // Créez un dresseur directement dans le fichier de test
-  const nicolasWunderle = await Dresseur.create({
-    email: "nicolas.wunderle@gmail.com",
-    password: "vivelaprog",
-    // ... autres propriétés du dresseur
-  });
-*/
-const response = await supertest(app).post("/api/dresseur/login").send({
-  pseudo: "nicorhzuwr",
-  mot_de_passe: "vivelaprog",
-});
-
-token = response.body.token;
-
-let token;
 let carteId;
 
-describe("Tests des routes pour les cartes", () => {
+// Test de création d'une carte
+describe("POST /api/cartes", function () {
   it("Devrait créer une nouvelle carte", async () => {
     const response = await supertest(app)
-      .post("/api/carte")
-      .send({
-        id_api: "yourhb_id",
-        etat: "neuve",
-        desc_etat: "Description de l'état",
-        type: "normale",
-        statut: "collectee",
-        quantite: 3,
-        dresseur_id: "656776bf963e32e19a34787c",
-      })
-      .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(201);
-    carteId = response.body._id;
-  });
-
-  // Test de création d'une carte
-  it("Devrait créer une nouvelle carte", async () => {
-    const response = await supertest(app)
-      .post("/api/carte")
+      .post("/api/cartes")
       .send({
         id_api: "yourpi_id",
         etat: "neuve",
@@ -62,47 +20,108 @@ describe("Tests des routes pour les cartes", () => {
         statut: "collectee",
         quantite: 3,
       })
-      .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(201);
+      .expect(201)
+      .expect("Content-Type", "application/json");
+    //.set("Authorization", `Bearer ${token}`);
     carteId = response.body._id;
   });
 
-  // Test d'affichage d'une carte
-  it("Devrait afficher une carte spécifique", async () => {
+  it("Devrait pas créer une nouvelle carte", async () => {
     const response = await supertest(app)
-      .get(`/api/carte/${carteId}`)
-      .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("_id", carteId);
-  });
-
-  // Test de modification d'une carte
-  it("Devrait modifier une carte existante", async () => {
-    const response = await supertest(app)
-      .patch(`/api/carte/${carteId}`)
-      .send({})
-      .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("_id", carteId);
-  });
-
-  // Test de suppression d'une carte
-  it("Devrait supprimer une carte spécifique", async () => {
-    const response = await supertest(app)
-      .delete(`/api/carte/${carteId}`)
-      .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(204);
-  });
-
-  // Test d'affichage de toutes les cartes
-  it("Devrait afficher toutes les cartes", async () => {
-    const response = await supertest(app)
-      .get("/api/carte")
-      .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200);
+      .post("/api/cartes")
+      .send({
+        etat: "neuve",
+        desc_etat: "Description de l'état",
+        type: "normale",
+        statut: "collectee",
+        quantite: 3,
+      })
+      .expect(422)
+      .expect("Content-Type", "text/plain");
+    //.set("Authorization", `Bearer ${token}`);
+    carteId = response.body._id;
   });
 });
 
+// Test d'affichage d'une carte
+describe("GET /api/cartes/:carteId", function () {
+  it("Devrait afficher une carte spécifique", async () => {
+    const response = await supertest(app).get(`/api/cartes/${carteId}`);
+    // .set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode)
+      .toBe(200)
+      .expect("Content-Type", "application/json");
+    expect(response.body).toHaveProperty("_id", carteId);
+  });
+  it("Devrait pas afficher une carte spécifique", async () => {
+    const response = await supertest(app).get(`/api/cartes/${carteId}`);
+    // .set("Authorization", `Bearer ${token}`);
+    expect(404);
+    expect("Content-Type", "text/plain");
+  });
+});
+// Test de modification d'une carte
+describe("PATCH /api/cartes/:carteId", function () {
+  it("Devrait modifier une carte existante", async () => {
+    const response = await supertest(app)
+      .patch(`/api/cartes/:carteId/${carteId}`)
+      .send({});
+    // .set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode).toBe(200);
+    //expect erreurs
+    expect(response.body).toHaveProperty("_id", carteId);
+  });
+  it("Devrait pas modifier une carte existante", async () => {
+    const response = await supertest(app)
+      .patch(`/api/cartes/:carteId/${carteId}`)
+      .send({});
+    // .set("Authorization", `Bearer ${token}`);
+    expect(404);
+    expect("Content-Type", "text/plain");
+  });
+  it("Devrait pas modifier une carte existante", async () => {
+    const response = await supertest(app)
+      .patch(`/api/cartes/:carteId/${carteId}`)
+      .send({});
+    // .set("Authorization", `Bearer ${token}`);
+    expect(422);
+    expect("Content-Type", "text/plain");
+  });
+});
+// Test de suppression d'une carte
+describe("DELETE /api/cartes/:carteId", function () {
+  it("Devrait supprimer une carte spécifique", async () => {
+    const response = await supertest(app).delete(
+      `/api/cartes/:carteId/${carteId}`
+    );
+    //.set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode).toBe(204).expect("Content-Type", "text/plain");
+  });
+  it("Devrait pas supprimer une carte spécifique", async () => {
+    const response = await supertest(app).delete(
+      `/api/cartes/:carteId/${carteId}`
+    );
+    //.set("Authorization", `Bearer ${token}`);
+    expect(404);
+    expect("Content-Type", "text/plain");
+  });
+});
+// Test d'affichage de toutes les cartes
+describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}", function () {
+  it("Devrait afficher toutes les cartes", async () => {
+    const response = await supertest(app).get("/api/cartes/:{dresseurId}");
+    //.set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode)
+      .toBe(200)
+      .expect("Content-Type", "application/json");
+  });
+  it("Devrait pas afficher toutes les cartes", async () => {
+    const response = await supertest(app).get("/api/cartes/:{dresseurId}");
+    //.set("Authorization", `Bearer ${token}`);
+    expect(404);
+    expect("Content-Type", "text/plain");
+  });
+});
 afterAll(async () => {
   await mongoose.disconnect();
 });

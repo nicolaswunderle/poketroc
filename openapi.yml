@@ -238,6 +238,8 @@ paths:
                 $ref: "#/components/schemas/Carte"
         "404":
           $ref: "#/components/responses/CartePasModifiee"
+        "422":
+          $ref: "#/components/responses/CarteModificationErreur"
     delete:
       summary: Supprimer la carte
       tags:
@@ -634,7 +636,7 @@ components:
     CarteValidationErreur:
       description: Erreur de validation lors de la création.
       content:
-        application/json:
+        text/plain:
           example: Une erreur de validation est survenue, la carte n'a pas été créée.
     CartePasAffichee:
       description: CarteId introuvable.
@@ -648,6 +650,11 @@ components:
           example: >-
             La carteId 'aaab' n'a pas été trouvée et n'a donc pas pu être
             modifiée.
+    CarteModificationErreur:
+      description: Erreur lors de la modification.
+      content:
+        text/plain:
+          example: Erreur de modification de la carteId 'aaab'.
     CarteSupprimee:
       description: CarteId supprimée
       content:
