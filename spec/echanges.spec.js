@@ -59,6 +59,20 @@ describe("POST /api/echanges", () => {
   });
 });
 
+// Test d'affichage des échanges
+describe("GET /api/cartes/:{dresseurId}", function () {
+  it("Devrait afficher toutes les cartes", async () => {
+    const response = await supertest(app).get("/api/cartes/:{dresseurId}");
+    //.set("Authorization", `Bearer ${token}`);
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
+  });
+  it("Devrait pas afficher toutes les cartes", async () => {
+    const response = await supertest(app).get("/api/cartes/:{dresseurId}");
+    //.set("Authorization", `Bearer ${token}`);
+    expect(404);
+    expect("Content-Type", "text/plain");
+  });
+});
 afterAll(async () => {
   await mongoose.disconnect();
 });

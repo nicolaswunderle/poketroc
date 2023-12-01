@@ -127,7 +127,7 @@ describe("DELETE /api/cartes/:carteId", function () {
   });
 });
 // Test d'affichage de toutes les cartes
-describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}", function () {
+describe("GET /api/cartes/:{dresseurId}", function () {
   it("Devrait afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");
     //.set("Authorization", `Bearer ${token}`);
