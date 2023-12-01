@@ -5,6 +5,7 @@ import { WebSocketServer } from 'ws';
 import { promisify } from "util";
 import { jwtSecret } from "./config.js";
 import Dresseur from "./models/dresseur.js";
+import Echange from "./models/echange.js";
 import { getDresseurAProximite } from './services/dresseurService.js';
 
 const verifyJwt = promisify(jwt.verify);
@@ -57,7 +58,7 @@ export function broadcastDresseur(nouveauDresseur) {
 }
 
 function onMessageReceived(ws, message) {
-  const {type, token, localisation} = message;
+  const {type, token, localisation, echangeId} = message;
   if (type === 'getDresseurAProximite') {
     let dresseurId;
 
@@ -81,6 +82,25 @@ function onMessageReceived(ws, message) {
         return ws.send(JSON.stringify({ error: error.message }));
       });
   } else if (type === 'getMessagesOfEchange') {
+    let dresseurId;
+    verifyJwt(token, jwtSecret)
+      .then(payload => {
+        if (!mongoose.Types.ObjectId.isValid(payload.sub)) return ws.send(JSON.stringify({ error: "L'id du dresseur dans le JWT est invalide." }));
+        dresseurId = payload.sub;
+        // Check if the Dresseur ID exists in the database.
+        return Dresseur.findById(dresseurId);
+      })
+      .then(dresseur => {
+        if(!dresseur) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} ne correspond à aucun dresseur`}));
+        return Echange.findById(echangeId);
+      })
+      .then(echange => {
+      if(!echange) return ws.send(JSON.stringify({ error: `L'id ${echangeId} ne correspond à aucun échange`}));
+      return echange.dresseur_concerne_id;
+      }).then(dresseur_concerne_id => {
+        if(!(dresseur_concerne_id === dresseurId)) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} n'est conserné par aucun échange`}));
+        return
+      })
     return ws.send("salut");
   }
   

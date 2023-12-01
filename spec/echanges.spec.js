@@ -3,6 +3,7 @@ import app from "../app.js";
 import mongoose from "mongoose";
 import { cleanUpDatabase } from "../spec/utils.js";
 
+let echangeId;
 beforeEach(cleanUpDatabase);
 
 // Créer un échange
@@ -23,6 +24,9 @@ describe("POST /api/echanges", () => {
       .expect("Content-Type", /json/);
 
     const responseBody = response.body;
+
+    echangeId = responseBody._id;
+
     // Assertions
     expect(responseBody).toBeObject();
     expect(responseBody).toContainAllKeys(['etat', 'dresseur_cree_id', 'dresseur_concerne_id', 'createdAt', 'updatedAt', '_id']);
