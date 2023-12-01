@@ -38,41 +38,6 @@ paths:
                 $ref: "#/components/schemas/Dresseur"
         "422":
           $ref: "#/components/responses/DresseurValidationErreur"
-  /dresseurs?localisation={coordonnéesGeographique}&page={number}&pageSize={number}:
-    get:
-      summary: Afficher les dresseurs par ordre de proximité
-      tags:
-        - dresseur
-      parameters:
-        - name: coordonnéesGeographique
-          in: path
-          description: Coordonnées géographiques du dresseur
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: query
-          description: Numéro de la page
-          required: false
-          schema:
-            type: integer
-        - name: pageSize
-          in: query
-          description: Taille de la page
-          required: false
-          schema:
-            type: integer
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Liste des dresseurs proches est affichée.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Dresseur"
-        "503":
-          $ref: "#/components/responses/ErreurConnexion"
   /dresseurs/{dresseurId}:
     get:
       summary: Afficher le dresseur
@@ -258,7 +223,7 @@ paths:
           $ref: "#/components/responses/CarteSupprimee"
         "404":
           $ref: "#/components/responses/CartePasSupprimee"
-  /cartes/{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}:
+  /cartes/{dresseurId}:
     get:
       summary: Afficher toutes les cartes du dresseur en fonction du statut.
       tags:
@@ -327,7 +292,7 @@ paths:
                 $ref: "#/components/schemas/Echange"
         "422":
           $ref: "#/components/responses/EchangeValidationErreur"
-  /echanges/proposes?tri={nouveaute,pertinence}&page={number}&pageSize={number}:
+  /echanges/proposes:
     get:
       summary: Afficher tous les échanges proposés
       tags:
@@ -435,29 +400,6 @@ paths:
           $ref: "#/components/responses/EchangePasSupprime"
   /echanges/{dresseurId}:
     get:
-      summary: Afficher tous les échanges du dresseur
-      tags:
-        - échange
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: dresseurId
-          in: path
-          description: Identifiant du dresseur
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Les échanges sont affichés.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Echange"
-        "404":
-          $ref: "#/components/responses/EchangesPasAffiche"
-  /echanges/{dresseurId}?etat={accepte, attente, refuse}:
-    get:
       summary: Afficher les échanges du dresseur en fonction de l'état
       tags:
         - échange
@@ -513,29 +455,6 @@ paths:
           $ref: "#/components/responses/MessageErreur"
         "422":
           $ref: "#/components/responses/DestinataireErreur"
-  /messages/{messageId}:
-    delete:
-      summary: Supprimer un message
-      tags:
-        - message
-      parameters:
-        - name: messageId
-          in: path
-          description: Identifiant du message
-          required: true
-          schema:
-            type: string
-      security:
-        - BearerAuth: []
-      responses:
-        "204":
-          description: MessageId supprimé
-          content:
-            text/plain:
-              schema:
-                example: Le messageId 7be91a9a41bc839033eedf0k à été supprimé.
-        "404":
-          $ref: "#/components/responses/MessageIntrouvable"
   /messages/{echangeId}:
     get:
       summary: Affiche tous les messages d’un échange
@@ -657,9 +576,6 @@ components:
           example: Erreur de modification de la carteId 'aaab'.
     CarteSupprimee:
       description: CarteId supprimée
-      content:
-        text/plain:
-          example: La carteId 'aaab' a été supprimée.
     CartePasSupprimee:
       description: CarteId introuvable.
       content:
@@ -685,9 +601,6 @@ components:
           example: L'échangeId 7fe91a9a41bc839033eedf0f introuvable, suppression impossible.
     EchangeSupprime:
       description: L'échange a été supprimé avec succès.
-      content:
-        text/plain:
-          example: L'échangeId 7fe91a9a41bc839033eedf0f a été supprimé avec succès.
     EchangePasModifie:
       description: EchangeId introuvable.
       content:
@@ -716,11 +629,6 @@ components:
       content:
         text/plain:
           example: Le message n'a pas pu être créé
-    MessageIntrouvable:
-      description: Message introuvable
-      content:
-        text/plain:
-          example: Le messageId 7be91a9a41bc839033eedf0k est introuvable.
     DiscussionIntrouvable:
       description: EchangeId introuvable
       content:

@@ -12,7 +12,7 @@ const debug = debugFactory("poketroc:cartes");
 const router = express.Router();
 //autenticate
 // Créer une carte
-router.post("/", requireJson, supChampsCarte, function (req, res, next) {
+router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, next) {
   const body = req.body;
   // body.dresseur_id = req.dresseurCon._id;
   const nouvelleCarte = new Carte(req.body);

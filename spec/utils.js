@@ -19,7 +19,6 @@ export const cleanUpDatabase = async function () {
 
 export function generateValidJwt(dresseur) {
   // Generate a valid JWT which expires in 7 days.
-  console.log(dresseur._id.toString())
   const payload = { 
     sub: dresseur._id.toString(),
     exp: Math.floor(Date.now() / 1000) + 7 * 24 * 3600,

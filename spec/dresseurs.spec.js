@@ -1,6 +1,10 @@
+
 import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
+import supertest from "supertest";
+import app from "../app.js";
+import mongoose from "mongoose";
 import { cleanUpDatabase, generateValidJwt } from "./utils.js"
 
 let dresseur_id = "";
@@ -14,25 +18,25 @@ let enLigne;
 beforeEach(cleanUpDatabase);
 
 // Créer un dresseur
-test('POST /api/dresseurs', async () => {
-    const donnees = {
-        prenom: "Nicolas",
-        nom: "Wunderle",
-        pseudo: "nico",
-        email: "nicolas.wunderle@gmail.com",
-        age: 24,
-        localisation: { type: 'Point', coordinates: [ -73.97, 40.77 ] },
-        mot_de_passe: "nicowun"
-    }
-    const donneesAttendues = {
-        ...donnees,
-        url_image_profil: 'asset/image_profil_defaut.jpeg',
-        en_ligne: false,
-        deck_visible: true,
-    }
+test("POST /api/dresseurs", async () => {
+  const donnees = {
+    prenom: "Nicolas",
+    nom: "Wunderle",
+    pseudo: "nico",
+    email: "nicolas.wunderle@gmail.com",
+    age: 24,
+    localisation: { type: "Point", coordinates: [-73.97, 40.77] },
+    mot_de_passe: "nicowun",
+  };
+  const donneesAttendues = {
+    ...donnees,
+    url_image_profil: "asset/image_profil_defaut.jpeg",
+    en_ligne: false,
+    deck_visible: true,
+  };
 
-    const res = await supertest(app)
-    .post('/api/dresseurs')
+  const res = await supertest(app)
+    .post("/api/dresseurs")
     .send(donnees)
     .expect(201)
     .expect('Content-Type', /json/);
@@ -62,7 +66,6 @@ test('POST /api/dresseurs', async () => {
             expect(body[cle]).toEqual(donneesAttendues[cle]);
         }
     });
-    
 });
 
 // Déconnexion
@@ -214,7 +217,59 @@ describe('PATCH /dresseurs/{dresseurId}', () => {
               .send(`Le dresseur n'a pas été modifié car aucun changement n'a été détecté`)
               .expect(304);
         }
-    });
+      });
+      const body = response.body;
+      // Assertions
+      expect(body).toBeObject();
+      expect(body).toContainAllKeys([
+        "prenom",
+        "nom",
+        "pseudo",
+        "age",
+        "url_image_profil",
+        "deck_visible",
+        "mot_de_passe",
+        "updatedAt",
+      ]);
+
+      // Check specific fields
+      expect(body).toBeObject();
+      expect(body).toContainAllKeys([
+        "_id",
+        "prenom",
+        "nom",
+        "pseudo",
+        "email",
+        "age",
+        "localisation",
+        "url_image_profil",
+        "en_ligne",
+        "deck_visible",
+      ]);
+      expect(body._id).toMatch(/^[0-9a-f]{24}$/);
+      expect(body.age).toBeNumber();
+      expect(body.localisation).toBeObject();
+      expect(body.localisation).toContainAllKeys(["type", "coordinates"]);
+      expect(body.localisation.coordinates).toBeArray();
+      expect(body.localisation.coordinates[0]).toBeNumber();
+      expect(body.localisation.coordinates[1]).toBeNumber();
+      expect(body.en_ligne).toBeBoolean();
+      expect(body.deck_visible).toBeBoolean();
+
+      // Check if the password has been hashed
+      expect(updatedDresseur.mot_de_passe).not.toEqual(
+        updatedDresseurData.mot_de_passe
+      );
+      expect(body).toEqual();
+    } else {
+      // Assuming your API returns a 422 response for an unprocessable entity
+      const invalidRecipientData = `Le dresseurId ${dresseur_id} n'a pas été trouvé, modification invalide.`;
+      await supertest(app)
+        .patch("/api/dresseurs/{dresseurId}")
+        .send(invalidRecipientData)
+        .expect(404);
+    }
+  });
 });
 
 // Supprimer
@@ -235,6 +290,6 @@ describe('DELETE /api/dresseurs/{dresseurId}', () => {
     });
 });
 
-afterAll(async () => {  
-    await mongoose.disconnect(); 
+afterAll(async () => {
+  await mongoose.disconnect();
 });

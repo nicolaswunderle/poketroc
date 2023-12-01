@@ -4,45 +4,43 @@ import mongoose from "mongoose";
 import Dresseur from "../models/dresseur.js";
 import { cleanUpDatabase, generateValidJwt } from "./utils.js";
 
-let carteId;
-let token;
-let johnDoe;
-
 beforeEach(cleanUpDatabase);
 
+let carteId;
+
 describe("POST /api/cartes", () => {
-  beforeEach(async function() {
-    johnDoe = await Dresseur.create({ 
-      prenom: "John", 
-      nom: "Doe", 
-      pseudo: "Jo", 
-      email: "john.doe@gmail.com", 
-      age: 24, 
-      localisation: { 
-        type: "Point", 
-        coordinates: [ -74 , 7 ] 
-      }, 
-      mot_de_passe: "johdoe"
+  let johnDoe;
+  beforeEach(async function () {
+    johnDoe = await Dresseur.create({
+      prenom: "John",
+      nom: "Doe",
+      pseudo: "Jo",
+      email: "john.doe@gmail.com",
+      age: 24,
+      localisation: {
+        type: "Point",
+        coordinates: [-74, 7],
+      },
+      mot_de_passe: "johdoe",
     });
-
-    token = await generateValidJwt(johnDoe);
   });
-
   it("Devrait créer une nouvelle carte", async () => {
+    const token = await generateValidJwt(johnDoe);
     const response = await supertest(app)
       .post("/api/cartes")
-      .set('Authorization', `Bearer ${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({
-        id_api: "yourpi_id",
+        id_api: "yourhb_id",
         etat: "neuve",
         desc_etat: "Description de l'état",
         type: "normale",
         statut: "collectee",
         quantite: 3,
+        dresseur_id: johnDoe.id,
       })
       .expect(201)
-      .expect('Content-Type', /json/);
-    
+      .expect("Content-Type", /json/);
+
     const body = response.body;
     expect(body).toBeObject();
 
@@ -53,7 +51,6 @@ describe("POST /api/cartes", () => {
     const response = await supertest(app)
       .post("/api/cartes")
       .send({
-        etat: "neuve",
         desc_etat: "Description de l'état",
         type: "normale",
         statut: "collectee",
@@ -69,18 +66,19 @@ describe("POST /api/cartes", () => {
 // Test d'affichage d'une carte
 describe("GET /api/cartes/:carteId", function () {
   it("Devrait afficher une carte spécifique", async () => {
-    const response = await supertest(app).get(`/api/cartes/${carteId}`);
-    // .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode)
-      .toBe(200)
-      .expect("Content-Type", "application/json");
+    const response = await supertest(app)
+      .get(`/api/cartes/${carteId}`)
+      // .set("Authorization", `Bearer ${token}`)
+      .expect(200)
+      .expect("Content-Type", /json/);
+
     expect(response.body).toHaveProperty("_id", carteId);
   });
   it("Devrait pas afficher une carte spécifique", async () => {
     const response = await supertest(app).get(`/api/cartes/${carteId}`);
     // .set("Authorization", `Bearer ${token}`);
     expect(404);
-    expect("Content-Type", "text/plain");
+    expect("Content-Type", /json/);
   });
 });
 // Test de modification d'une carte
@@ -90,8 +88,7 @@ describe("PATCH /api/cartes/:carteId", function () {
       .patch(`/api/cartes/:carteId/${carteId}`)
       .send({});
     // .set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(200);
-    //expect erreurs
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
     expect(response.body).toHaveProperty("_id", carteId);
   });
   it("Devrait pas modifier une carte existante", async () => {
@@ -118,7 +115,7 @@ describe("DELETE /api/cartes/:carteId", function () {
       `/api/cartes/:carteId/${carteId}`
     );
     //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode).toBe(204).expect("Content-Type", "text/plain");
+    expect(response.statusCode).toBe(204);
   });
   it("Devrait pas supprimer une carte spécifique", async () => {
     const response = await supertest(app).delete(
@@ -130,13 +127,11 @@ describe("DELETE /api/cartes/:carteId", function () {
   });
 });
 // Test d'affichage de toutes les cartes
-describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={number}&pageSize={number}", function () {
+describe("GET /api/cartes/:{dresseurId}", function () {
   it("Devrait afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");
     //.set("Authorization", `Bearer ${token}`);
-    expect(response.statusCode)
-      .toBe(200)
-      .expect("Content-Type", "application/json");
+    expect(response.statusCode).toBe(200).expect("Content-Type", /json/);
   });
   it("Devrait pas afficher toutes les cartes", async () => {
     const response = await supertest(app).get("/api/cartes/:{dresseurId}");
@@ -145,9 +140,6 @@ describe("GET /api/cartes/:{dresseurId}?statut={collectee, souhaitee}&page={numb
     expect("Content-Type", "text/plain");
   });
 });
-
-
-
 
 afterAll(async () => {
   await mongoose.disconnect();
