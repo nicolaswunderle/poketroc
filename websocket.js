@@ -50,15 +50,10 @@ export function createWebSocketServer(httpServer) {
   });
 }
 
-export function broadcastMessage(message) {
-  // const {nouveauDresseur} = message;
-  // if (nouveauDresseur) {
-  //   ws.send(JSON.stringify(nouveauDresseur))
-  // }
+export function broadcastDresseur(nouveauDresseur) {
   clients.forEach((client) => {
-    client.send("slaut")
+    client.send(JSON.stringify(nouveauDresseur))
   });
-  
 }
 
 function onMessageReceived(ws, message) {
