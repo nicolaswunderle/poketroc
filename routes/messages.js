@@ -1,39 +1,43 @@
 import debugFactory from 'debug';
 import express from "express";
+import mongoose from "mongoose";
 import Message from "../models/message.js";
-import { requireJson, authenticate, loadEchangeFromParams } from "./utils.js";
+import Echange from "../models/echange.js";
+import { requireJson, authenticate, loadEchangeFromParams, supChampsCarte } from "./utils.js";
 
 const debug = debugFactory('poketroc:messages');
 const router = express.Router();
 
-// Créer un message
-router.post("/", function (req, res, next) {
-  const nouveauMessage = new Message(req.body);
+// Créer un message A FAIRE DANS WEBSOCKET
+router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, next) {
+  const body = req.body;
+  const echangeId = body.echange_id
+  body.dresseur_id = req.dresseurCon._id;
 
-  nouveauMessage.save().then(messageSauve => {   
-    res.status(201).send(messageSauve);
-  })
-  .catch(next);
+  if (!mongoose.Types.ObjectId.isValid(echangeId)) return res.status(400).send("L'id de l'échange est invalide.");
+  
+  // Il faut vérifier que l'utilisateurs connecté se trouve soit dans dresseur_cree_id ou dans dresseur_concerne
+  Echange.findById(echangeId)
+    .exec()
+    .then(echange => {
+      if (!echange) return res.status(404).send(`Aucun échange ne possède l'id ${echangeId}`);
+      new Message(body)
+        .save()
+        .then(messageSauve => {   
+          if (!messageSauve) return res.status(400).send(`Le message n'a pas pu être créé`);
+          res.status(201).send(messageSauve);
+        })
+        .catch(next);
+    })
+    .catch(next);
+  
     
 });
 
-//Supprimer un message
-router.delete("/:messageId",authenticate, function (req, res, next) {
-  const messageId = req.params.messageId;
-    Message.deleteOne({ _id: messageId })
-      .exec()
-      .then(message => {
-        if (!message) return res.status(404).send("Le message à supprimer n'existe pas"); // Unauthorized
-        res.sendStatus(204)
-        next();
-      })
-      .catch(next);
-});
-
-// Afficher une conversation
-router.get("/:echangeId",authenticate, loadEchangeFromParams, function (req, res, next){
-  const echangeId = req.params.echangeId;
+// Afficher une conversation A FAIRE DANS WEBSOCKET
+router.get("/:echangeId", authenticate, loadEchangeFromParams, function (req, res, next){
   Message.find()
+    .where
     .then((messages) => {
       messages.forEach((message) => {
         if(message.echange_id === echangeId){

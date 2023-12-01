@@ -4,7 +4,7 @@ import { promisify } from "util";
 import { jwtSecret } from "../config.js";
 import Dresseur from "../models/dresseur.js";
 import Echange from "../models/echange.js";
-//import Carte from "../models/carte.js";
+import Carte from "../models/carte.js";
 import Message from "../models/message.js";
 
 const verifyJwt = promisify(jwt.verify);
@@ -95,6 +95,21 @@ export function supChampsEchange(req, res, next) {
   next();
 }
 
+export function loadCarteFromParams(req, res, next) {
+  const carteId = req.params.carteId;
+  // Vérification de la validité de l'ID dans les paramêtres
+  if (!mongoose.Types.ObjectId.isValid(carteId)) return res.status(400).send("L'id de la carte est invalide.");
+
+  Carte.findById(carteId)
+    .exec()
+    .then(carte => {
+      if (!carte) return res.status(404).send(`Aucune carte ne possède l'id ${carteId}`);
+      req.carte = carte;
+      next();
+    })
+    .catch(next);
+}
+
 export function supChampsCarte(req, res, next) {
   if (req.body.dresseur_id) delete req.body.dresseur_id;
   if (req.body.createdAt) delete req.body.createdAt;
@@ -102,41 +117,24 @@ export function supChampsCarte(req, res, next) {
   next();
 }
 
+export function loadMessageFromParams(req, res, next) {
+  const messageId = req.params.messageId;
+  // Vérification de la validité de l'ID dans les paramêtres
+  if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).send("L'id du message est invalide.");
+
+  Message.findById(messageId)
+    .exec()
+    .then(message => {
+      if (!message) return res.status(404).send(`Aucun message ne possède l'id ${messageId}`);
+      req.message = message;
+      next();
+    })
+    .catch(next);
+}
+
 export function supChampsMessage(req, res, next) {
   if (req.body.createdAt) delete req.body.createdAt;
   if (req.body.updatedAt) delete req.body.updatedAt;
-  next();
-}
-
-export function loadLocationFromParams(req, res, next) {
-  const localisation = req.query.localisation;
-  if (localisation) {
-    let localisationArray = [];
-    try {
-      localisationArray = JSON.parse(localisation);
-    } catch {
-      return res.status(400).send("Le tableau n'est pas valide.");
-    }
-    if (Array.isArray(localisationArray)) {
-      if (localisationArray.length == 2) {
-        if (typeof localisationArray[0] === "number" && typeof localisationArray[1] === "number") {
-          if ((localisationArray[0] >= -90 && localisationArray[0] <= 90) && (localisationArray[1] >= -180 && localisationArray[1] <= 180)) {
-            req.localisation = localisationArray;
-          } else {
-            return res.status(400).send("Le première coordonnée doit être en -90 et 90 et la deuxième entre -180 et 180.")
-          }
-        } else {
-          return res.status(400).send("Les coordonnées ne sont pas des nombres.")
-        }
-      } else {
-        return res.status(400).send("Le tableau de coordonnées doit contenir deux coordonées.")
-      }
-    } else {
-      return res.status(400).send("Le paramètre localisation n'est pas un tableau.")
-    }
-  } else {
-    return res.status(400).send("Il manque le paramètre localisation.");
-  }
   next();
 }
 
@@ -164,19 +162,4 @@ export function getPaginationParameters(req) {
   }
 
   return { page, pageSize };
-}
-
-export function loadMessageFromParams(req, res, next) {
-  const messageId = req.params.messageId;
-  // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).send("L'id du message est invalide.");
-
-  Message.findById(messageId)
-    .exec()
-    .then(message => {
-      if (!message) return res.status(404).send(`Aucun message ne possède l'id ${messageId}`);
-      req.message = message;
-      next();
-    })
-    .catch(next);
 }

@@ -6,7 +6,7 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
-import { authenticate, loadLocationFromParams, getPaginationParameters, loadDresseurFromParams, supChampsDresseur, editPermissionDresseur, requireJson } from "./utils.js";
+import { authenticate, loadDresseurFromParams, supChampsDresseur, editPermissionDresseur, requireJson } from "./utils.js";
 import { broadcastDresseur } from '../websocket.js';
 
 const debug = debugFactory('poketroc:dresseurs');
@@ -38,34 +38,6 @@ router.post("/", requireJson, supChampsDresseur, function (req, res, next) {
     .catch(next);
   }
     
-});
-
-// Affiche tous les dresseurs à proximité
-router.get("/", authenticate, loadLocationFromParams, function (req, res, next) {
-
-  const { page, pageSize } = getPaginationParameters(req);
-  const localisation = req.localisation;
-
-  if (!localisation) return res.status(400).send("Il manque les coordonnées de la localisation.");
-
-  Dresseur.find({
-    localisation: { 
-      $near:{ 
-        $geometry: { 
-          type: "Point",
-          coordinates: localisation
-        } 
-      }
-    }
-  })
-  .skip((page - 1) * pageSize)
-  .limit(pageSize)
-  .exec()
-  .then(dresseurs => {
-    res.status(200).send(dresseurs);
-  })
-  .catch(next)
-
 });
 
 // Permet de se connecter
@@ -125,7 +97,7 @@ router.get("/:dresseurId", authenticate, loadDresseurFromParams, function (req, 
 });
 
 // Modifie le dresseur
-router.patch("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
+router.patch("/:dresseurId", requireJson, authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
   const dresseur = req.dresseur;
   const majDresseur = req.body;
   let modification = false;
@@ -170,7 +142,8 @@ router.patch("/:dresseurId", authenticate, loadDresseurFromParams, editPermissio
 router.delete("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
   Dresseur.deleteOne({ _id: req.dresseur.id })
     .exec()
-    .then(() => {
+    .then((valid) => {
+      if (valid.deletedCount === 0) return res.status(404).send("Dresseur non trouvée");
       res.sendStatus(204);
     })
     .catch(next);
