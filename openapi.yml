@@ -455,25 +455,6 @@ paths:
           $ref: "#/components/responses/MessageErreur"
         "422":
           $ref: "#/components/responses/DestinataireErreur"
-  /messages/{messageId}:
-    delete:
-      summary: Supprimer un message
-      tags:
-        - message
-      parameters:
-        - name: messageId
-          in: path
-          description: Identifiant du message
-          required: true
-          schema:
-            type: string
-      security:
-        - BearerAuth: []
-      responses:
-        "204":
-          description: MessageId supprimé
-        "404":
-          $ref: "#/components/responses/MessageIntrouvable"
   /messages/{echangeId}:
     get:
       summary: Affiche tous les messages d’un échange
@@ -648,11 +629,6 @@ components:
       content:
         text/plain:
           example: Le message n'a pas pu être créé
-    MessageIntrouvable:
-      description: Message introuvable
-      content:
-        text/plain:
-          example: Le messageId 7be91a9a41bc839033eedf0k est introuvable.
     DiscussionIntrouvable:
       description: EchangeId introuvable
       content:
