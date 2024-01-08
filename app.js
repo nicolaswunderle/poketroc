@@ -18,6 +18,9 @@ mongoose.connect(databaseUrl);
 
 const app = express();
 
+// Activer CORS pour toutes les requêtes
+app.use(cors());
+
 // Parse the OpenAPI document.
 const openApiDocument = yaml.load(fs.readFileSync("./openapi.yml"));
 // Serve the Swagger UI documentation.
