@@ -4,66 +4,108 @@ import mongoose from "mongoose";
 import Echange from "../models/echange.js";
 import Carte from "../models/carte.js";
 import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
-import { requireJson, authenticate, loadDresseurFromParams, loadEchangeFromParams, supChampsEchange, editPermissionDresseur } from "./utils.js";
+import { requireJson, authenticate, tabCartesValidator, loadDresseurFromParams, loadEchangeFromParams, supChampsEchange, editPermissionDresseur } from "./utils.js";
 
-const debug = debugFactory('poketroc:messages');
+const debug = debugFactory('poketroc:echanges');
 const router = express.Router();
 
 // Créer un échange
 router.post("/", requireJson, authenticate, supChampsEchange, function (req, res, next) {
-  const carteId = req.body.carte_id;
   const dresseurIdAuth = req.dresseurCon._id;
-  if (!mongoose.Types.ObjectId.isValid(carteId)) return res.status(400).send("Le champ carte_id est invalide.");
-
-  Carte.findById(carteId)
-    .where('dresseur_id')
-    .equals(dresseurIdAuth)
-    .where('statut')
-    .equals('collectee')
-    .exec()
-    .then(carte => {
-      if (!carte) return res.status(404).send(`Le dresseur avec l'id ${dresseurIdAuth} ne possède pas la carte avec l'id ${carteId}`);
-      return carte._id;
+  // on obtient un tableau de une ou plusieurs carte que le dresseur veut échanger et cette propriété est obligatoire
+  const cartesId = req.body.cartes_id;
+  if (!cartesId) return res.status(400).send("Il manque La propriété 'cartes_id'.");
+  // on obtient un tableau de une ou plusieurs carte que le dresseur veut échanger
+  const dresseurConcerneCartesId = req.body.cartes_id_dresseur_concerne;
+  // Si le deuxième paramêtre a été ajouté
+  if (dresseurConcerneCartesId) {
+    tabCartesValidator(dresseurConcerneCartesId);
+    Carte.find({
+      _id: { $in: dresseurConcerneCartesId },
+      statut: "collectee"
     })
-    .then(carteIdVerif => {
-      EchangeConcerneCarte.findOne()
-        .populate('echange_id')
-        .where("echange_id.etat")
-        .equals('attente')
-        .where("echange_id.dresseur_cree_id")
-        .equals(dresseurIdAuth)
-        .where("carte_id")
-        .equals(carteIdVerif)
-        .exec()
-        .then(echangeInterdit => {
-          if (echangeInterdit) return res.status(400).send(`Un échange en attente crée par le dresseur avec l'id ${dresseurIdAuth} avec la carte dont l'id est ${carteIdVerif} existe déjà.`);
-          return true;
-        })
-        .then(() => {
-          req.body.dresseur_cree_id = dresseurIdAuth;
-          return new Echange(req.body).save();
-        })
-        .then(echangeSauve => {
-          if (!echangeSauve) return res.status(400).send(`L'échange n'a pas pu être créé.`);
-          return new EchangeConcerneCarte({
-              carte_id: carteIdVerif,
-              echange_id: echangeSauve._id
-          }).save();
-        })
-        .then(echangeConcerneCarteSauve => {
-          if (!echangeConcerneCarteSauve) return res.status(400).send(`L'échange dans la table intermédiaire n'a pas pu être créé.`);
-          return EchangeConcerneCarte
-            .findById(echangeConcerneCarteSauve._id)
-            .populate('echange_id')
-            .populate('carte_id')
-        })
-        .then(echangeFinalSauve => {
-          res.status(201).send(echangeFinalSauve);
-          next();
+    .then(cartesADresseur => {
+      const dresseurId = cartesADresseur[0].dresseur_id;
+      // enlève tous les dresseurs qui ne sont pas les mêmes que le premier (si il en enlève la vérification de la taille des tableaux ne passera pas)
+      const cartesADresseurVerif = cartesADresseur.filter(carte => carte.dresseur_id.toString() === dresseurId.toString());
+      const cartesIdVerifDresseur = dresseurConcerneCartesId.length === cartesADresseurVerif.length;
+      if (!cartesIdVerifDresseur) return res.status(404).send(`Soit les id de cartes concernées n'appartiennent pas toutes au même dresseur ou alors une des cartes n'est pas collectée mais souhaitée par le dresseur.`);
+      
+      // Vérification si les cartes sont déjà dans un échange en attente
+      EchangeConcerneCarte.find({ carte_id: { $in: dresseurConcerneCartesId } })
+      .populate({
+        path: 'echange_id',
+        match: { etat: 'attente' }
+      })
+      .then(cartesEnAttente => {
+        for (const carteEnAttente of cartesEnAttente) {
+          if (carteEnAttente.echange_id?.etat === "attente") {
+            return res.status(400).send(`Certaines cartes du dresseur concerné sont déjà liées à un échange en attente.`);
+          }
+        }
+      })
+      .catch(next)
+    })
+    .catch(next);
+  }
+  
+  tabCartesValidator(cartesId);
+  Carte.find({
+    _id: { $in: cartesId },
+    statut: "collectee",
+    dresseur_id: dresseurIdAuth
+  })
+  .then(cartesADresseurAuth => {
+    const cartesIdVerifDresseurAuth = cartesId.length === cartesADresseurAuth.length;
+    if (!cartesIdVerifDresseurAuth) return res.status(404).send(`Le dresseur avec l'id ${dresseurIdAuth} ne possède pas une des cartes se trouvant dans le tableau 'cartes_id' ou la carte est de type 'souhaitee' alors qu'elle devrait être en type 'collectee'.`);
+    
+    // Vérification si les cartes sont déjà dans un échange en attente
+    EchangeConcerneCarte.find({ carte_id: { $in: cartesId } })
+    .populate({
+      path: 'echange_id',
+      match: { etat: 'attente' }
+    })
+    .then(cartesEnAttente => {
+      for (const carteEnAttente of cartesEnAttente) {
+        if (carteEnAttente.echange_id?.etat === "attente") {
+          return res.status(400).send(`Certaines cartes du dresseur connecté sont déjà liées à un échange en attente.`);
+        }
+      }
+
+      // Aucune carte n'est liée à un échange en attente
+      req.body.dresseur_cree_id = dresseurIdAuth;
+      const nouvelEchange = new Echange(req.body);
+
+      nouvelEchange.save()
+        .then(echange => {
+          if (!echange) return res.status(400).send(`L'échange n'a pas pu être créé.`);
+          const echangeId = echange._id;
+
+          // Création dans la table intermédiaire
+          const promises = cartesId.map(carteId => {
+            const nouvelEchangeConcerneCarte = new EchangeConcerneCarte({
+              carte_id: carteId,
+              echange_id: echangeId
+            });
+
+            return nouvelEchangeConcerneCarte.save();
+          });
+
+          Promise.all(promises)
+            .then((creationEchangeConcerne) => {
+              if (!creationEchangeConcerne) return res.status(400).send(`L'échange dans la table intermédiaire n'a pas pu être créé.`);
+              
+              res.status(201).send({ echange, cartes_dresseur_cree: cartesADresseurAuth });
+            })
+            .catch(next);
         })
         .catch(next);
     })
     .catch(next);
+    
+  })
+  .catch(next);
+
 });
 
 // Affiche un échange

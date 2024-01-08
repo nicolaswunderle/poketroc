@@ -1,13 +1,15 @@
 import debugFactory from "debug";
 import express from "express";
 import Carte from "../models/carte.js";
+import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
 import {
   getPaginationParameters,
   authenticate,
   requireJson,
   supChampsCarte,
   loadCarteFromParams,
-  editPermissionDresseur
+  editPermissionDresseur,
+  loadDresseurFromQuery
 } from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
@@ -26,13 +28,15 @@ router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, 
 });
 
 // Afficher toutes les cartes du dresseur
-router.get("/", authenticate, function (req, res, next) {
+router.get("/", authenticate, loadDresseurFromQuery, function (req, res, next) {
   const statut = req.query.statut;
   if (!statut) return res.status(400).send("Il manque le statut des cartes à afficher collectee ou souhaitee");
   if (statut !== "collectee" && statut !== "souhaitee") return res.status(400).send("Le statut des cartes à afficher n'est pas égal à collectee ou souhaitee");
   const { page, pageSize } = getPaginationParameters(req);
   // Oblige d'avoir l'état
-  Carte.find()
+  // Si le dresseur connecté veut voir ses cartes il n'y a aucune restriction
+  if (req.dresseurCon._id.toString() === req.dresseur._id.toString()) { 
+    Carte.find()
     .where("dresseur_id")
     .equals(req.dresseurCon._id)
     .where("statut")
@@ -44,6 +48,104 @@ router.get("/", authenticate, function (req, res, next) {
       res.status(200).send(cartes);
     })
     .catch(next);
+  } else {
+    // Dans le cas où le dresseur connecté regarde un autre deck que le siens
+    if (statut === "souhaitee") {
+      // Affiche uniquement les carte souhaité que le dresseur connecté possède
+      Carte.aggregate([
+        {
+          $match: {
+            dresseur_id: req.dresseurCon._id,
+            statut: 'collectee'
+          }
+        },
+        {
+          $lookup: {
+            from: 'cartes', // Nom de la collection de cartes
+            let: { id_api: '$id_api' },
+            pipeline: [
+              {
+                $match: {
+                  dresseur_id: req.dresseur._id,
+                  statut: 'souhaitee',
+                  $expr: { $eq: ['$id_api', '$$id_api'] }
+                }
+              }
+            ],
+            as: 'cartesDeuxiemeDresseur'
+          }
+        },
+        {
+          $match: {
+            cartesDeuxiemeDresseur: { $ne: [] } // Filtrer les cartes avec des correspondances
+          }
+        },
+        // Étape de remplacement de la racine par les champs de la deuxième collection
+        {
+          $replaceRoot: { newRoot: { $arrayElemAt: ['$cartesDeuxiemeDresseur', 0] } }
+        }
+      ])
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .exec()
+      .then((cartes) => {
+        res.status(200).send(cartes);
+      })
+      .catch(next);
+    } else {
+      if (req.dresseur.deck_visible) {
+        Carte.aggregate([
+          {
+            $match: {
+              dresseur_id: req.dresseur._id,
+              statut: statut,
+            }
+          },
+          {
+            $lookup: {
+              // permet de joindre la table intermédiaire
+              from: 'echangeconcernecartes',
+              localField: '_id',
+              foreignField: 'carte_id',
+              as: 'echange_attente',
+            }
+          },
+          {
+            $lookup: {
+              // permet d'avoir les infos des champs de la table echanges pour pouvoir filtrer à l'étape d'après
+              from: 'echanges',
+              localField: 'echange_attente.echange_id',
+              foreignField: '_id',
+              as: 'details_echanges_attente',
+            }
+          },
+          {
+            $match: {
+              'details_echanges_attente.etat': { $ne: 'attente' },
+            }
+          },
+          {
+            $project: {
+              // plus besoins de voir les tableau qui ont été utilisé pour filtrer
+              echange_attente: 0,
+              details_echanges_attente: 0,
+            }
+          },
+        ])
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .exec()
+        .then((cartes) => {
+          res.status(200).send(cartes);
+        })
+        .catch(next);
+      } else {
+        res.status(403).send(`Les cartes du dresseur avec l'id ${req.dresseur._id} ne sont pas visible par tout le monde.`);
+      }
+    }
+    
+  }
+  
 });
 
 // Afficher une carte

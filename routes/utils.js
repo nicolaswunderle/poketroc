@@ -52,7 +52,7 @@ export function editPermissionDresseur(req, res, next) {
 export function loadDresseurFromParams(req, res, next) {
   const dresseurId = req.params.dresseurId;
   // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(dresseurId)) return res.status(400).send("L'id du dresseur dans les paraêmtress est invalide.");
+  if (!mongoose.Types.ObjectId.isValid(dresseurId)) return res.status(400).send("L'id du dresseur dans les paramêtres est invalide.");
 
   Dresseur.findById(dresseurId)
     .exec()
@@ -62,6 +62,27 @@ export function loadDresseurFromParams(req, res, next) {
       next();
     })
     .catch(next);
+}
+
+export function loadDresseurFromQuery(req, res, next) {
+  const dresseurId = req.query.dresseurId;
+  // Si aucun id n'est donné alors par défaut c'est celui du dresseur connecté qui est utilisé
+  if (!dresseurId) {
+    req.dresseur = req.dresseurCon;
+    next();
+  } else {
+    // Vérification de la validité de l'ID dans les paramêtres
+    if (!mongoose.Types.ObjectId.isValid(dresseurId)) return res.status(400).send("L'id du dresseur dans la query est invalide.");
+
+    Dresseur.findById(dresseurId)
+      .exec()
+      .then(dresseur => {
+        if (!dresseur) return res.status(404).send(`Aucun dresseur ne possède l'id ${dresseurId}`);
+        req.dresseur = dresseur;
+        next();
+      })
+      .catch(next);
+  }
 }
 
 export function supChampsDresseur(req, res, next) {
@@ -104,8 +125,17 @@ export function loadCarteFromParams(req, res, next) {
     .exec()
     .then(carte => {
       if (!carte) return res.status(404).send(`Aucune carte ne possède l'id ${carteId}`);
-      req.carte = carte;
-      next();
+      Dresseur.findById(carte.dresseur_id)
+        .exec()
+        .then(dresseur => {
+          if (carte.dresseur_id.toString() !== req.dresseurCon._id.toString() && carte.statut === "collectee" && !dresseur.deck_visible) {
+            return res.status(403).send(`Les cartes du dresseur avec l'id ${carte.dresseur_id} ne sont pas visible par tout le monde.`);
+          } else {
+            req.carte = carte;
+            next();
+          }
+        })
+        .catch(next)
     })
     .catch(next);
 }
@@ -115,6 +145,16 @@ export function supChampsCarte(req, res, next) {
   if (req.body.createdAt) delete req.body.createdAt;
   if (req.body.updatedAt) delete req.body.updatedAt;
   next();
+}
+
+export function tabCartesValidator(tabCartes) {
+  // Vérification si c'est un tableau
+  if (!Array.isArray(tabCartes)) return res.status(400).send("La propriété 'cartes_id' n'est pas un tableau valide.");
+  if (tabCartes <= 0) return res.status(400).send("Le tableau 'cartes_id' doit contenir au moins un id de carte.");
+  // vérification des cartes
+  for (const carteId of tabCartes) {
+    if (!mongoose.Types.ObjectId.isValid(carteId)) return res.status(400).send(`L'id ${carteId} n'est pas un id de carte valide.`);
+  }
 }
 
 export function loadMessageFromParams(req, res, next) {
@@ -156,7 +196,7 @@ export function getPaginationParameters(req) {
   }
 
   // Parse the "pageSize" URL query parameter indicating how many elements should be in the response
-  let pageSize = parseInt(req.query.pagesize, 10);
+  let pageSize = parseInt(req.query.pageSize, 10);
   if (isNaN(pageSize) || pageSize < 0 || pageSize > 50) {
     pageSize = 50;
   }
