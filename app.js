@@ -5,7 +5,9 @@ import mongoose from "mongoose";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 import yaml from "js-yaml";
+import cors from "cors";
 import { databaseUrl } from "./config.js";
+
 //Router
 import indexRouter from "./routes/index.js";
 import dresseursRouter from "./routes/dresseurs.js";
