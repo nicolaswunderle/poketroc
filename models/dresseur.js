@@ -30,11 +30,13 @@ const dresseurSchema = new Schema({
         lowercase: true,
         trim: true
     },
-    age: {
-        type: Number,
-        required: [true, "L'âge du dresseur est obligatoire."],
-        min: [1, "L'âge du dresseur doit être plus grand ou égal à 1."],
-        max: [200, "L'âge du dresseur doit être plus petit ou égal à 200."]
+    date_naissance: {
+        type: Date,
+        required: [true, "La date de naissance du dresseur est obligatoire."],
+        validate: {
+            validator: validateBirthDate,
+            message: "L'âge du dresseur doit être plus grand ou égal à 13 ans et plus petit ou égal à 200 ans.",
+        }
     },
     localisation: {
         type: {
@@ -100,6 +102,12 @@ function isLongitude(value) {
     return value >= -180 && value <= 180;
 }
 
+// Validate birth date
+function validateBirthDate (date) {
+    const dateToMilli = date.getTime()
+    const ageCalculator = age => Date.now() - age * 365 * 24 * 60 * 60 * 1000;
+    return dateToMilli && dateToMilli < ageCalculator(13) && dateToMilli > ageCalculator(200);
+}
 
 dresseurSchema.set("toJSON", {
     transform: transformJson

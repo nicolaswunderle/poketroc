@@ -68,7 +68,10 @@ router.post("/connexion", requireJson, function (req, res, next) {
             dresseur.save().then(dresseurSauve => {
               if (!dresseurSauve) return res.status(400).send("Le dresseur n'a pas pu être modifié.");
               broadcastDresseur({nouveauDresseur: dresseurSauve})
-              res.status(201).send({ token });
+              res.status(201).send({ 
+                token: { token },
+                dresseur: dresseurSauve
+              });
             })
             .catch(next)
             
