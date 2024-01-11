@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { promisify } from "util";
 import { jwtSecret } from "../config.js";
+// Il faut garder les imports car la fonction loadRessourceFromParams utilise dynmaiquement Dresseur, Echange, Carte et Message
 import Dresseur from "../models/dresseur.js";
 import Echange from "../models/echange.js";
 import Carte from "../models/carte.js";
@@ -41,31 +42,107 @@ export function authenticate(req, res, next) {
   });
 }
 
-export function editPermissionDresseur(req, res, next) {
-  // il faut que la personne qui est chargée soit la même que celle authentifiée
-  if (req.params.dresseurId !== req.currentUserId) {
-    return res.status(403).send(`Vous n'avez pas les autorisations pour modifier un autre compte`);
+export function editPermission(dresseurId) {
+  return (req, res, next) => {
+    // il faut que la personne qui est chargée soit la même que celle authentifiée
+    if (req.currentUserId !== eval(dresseurId).toString()) {
+      return res.status(403).send(`Vous n'avez pas les autorisations de modification.`);
+    }
+    next();
   }
-  next();
 }
 
-export function loadDresseurFromParams(req, res, next) {
-  const dresseurId = req.params.dresseurId;
-  // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(dresseurId)) return res.status(400).send("L'id du dresseur dans les paramêtres est invalide.");
+export function requireJson(req, res, next) {
+  if (req.is('application/json')) {
+    return next();
+  }
 
-  Dresseur.findById(dresseurId)
-    .exec()
-    .then(dresseur => {
-      if (!dresseur) return res.status(404).send(`Aucun dresseur ne possède l'id ${dresseurId}`);
-      req.dresseur = dresseur;
-      next();
-    })
-    .catch(next);
+  const error = new Error('Cette ressource ne supporte que le format application/json');
+  error.status = 415; // 415 Unsupported Media Type
+  next(error);
+}
+
+export function loadRessourceFromParams(modelName) {
+  return (req, res, next) => {
+    const modelNameLowerCase = modelName.toLowerCase();
+    const paramName = `${modelNameLowerCase}Id`
+    const ressourceId = req.params[paramName];
+    // Vérification de la validité de l'ID dans les paramêtres
+    if (!mongoose.Types.ObjectId.isValid(ressourceId)) return res.status(400).send(`L'id de la ressource ${modelNameLowerCase} dans les paramêtres est invalide.`);
+
+    // eval permet de "convertir" une chaine de caratctère en javascript
+    eval(modelName).findById(ressourceId)
+      .exec()
+      .then(ressource => {
+        // si aucune ressource n'a été trouvée
+        if (!ressource) return res.status(404).send(`Aucune ressource ${modelNameLowerCase} ne possède l'id ${ressourceId}`);
+        // s'il y a des choses à faire pour certain modèle en particulier
+        switch (modelName) {
+          case 'Carte':
+            const dresseurId = ressource.dresseur_id;
+            
+            Dresseur.findById(dresseurId)
+              .exec()
+              .then(dresseur => {
+                if (dresseurId.toString() !== req.dresseurCon._id.toString() && ressource.statut === "collectee" && !dresseur.deck_visible) {
+                  return res.status(403).send(`Les cartes du dresseur avec l'id ${dresseurId} ne sont pas visible par tout le monde.`);
+                } else {
+                  req[modelNameLowerCase] = ressource;
+                  next();
+                }
+              })
+              .catch(next);
+          break;
+          default:
+            req[modelNameLowerCase] = ressource;
+            next();
+          break;
+        }
+      })
+      .catch(next);
+  }
+}
+
+export function loadQuery(queryObject) {
+  // format queryObject { nameOfQuery: (required or not) true | false }
+  return (req, res, next) => {
+    for (const queryName in queryObject) {
+      if (queryObject[queryName] && !req.query[queryName]) return res.status(400).send(`Il manque la query '${queryName}' dans l'url.`);
+      if (req.query[queryName]) {
+        req[queryName] = req.query[queryName];
+      }
+    }
+    next();
+  }
+}
+
+export function getPaginationParameters(req) {
+  // Parse the "page" URL query parameter indicating the index of the first element that should be in the response
+  let page = parseInt(req.query.page, 10);
+  if (isNaN(page) || page < 1) {
+    page = 1;
+  }
+
+  // Parse the "pageSize" URL query parameter indicating how many elements should be in the response
+  let pageSize = parseInt(req.query.pageSize, 10);
+  if (isNaN(pageSize) || pageSize < 0 || pageSize > 50) {
+    pageSize = 50;
+  }
+
+  return { page, pageSize };
+}
+
+export function supChamps(tabChamps) {
+  return (req, res, next) => {
+    for (const champ of tabChamps) {
+      if (req.body[champ]) delete req.body[champ];
+    }
+    next();
+  }
 }
 
 export function loadDresseurFromQuery(req, res, next) {
-  const dresseurId = req.query.dresseurId;
+  const dresseurId = req.dresseurId;
   // Si aucun id n'est donné alors par défaut c'est celui du dresseur connecté qui est utilisé
   if (!dresseurId) {
     req.dresseur = req.dresseurCon;
@@ -85,68 +162,6 @@ export function loadDresseurFromQuery(req, res, next) {
   }
 }
 
-export function supChampsDresseur(req, res, next) {
-  // on enlève les champs qui ne peuvent pas être créé par l'utilisateur
-  if (req.body.en_ligne) delete req.body.en_ligne;
-  if (req.body.createdAt) delete req.body.createdAt;
-  if (req.body.updatedAt) delete req.body.updatedAt;
-  next();
-}
-
-export function loadEchangeFromParams(req, res, next) {
-  const echangeId = req.params.echangeId;
-  // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(echangeId)) return res.status(400).send("L'id de l'échange est invalide.");
-
-  Echange.findById(echangeId)
-    .exec()
-    .then(echange => {
-      if (!echange) return res.status(404).send(`Aucun échange ne possède l'id ${echangeId}`);
-      req.echange = echange;
-      next();
-    })
-    .catch(next);
-}
-
-export function supChampsEchange(req, res, next) {
-  if (req.body.dresseur_cree_id) delete req.body.dresseur_cree_id;
-  if (req.body.etat) delete req.body.etat;
-  if (req.body.createdAt) delete req.body.createdAt;
-  if (req.body.updatedAt) delete req.body.updatedAt;
-  next();
-}
-
-export function loadCarteFromParams(req, res, next) {
-  const carteId = req.params.carteId;
-  // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(carteId)) return res.status(400).send("L'id de la carte est invalide.");
-
-  Carte.findById(carteId)
-    .exec()
-    .then(carte => {
-      if (!carte) return res.status(404).send(`Aucune carte ne possède l'id ${carteId}`);
-      Dresseur.findById(carte.dresseur_id)
-        .exec()
-        .then(dresseur => {
-          if (carte.dresseur_id.toString() !== req.dresseurCon._id.toString() && carte.statut === "collectee" && !dresseur.deck_visible) {
-            return res.status(403).send(`Les cartes du dresseur avec l'id ${carte.dresseur_id} ne sont pas visible par tout le monde.`);
-          } else {
-            req.carte = carte;
-            next();
-          }
-        })
-        .catch(next)
-    })
-    .catch(next);
-}
-
-export function supChampsCarte(req, res, next) {
-  if (req.body.dresseur_id) delete req.body.dresseur_id;
-  if (req.body.createdAt) delete req.body.createdAt;
-  if (req.body.updatedAt) delete req.body.updatedAt;
-  next();
-}
-
 export function tabCartesValidator(tabCartes) {
   // Vérification si c'est un tableau
   if (!Array.isArray(tabCartes)) return res.status(400).send("La propriété 'cartes_id' n'est pas un tableau valide.");
@@ -157,49 +172,4 @@ export function tabCartesValidator(tabCartes) {
   }
 }
 
-export function loadMessageFromParams(req, res, next) {
-  const messageId = req.params.messageId;
-  // Vérification de la validité de l'ID dans les paramêtres
-  if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).send("L'id du message est invalide.");
 
-  Message.findById(messageId)
-    .exec()
-    .then(message => {
-      if (!message) return res.status(404).send(`Aucun message ne possède l'id ${messageId}`);
-      req.message = message;
-      next();
-    })
-    .catch(next);
-}
-
-export function supChampsMessage(req, res, next) {
-  if (req.body.createdAt) delete req.body.createdAt;
-  if (req.body.updatedAt) delete req.body.updatedAt;
-  next();
-}
-
-export function requireJson(req, res, next) {
-  if (req.is('application/json')) {
-    return next();
-  }
-
-  const error = new Error('Cette ressource ne supporte que le format application/json');
-  error.status = 415; // 415 Unsupported Media Type
-  next(error);
-}
-
-export function getPaginationParameters(req) {
-  // Parse the "page" URL query parameter indicating the index of the first element that should be in the response
-  let page = parseInt(req.query.page, 10);
-  if (isNaN(page) || page < 1) {
-    page = 1;
-  }
-
-  // Parse the "pageSize" URL query parameter indicating how many elements should be in the response
-  let pageSize = parseInt(req.query.pageSize, 10);
-  if (isNaN(pageSize) || pageSize < 0 || pageSize > 50) {
-    pageSize = 50;
-  }
-
-  return { page, pageSize };
-}

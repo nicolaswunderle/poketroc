@@ -3,13 +3,13 @@ import express from "express";
 import mongoose from "mongoose";
 import Message from "../models/message.js";
 import Echange from "../models/echange.js";
-import { requireJson, authenticate, loadEchangeFromParams, supChampsCarte } from "./utils.js";
+import { requireJson, authenticate, loadRessourceFromParams, supChamps } from "./utils.js";
 
 const debug = debugFactory('poketroc:messages');
 const router = express.Router();
 
 // Créer un message A FAIRE DANS WEBSOCKET
-router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, next) {
+router.post("/", requireJson, authenticate, supChamps(['dresseur_id', 'createdAt', 'updatedAt']), function (req, res, next) {
   const body = req.body;
   const echangeId = body.echange_id
   body.dresseur_id = req.dresseurCon._id;
@@ -35,7 +35,7 @@ router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, 
 });
 
 // Afficher une conversation A FAIRE DANS WEBSOCKET
-router.get("/:echangeId", authenticate, loadEchangeFromParams, function (req, res, next){
+router.get("/:echangeId", authenticate, loadRessourceFromParams('Echange'), function (req, res, next){
   Message.find()
     .where
     .then((messages) => {
