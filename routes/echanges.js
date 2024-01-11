@@ -4,13 +4,13 @@ import mongoose from "mongoose";
 import Echange from "../models/echange.js";
 import Carte from "../models/carte.js";
 import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
-import { requireJson, authenticate, tabCartesValidator, loadDresseurFromParams, loadEchangeFromParams, supChampsEchange, editPermissionDresseur } from "./utils.js";
+import { requireJson, authenticate, tabCartesValidator, loadRessourceFromParams, supChamps, editPermission, loadQuery } from "./utils.js";
 
 const debug = debugFactory('poketroc:echanges');
 const router = express.Router();
 
 // Créer un échange
-router.post("/", requireJson, authenticate, supChampsEchange, function (req, res, next) {
+router.post("/", requireJson, authenticate, supChamps(['dresseur_cree_id', 'etat', 'createdAt', 'updatedAt']), function (req, res, next) {
   const dresseurIdAuth = req.dresseurCon._id;
   // on obtient un tableau de une ou plusieurs carte que le dresseur veut échanger et cette propriété est obligatoire
   const cartesId = req.body.cartes_id;
@@ -109,12 +109,12 @@ router.post("/", requireJson, authenticate, supChampsEchange, function (req, res
 });
 
 // Affiche un échange
-router.get("/:echangeId", authenticate, loadEchangeFromParams, function (req, res, next) {
+router.get("/:echangeId", authenticate, loadRessourceFromParams('Echange'), function (req, res, next) {
   res.status(200).send(req.echange);
 });
 
 // Modifier un échange
-router.patch("/:echangeId", requireJson, authenticate, loadEchangeFromParams, editPermissionDresseur, function (req, res, next) {
+router.patch("/:echangeId", requireJson, authenticate, loadRessourceFromParams('Echange'), editPermission('req.echange.dresseur_cree_id'), function (req, res, next) {
   const echange = req.echange;
   const majEchange = req.body;
   let modification = false;
@@ -140,7 +140,7 @@ router.patch("/:echangeId", requireJson, authenticate, loadEchangeFromParams, ed
 });
 
 // Supprime l'échange
-router.delete("/:echangeId", authenticate, loadEchangeFromParams, editPermissionDresseur, function (req, res, next) {
+router.delete("/:echangeId", authenticate, loadRessourceFromParams('Echange'), editPermission('req.echange.dresseur_cree_id'), function (req, res, next) {
   Echange.deleteOne({ _id: req.echange.id })
     .exec()
     .then((valid) => {
@@ -151,8 +151,8 @@ router.delete("/:echangeId", authenticate, loadEchangeFromParams, editPermission
 });
 
 // Affiche un échange
-router.get("/dresseur/:dresseurId", authenticate, loadDresseurFromParams, function (req, res, next) {
-  const etat = req.query.etat;
+router.get("/dresseur/:dresseurId", authenticate, loadRessourceFromParams('Dresseur'), loadQuery({etat: false}), function (req, res, next) {
+  const etat = req.etat;
   
   if (etat) {
     if (etat !== "accepte" && etat !== "attente" && etat !== "refuse") return res.status(400).send("Le statut des cartes à afficher n'est pas égal à accepte, attente ou refuse");

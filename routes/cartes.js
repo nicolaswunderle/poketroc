@@ -6,17 +6,18 @@ import {
   getPaginationParameters,
   authenticate,
   requireJson,
-  supChampsCarte,
-  loadCarteFromParams,
-  editPermissionDresseur,
-  loadDresseurFromQuery
+  supChamps,
+  loadRessourceFromParams,
+  editPermission,
+  loadDresseurFromQuery,
+  loadQuery
 } from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
 const router = express.Router();
 
 // Créer une carte
-router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, next) {
+router.post("/", requireJson, authenticate, supChamps(['dresseur_id', 'createdAt', 'updatedAt']), function (req, res, next) {
   const body = req.body;
   body.dresseur_id = req.dresseurCon._id;
   new Carte(req.body)
@@ -28,10 +29,9 @@ router.post("/", requireJson, authenticate, supChampsCarte, function (req, res, 
 });
 
 // Afficher toutes les cartes du dresseur
-router.get("/", authenticate, loadDresseurFromQuery, function (req, res, next) {
-  const statut = req.query.statut;
-  if (!statut) return res.status(400).send("Il manque le statut des cartes à afficher collectee ou souhaitee");
-  if (statut !== "collectee" && statut !== "souhaitee") return res.status(400).send("Le statut des cartes à afficher n'est pas égal à collectee ou souhaitee");
+router.get("/", authenticate, loadQuery({ statut: true, dresseurId: false }), loadDresseurFromQuery, function (req, res, next) {
+  const statut = req.statut;
+  if (statut !== "collectee" && statut !== "souhaitee") return res.status(400).send("Le statut des cartes à afficher n'est pas égal à 'collectee' ou 'souhaitee'");
   const { page, pageSize } = getPaginationParameters(req);
   // Oblige d'avoir l'état
   // Si le dresseur connecté veut voir ses cartes il n'y a aucune restriction
@@ -149,12 +149,12 @@ router.get("/", authenticate, loadDresseurFromQuery, function (req, res, next) {
 });
 
 // Afficher une carte
-router.get("/:carteId", authenticate, loadCarteFromParams, function (req, res, next) {
+router.get("/:carteId", authenticate, loadRessourceFromParams('Carte'), function (req, res, next) {
   res.status(200).send(req.carte);
 });
 
 // Modifier une carte
-router.patch("/:carteId", requireJson, authenticate, loadCarteFromParams, editPermissionDresseur, function (req, res, next) {
+router.patch("/:carteId", requireJson, authenticate, loadRessourceFromParams('Carte'), editPermission('req.carte.dresseur_id'), supChamps(['_id', '__v', 'id_api', 'createdAt', 'updatedAt']), function (req, res, next) {
   const carte = req.carte;
   const majCarte = req.body;
   let modification = false;
@@ -180,7 +180,7 @@ router.patch("/:carteId", requireJson, authenticate, loadCarteFromParams, editPe
 });
 
 // Supprimer une carte
-router.delete("/:carteId", authenticate, loadCarteFromParams, editPermissionDresseur, function (req, res, next) {
+router.delete("/:carteId", authenticate, loadRessourceFromParams('Carte'), editPermission('req.carte.dresseur_id'), function (req, res, next) {
   Carte.deleteOne({ _id: req.carte.id })
     .exec()
     .then((valid) => {

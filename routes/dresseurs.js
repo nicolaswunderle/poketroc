@@ -6,7 +6,13 @@ import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
 import { bcryptCostFactor } from "../config.js";
-import { authenticate, loadDresseurFromParams, supChampsDresseur, editPermissionDresseur, requireJson } from "./utils.js";
+import { 
+  authenticate, 
+  loadRessourceFromParams, 
+  supChamps, 
+  editPermission, 
+  requireJson
+} from "./utils.js";
 import { broadcastDresseur } from '../websocket.js';
 
 const debug = debugFactory('poketroc:dresseurs');
@@ -15,7 +21,7 @@ const router = express.Router();
 const signJwt = promisify(jwt.sign);
 
 // Créer un dresseur
-router.post("/", requireJson, supChampsDresseur, function (req, res, next) {
+router.post("/", requireJson, supChamps(['en_ligne', 'createdAt', 'updatedAt']), function (req, res, next) {
   const mdpBrut = req.body.mot_de_passe;
   const nouveauDresseur = new Dresseur(req.body);
 
@@ -95,12 +101,12 @@ router.delete("/connexion", authenticate, function (req, res, next) {
 });
 
 // Affiche un dresseur
-router.get("/:dresseurId", authenticate, loadDresseurFromParams, function (req, res, next) {
+router.get("/:dresseurId", authenticate, loadRessourceFromParams('Dresseur'), function (req, res, next) {
   res.status(200).send(req.dresseur);
 });
 
 // Modifie le dresseur
-router.patch("/:dresseurId", requireJson, authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
+router.patch("/:dresseurId", requireJson, authenticate, loadRessourceFromParams('Dresseur'), editPermission('req.params.dresseurId'), function (req, res, next) {
   const dresseur = req.dresseur;
   const majDresseur = req.body;
   let modification = false;
@@ -142,7 +148,7 @@ router.patch("/:dresseurId", requireJson, authenticate, loadDresseurFromParams, 
 });
 
 // Supprime le dresseur
-router.delete("/:dresseurId", authenticate, loadDresseurFromParams, editPermissionDresseur, function (req, res, next) {
+router.delete("/:dresseurId", authenticate, loadRessourceFromParams('Dresseur'), editPermission('req.params.dresseurId'), function (req, res, next) {
   Dresseur.deleteOne({ _id: req.dresseur.id })
     .exec()
     .then((valid) => {
