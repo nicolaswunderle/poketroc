@@ -10,7 +10,8 @@ import {
   loadRessourceFromParams,
   editPermission,
   loadDresseurFromQuery,
-  loadQuery
+  loadQuery,
+  modifications
 } from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
@@ -154,20 +155,11 @@ router.get("/:carteId", authenticate, loadRessourceFromParams('Carte'), function
 });
 
 // Modifier une carte
-router.patch("/:carteId", requireJson, authenticate, loadRessourceFromParams('Carte'), editPermission('req.carte.dresseur_id'), supChamps(['_id', '__v', 'id_api', 'createdAt', 'updatedAt']), function (req, res, next) {
+router.patch("/:carteId", requireJson, authenticate, loadRessourceFromParams('Carte'), editPermission('req.carte.dresseur_id'), supChamps(['_id', '__v', 'id_api', 'statut', 'dresseur_id', 'createdAt', 'updatedAt']), function (req, res, next) {
   const carte = req.carte;
-  const majCarte = req.body;
-  let modification = false;
+  const carteMaj = req.body;
 
-  Object.keys(majCarte).forEach((cle) => {
-    if (carte[cle] !== majCarte[cle] && (cle !== "_id" || cle !== "__v" || cle !== "createdAt" || cle !== "updatedAt" || cle !== "id_api")) {
-      // si la valeur n'est pas la même qu'avant alors on la change
-      carte[cle] = majCarte[cle];
-      if (!modification) modification = true;
-    }
-  });
-
-  if (modification) {
+  if (modifications(carte, carteMaj)) {
     // Si il y a eu un changement 
     carte.updatedAt = new Date();
     carte.save().then(carteSauve => {

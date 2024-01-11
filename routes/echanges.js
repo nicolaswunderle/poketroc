@@ -4,7 +4,16 @@ import mongoose from "mongoose";
 import Echange from "../models/echange.js";
 import Carte from "../models/carte.js";
 import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
-import { requireJson, authenticate, tabCartesValidator, loadRessourceFromParams, supChamps, editPermission, loadQuery } from "./utils.js";
+import { 
+  requireJson, 
+  authenticate, 
+  tabCartesValidator, 
+  loadRessourceFromParams, 
+  supChamps, 
+  editPermission, 
+  loadQuery, 
+  modifications
+} from "./utils.js";
 
 const debug = debugFactory('poketroc:echanges');
 const router = express.Router();
@@ -114,20 +123,11 @@ router.get("/:echangeId", authenticate, loadRessourceFromParams('Echange'), func
 });
 
 // Modifier un échange
-router.patch("/:echangeId", requireJson, authenticate, loadRessourceFromParams('Echange'), editPermission('req.echange.dresseur_cree_id'), function (req, res, next) {
+router.patch("/:echangeId", requireJson, authenticate, loadRessourceFromParams('Echange'), editPermission('req.echange.dresseur_cree_id'), supChamps(['_id', '__v', 'dresseur_cree_id', 'createdAt', 'updatedAt']), function (req, res, next) {
   const echange = req.echange;
-  const majEchange = req.body;
-  let modification = false;
+  const echangeMaj = req.body;
 
-  Object.keys(majEchange).forEach((cle) => {
-    if (echange[cle] !== majEchange[cle] && (cle !== "_id" || cle !== "__v" || cle !== "createdAt" || cle !== "updatedAt")) {
-      // si la valeur n'est pas la même qu'avant alors on la change
-      echange[cle] = majEchange[cle];
-      if (!modification) modification = true;
-    }
-  });
-
-  if (modification) {
+  if (modifications(echange, echangeMaj)) {
     // Si il y a eu un changement 
     echange.updatedAt = new Date();
     echange.save().then(echangeSauve => {
