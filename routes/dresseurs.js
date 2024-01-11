@@ -11,7 +11,8 @@ import {
   loadRessourceFromParams, 
   supChamps, 
   editPermission, 
-  requireJson
+  requireJson,
+  modifications
 } from "./utils.js";
 import { broadcastDresseur } from '../websocket.js';
 
@@ -106,22 +107,13 @@ router.get("/:dresseurId", authenticate, loadRessourceFromParams('Dresseur'), fu
 });
 
 // Modifie le dresseur
-router.patch("/:dresseurId", requireJson, authenticate, loadRessourceFromParams('Dresseur'), editPermission('req.params.dresseurId'), function (req, res, next) {
+router.patch("/:dresseurId", requireJson, authenticate, loadRessourceFromParams('Dresseur'), editPermission('req.params.dresseurId'), supChamps(['_id', '__v', 'en_ligne', 'createdAt', 'updatedAt']), function (req, res, next) {
   const dresseur = req.dresseur;
-  const majDresseur = req.body;
-  let modification = false;
-  // mise à jour des données 
-  Object.keys(majDresseur).forEach((cle) => {
-    if (dresseur[cle] !== majDresseur[cle] && (cle !== "_id" || cle !== "__v" || cle !== "createdAt" || cle !== "updatedAt")) {
-      // si la valeur n'est pas la même qu'avant alors on la change
-      dresseur[cle] = majDresseur[cle];
-      if (!modification) modification = true;
-    }
-  });
+  const dresseurMaj = req.body;
 
   // ajoute le champ mot de passe si il a été modifié
-  const { mot_de_passe } = majDresseur;
-  if (mot_de_passe || modification) {
+  const { mot_de_passe } = req.body;
+  if (mot_de_passe || modifications(dresseur, dresseurMaj)) {
     // Si il y a eu un changement 
     dresseur.updatedAt = new Date();
     if (mot_de_passe) {

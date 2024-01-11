@@ -141,6 +141,18 @@ export function supChamps(tabChamps) {
   }
 }
 
+export function modifications(ressource, ressourcetMaj) {
+  let modification = false;
+  Object.keys(ressourcetMaj).forEach((cle) => {
+    if (ressource[cle] !== ressourcetMaj[cle]) {
+      // si la valeur n'est pas la même qu'avant alors on la change
+      ressource[cle] = ressourcetMaj[cle];
+      if (!modification) modification = true;
+    }
+  });
+  return modification;
+}
+
 export function loadDresseurFromQuery(req, res, next) {
   const dresseurId = req.dresseurId;
   // Si aucun id n'est donné alors par défaut c'est celui du dresseur connecté qui est utilisé
