@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/", requireJson, authenticate, supChamps(['dresseur_id', 'createdAt', 'updatedAt']), function (req, res, next) {
   const body = req.body;
   const echangeId = body.echange_id
-  body.dresseur_id = req.dresseurCon._id;
+  body.dresseur_id = req.currentUserId;
 
   if (!mongoose.Types.ObjectId.isValid(echangeId)) return res.status(400).send("L'id de l'échange est invalide.");
   

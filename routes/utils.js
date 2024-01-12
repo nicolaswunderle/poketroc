@@ -6,6 +6,7 @@ import { jwtSecret } from "../config.js";
 import Dresseur from "../models/dresseur.js";
 import Echange from "../models/echange.js";
 import Carte from "../models/carte.js";
+import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
 import Message from "../models/message.js";
 
 const verifyJwt = promisify(jwt.verify);
@@ -84,7 +85,7 @@ export function loadRessourceFromParams(modelName) {
             Dresseur.findById(dresseurId)
               .exec()
               .then(dresseur => {
-                if (dresseurId.toString() !== req.dresseurCon._id.toString() && ressource.statut === "collectee" && !dresseur.deck_visible) {
+                if (dresseurId.toString() !== req.currentUserId && ressource.statut === "collectee" && !dresseur.deck_visible) {
                   return res.status(403).send(`Les cartes du dresseur avec l'id ${dresseurId} ne sont pas visible par tout le monde.`);
                 } else {
                   req[modelNameLowerCase] = ressource;
@@ -141,12 +142,12 @@ export function supChamps(tabChamps) {
   }
 }
 
-export function modifications(ressource, ressourcetMaj) {
+export function modifications(ressource, ressourceMaj) {
   let modification = false;
-  Object.keys(ressourcetMaj).forEach((cle) => {
-    if (ressource[cle] !== ressourcetMaj[cle]) {
+  Object.keys(ressourceMaj).forEach((cle) => {
+    if (ressource[cle] !== ressourceMaj[cle]) {
       // si la valeur n'est pas la même qu'avant alors on la change
-      ressource[cle] = ressourcetMaj[cle];
+      ressource[cle] = ressourceMaj[cle];
       if (!modification) modification = true;
     }
   });
@@ -174,14 +175,75 @@ export function loadDresseurFromQuery(req, res, next) {
   }
 }
 
-export function tabCartesValidator(tabCartes) {
-  // Vérification si c'est un tableau
-  if (!Array.isArray(tabCartes)) return res.status(400).send("La propriété 'cartes_id' n'est pas un tableau valide.");
-  if (tabCartes <= 0) return res.status(400).send("Le tableau 'cartes_id' doit contenir au moins un id de carte.");
-  // vérification des cartes
-  for (const carteId of tabCartes) {
-    if (!mongoose.Types.ObjectId.isValid(carteId)) return res.status(400).send(`L'id ${carteId} n'est pas un id de carte valide.`);
+export function loadCartesFromBody(cartesAppartenance) {
+  return (req, res, next) => {
+    let tabCartesId = "";
+    if (cartesAppartenance === 'cartes_id') {
+      tabCartesId = req.body.cartes_id;
+      if (!tabCartesId) return res.status(400).send("Il manque La propriété 'cartes_id'.");
+    } else if (cartesAppartenance === 'cartes_id_dresseur_concerne') {
+      tabCartesId = req.body.cartes_id_dresseur_concerne;
+    }
+    
+    if (!tabCartesId) return next();
+    // Vérification si c'est un tableau rempli
+    if (!Array.isArray(tabCartesId)) return res.status(400).send(`Le tableau '${cartesAppartenance}' n'est pas valide.`);
+    if (tabCartesId.length === 0) return res.status(400).send(`Le tableau '${cartesAppartenance}' doit contenir au moins un id de carte.`);
+    // vérification si l'id est valide
+    for (const carteId of tabCartesId) {
+      if (!mongoose.Types.ObjectId.isValid(carteId)) return res.status(400).send(`L'id ${carteId} n'est pas un id de carte valide.`);
+    }
+    Carte.find({
+      _id: { $in: tabCartesId }
+    })
+    .then(tabCartes => {
+      if (tabCartes.length !== tabCartesId.length) return res.status(400).send(`Les cartes n'ont pas toutes été trouvées dans la base de données.`)
+      const dresseurAuthId = req.currentUserId;
+      let dresseurConcerneId = "";
+      for (const carte of tabCartes) {
+        // vérfie que le statut ne soit pas souhaitee
+        if (carte.statut === 'souhaitee') return res.status(400).send(`La carte avec l'id ${carte._id} ne peut pas être échangée car son statut est 'souhaitee' et non 'collectee'.`);
+        // vérfie que toutes les cartes appartiennent au même dresseur
+        
+        if (dresseurConcerneId) {
+          if (dresseurConcerneId.toString() !== carte.dresseur_id.toString()) return res.status(400).send(`La carte avec l'id ${carte._id} n'a pas le même propriétaire que la carte précédente.`);
+        } else {
+          dresseurConcerneId = carte.dresseur_id;
+        }
+        // Vérification change en fonction du tableau de cartes traité
+        if (cartesAppartenance === 'cartes_id') {
+          // si on traite le tableau de cartes du dresseur connecté alors il faut que ce soit lui le propriétaire des cartes
+          if (carte.dresseur_id.toString() !== dresseurAuthId) return res.status(400).send(`La carte avec l'id ${carte._id} n'appartient pas au dresseur connecté qui crée l'échange.`);
+        } else if (cartesAppartenance === 'cartes_id_dresseur_concerne') {
+          // si on traite le tableau de cartes du dresseur concerné il ne faut pas que ce soit le même que le dresseur connecté
+          if (carte.dresseur_id.toString() === dresseurAuthId) return res.status(400).send(`Un dresseur ne peut pas échanger des cartes avec lui-même.`)
+        }
+      }
+      // Vérifie si la carte ne se trouve pas déjà dans un échange en attente
+      EchangeConcerneCarte.find({ 
+        carte_id: { $in: tabCartesId } 
+      })
+      .populate({
+        path: 'echange_id',
+        match: { etat: 'attente' }
+      })
+      .then(cartesEnAttente => {
+        // on a la liste de tous les echange concerne mais ceux qui match etat attente n'ont pas id d'échange null
+        for (const carteEnAttente of cartesEnAttente) {
+          if (carteEnAttente.echange_id !== null) return res.status(400).send(`La carte avec l'id ${carteEnAttente.carte_id} est déjà liées à un échange en attente.`);
+        }
+        
+        if (cartesAppartenance === 'cartes_id') {
+          req.cartesDresseurAuth = tabCartes;
+          req.cartesIdDresseurAuth = tabCartesId;
+        } else if (cartesAppartenance === 'cartes_id_dresseur_concerne') {
+          req.cartesDresseurConcerne = tabCartes;
+          req.cartesIdDresseurConcerne = tabCartesId;
+        }
+        next();
+      })
+      .catch(next)
+    })
+    .catch(next);
   }
 }
-
-
