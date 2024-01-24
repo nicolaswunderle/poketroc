@@ -4,15 +4,6 @@ const Schema = mongoose.Schema;
 
 // crée le schéma échange
 const echangeSchema = new Schema({
-    etat: {
-        type: String,
-        enum: {
-            values: ['accepte', 'attente', 'refuse'],
-            message: "L'état d'un échange doit être soit accepte, attente ou refuse."
-        },
-        default: 'attente',
-        trim: true
-    },
     dresseur_cree_id: {
         type: Schema.Types.ObjectId,
         ref: 'Dresseur',
@@ -27,6 +18,24 @@ const echangeSchema = new Schema({
             validator: validateDresseurConcerneId,
             message: "dresseur_concerne_id ne peut pas avoir la même valeur que dresseur_cree_id"
         },
+    },
+    etat_dresseur_cree: {
+        type: String,
+        enum: {
+            values: ['accepte', 'attente', 'refuse'],
+            message: "L'état d'un échange du dresseur qui crée l'échange doit être soit accepte, attente ou refuse."
+        },
+        default: 'attente',
+        trim: true
+    },
+    etat_dresseur_concerne: {
+        type: String,
+        enum: {
+            values: ['accepte', 'attente', 'refuse'],
+            message: "L'état d'un échange du dresseur qui est concerné par l'échange doit être soit accepte, attente ou refuse."
+        },
+        default: 'attente',
+        trim: true
     },
     createdAt: {
         type: Date,

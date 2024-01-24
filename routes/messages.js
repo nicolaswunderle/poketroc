@@ -12,11 +12,13 @@ const router = express.Router();
 router.post("/", requireJson, authenticate, supChamps(['dresseur_id', 'createdAt', 'updatedAt']), function (req, res, next) {
   const body = req.body;
   const echangeId = body.echange_id
+  const contenu = body.contenu
   body.dresseur_id = req.currentUserId;
-
+  if (!echangeId) return res.status(400).send("Il manque la propiété 'echange_id' dans le body");
+  if (!contenu) return res.status(400).send("Il manque la propiété 'contenu' dans le body");
   if (!mongoose.Types.ObjectId.isValid(echangeId)) return res.status(400).send("L'id de l'échange est invalide.");
   
-  // Il faut vérifier que l'utilisateurs connecté se trouve soit dans dresseur_cree_id ou dans dresseur_concerne
+  // Il faut ENCORE CREER LE MOYEN de vérifier que l'utilisateurs connecté se trouve soit dans dresseur_cree_id ou dans dresseur_concerne
   Echange.findById(echangeId)
     .exec()
     .then(echange => {
