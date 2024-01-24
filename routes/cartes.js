@@ -1,5 +1,6 @@
 import debugFactory from "debug";
 import express from "express";
+import mongoose from "mongoose";
 import Carte from "../models/carte.js";
 import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
 import {
@@ -11,7 +12,7 @@ import {
   editPermission,
   loadDresseurFromQuery,
   loadQuery,
-  modifications
+  modificationsObject
 } from "./utils.js";
 
 const debug = debugFactory("poketroc:cartes");
@@ -23,7 +24,7 @@ router.post("/",
   authenticate, 
   supChamps(['dresseur_id', 'createdAt', 'updatedAt']), 
   function (req, res, next) {
-    const body = req.body;
+    const { body } = req;
     body.dresseur_id = req.currentUserId;
     new Carte(req.body)
       .save()
@@ -40,7 +41,7 @@ router.get("/",
   loadQuery({ statut: true, dresseurId: false }), 
   loadDresseurFromQuery, 
   function (req, res, next) {
-    const statut = req.statut;
+    const { statut } = req;
     if (statut !== "collectee" && statut !== "souhaitee") return res.status(400).send("Le statut des cartes à afficher n'est pas égal à 'collectee' ou 'souhaitee'");
     const { page, pageSize } = getPaginationParameters(req);
     // Oblige d'avoir l'état
@@ -64,35 +65,40 @@ router.get("/",
         // Affiche uniquement les carte souhaité que le dresseur connecté possède
         Carte.aggregate([
           {
+            // Liste toutes les cartes souhaitées du dresseur
             $match: {
-              dresseur_id: req.currentUserId,
-              statut: 'collectee'
+              dresseur_id: req.dresseur._id,
+              statut: 'souhaitee'
             }
           },
           {
+            // Ajoute un champs matchingCollectees à toutes les cartes contenant toutes les cartes qui corressponde au localField
             $lookup: {
-              from: 'cartes', // Nom de la collection de cartes
-              let: { id_api: '$id_api' },
-              pipeline: [
-                {
-                  $match: {
-                    dresseur_id: req.dresseur._id,
-                    statut: 'souhaitee',
-                    $expr: { $eq: ['$id_api', '$$id_api'] }
-                  }
-                }
-              ],
-              as: 'cartesDeuxiemeDresseur'
+              from: 'cartes',
+              localField: 'id_api',
+              foreignField: 'id_api',
+              as: 'matchingCollectees'
             }
           },
           {
+            // permet de "déplier" le champs matchingCollectees pour qu'il n'y ait plus qu'une carte à l'intérieur
+            $unwind: '$matchingCollectees'
+          },
+          {
+            // refait un filtre
             $match: {
-              cartesDeuxiemeDresseur: { $ne: [] } // Filtrer les cartes avec des correspondances
+              'matchingCollectees.dresseur_id': new mongoose.Types.ObjectId(req.currentUserId),
+              'matchingCollectees.statut': 'collectee'
             }
           },
-          // Étape de remplacement de la racine par les champs de la deuxième collection
           {
-            $replaceRoot: { newRoot: { $arrayElemAt: ['$cartesDeuxiemeDresseur', 0] } }
+            // enlève les champs pas nécessaire
+            $project: {
+              matchingCollectees: 0,
+              createdAt: 0,
+              updatedAt: 0,
+              __v: 0
+            }
           }
         ])
         .skip((page - 1) * pageSize)
@@ -104,43 +110,35 @@ router.get("/",
         .catch(next);
       } else {
         if (req.dresseur.deck_visible) {
+          // Affiche les cartes du dresseur qui ne sont pas dans un échange
           Carte.aggregate([
             {
-              $match: {
-                dresseur_id: req.dresseur._id,
-                statut: statut,
-              }
+                $match: {
+                    dresseur_id: req.dresseur._id,
+                    statut: statut,
+                }
             },
             {
-              $lookup: {
-                // permet de joindre la table intermédiaire
-                from: 'echangeconcernecartes',
-                localField: '_id',
-                foreignField: 'carte_id',
-                as: 'echange_attente',
-              }
+                $lookup: {
+                    from: "echangeconcernecartes",
+                    localField: "_id",
+                    foreignField: "carte_id",
+                    as: "echangeConcerneCartes"
+                }
             },
             {
-              $lookup: {
-                // permet d'avoir les infos des champs de la table echanges pour pouvoir filtrer à l'étape d'après
-                from: 'echanges',
-                localField: 'echange_attente.echange_id',
-                foreignField: '_id',
-                as: 'details_echanges_attente',
-              }
+                $match: {
+                    "echangeConcerneCartes": { $eq: [] } // Filtre les cartes liées à un échange
+                }
             },
             {
-              $match: {
-                'details_echanges_attente.etat': { $ne: 'attente' },
-              }
-            },
-            {
-              $project: {
-                // plus besoins de voir les tableau qui ont été utilisé pour filtrer
-                echange_attente: 0,
-                details_echanges_attente: 0,
-              }
-            },
+                $project: {
+                    echangeConcerneCartes: 0, // Exclure le champ echangeConcerneCartes
+                    createdAt: 0,
+                    updatedAt: 0,
+                    __v: 0
+                }
+            }
           ])
           .skip((page - 1) * pageSize)
           .limit(pageSize)
@@ -176,10 +174,9 @@ router.patch("/:carteId",
   editPermission('req.carte.dresseur_id'),
   supChamps(['_id', '__v', 'id_api', 'statut', 'dresseur_id', 'createdAt', 'updatedAt']),
   function (req, res, next) {
-    const carte = req.carte;
-    const carteMaj = req.body;
+    const { carte } = req;
 
-    if (modifications(carte, carteMaj)) {
+    if (modificationsObject(carte, req.body)) {
       // Si il y a eu un changement 
       carte.updatedAt = new Date();
       carte.save().then(carteSauve => {
@@ -198,13 +195,18 @@ router.delete("/:carteId",
   loadRessourceFromParams('Carte'),
   editPermission('req.carte.dresseur_id'),
   function (req, res, next) {
-    Carte.deleteOne({ _id: req.carte.id })
-      .exec()
-      .then((valid) => {
-        if (valid.deletedCount === 0) return res.status(404).send("Carte non trouvée");
-        res.sendStatus(204);
-      })
-      .catch(next);
+    EchangeConcerneCarte.findOne({
+      carte_id: req.carte.id
+    })
+    .then(carteDansEchange => {
+      if (carteDansEchange) return res.status(400).send(`La carte avec l'id ${carteDansEchange.carte_id} ne peut pas être supprimée car elle est déjà dans un échange.`);
+      return Carte.deleteOne({ _id: req.carte.id });
+    })
+    .then(valid => {
+      if (valid.deletedCount !== 1) return res.status(404).send("Carte non trouvée");
+      res.sendStatus(204);
+    })
+    .catch(next);
   }
 );
 

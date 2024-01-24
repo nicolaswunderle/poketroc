@@ -5,14 +5,17 @@ import { promisify } from "util";
 import { jwtSecret } from "../config.js";
 import jwt from "jsonwebtoken";
 import Dresseur from "../models/dresseur.js";
+import Message from "../models/message.js";
+import Carte from "../models/carte.js";
+import Echange from "../models/echange.js";
+import EchangeConcerneCarte from "../models/echange_concerne_carte.js";
 import { bcryptCostFactor } from "../config.js";
 import { 
   authenticate, 
   loadRessourceFromParams, 
-  supChamps, 
-  editPermission, 
+  supChamps,
   requireJson,
-  modifications
+  modificationsObject
 } from "./utils.js";
 import { broadcastDresseur } from '../websocket.js';
 
@@ -27,26 +30,87 @@ router.post("/",
   supChamps(['en_ligne', 'createdAt', 'updatedAt']),
   function (req, res, next) {
     const mdpBrut = req.body.mot_de_passe;
+    if (!mdpBrut) return res.status(400).send(`Il manque le champs 'mot_de_passe' dans le body.`);
+    
     const nouveauDresseur = new Dresseur(req.body);
 
-    if (mdpBrut) {
-      bcrypt.hash(mdpBrut, bcryptCostFactor)
-        .then(mdpHashe => {
-          nouveauDresseur.mot_de_passe = mdpHashe;
-          return nouveauDresseur.save();
-        })
-        .then(dresseurSauve => {   
-          res.status(201).send(dresseurSauve);
-          next();
-        })
-        .catch(next);
-    } else {
-      // ne va jamais créer le dressseur car il manque le mot de passe mais permet d'avoir toutes les erreurs de validation si d'autres champs ne sont pas valides
-      nouveauDresseur.save().then(dresseurSauve => {   
-        res.status(201).send(dresseurSauve);
+    bcrypt.hash(mdpBrut, bcryptCostFactor)
+      .then(mdpHashe => {
+        nouveauDresseur.mot_de_passe = mdpHashe;
+        return nouveauDresseur.save();
+      })
+      .then(dresseurSauve => {   
+        return res.status(201).send(dresseurSauve);
       })
       .catch(next);
+  }
+);
+
+// Modifie le dresseur
+router.patch("/",
+  requireJson,
+  authenticate,
+  supChamps(['_id', '__v', 'en_ligne', 'createdAt', 'updatedAt']),
+  function (req, res, next) {
+    const dresseur = req.dresseurCon;
+
+    // ajoute le champ mot de passe si il a été modifié
+    const { mot_de_passe } = req.body;
+    if (mot_de_passe || modificationsObject(dresseur, req.body)) {
+      // Si il y a eu un changement 
+      dresseur.updatedAt = new Date();
+      if (mot_de_passe) {
+        bcrypt.hash(mot_de_passe, bcryptCostFactor)
+          .then(mdpHashe => {
+            dresseur.mot_de_passe = mdpHashe;
+            return dresseur.save();
+          })
+          .then(dresseurSauve => {   
+            res.status(200).send(dresseurSauve);
+          })
+          .catch(next);
+      } else {
+        dresseur.save().then(dresseurSauve => {   
+          res.status(200).send(dresseurSauve);
+        })
+        .catch(next);
+      }
+    } else {
+      return res.status(304).send("Le dresseur n'a pas été modifié car aucun changement n'a été détecté");
     }
+  }
+);
+
+// Supprime le dresseur
+router.delete("/",
+  authenticate,
+  function (req, res, next) {
+    const dresseurId = req.currentUserId;
+    Dresseur.deleteOne({ _id: dresseurId })
+      .then(valid => {
+        if (valid.deletedCount !== 1) return res.status(404).send("Dresseur non trouvée");
+        return Echange.find({$or: [
+          { dresseur_cree_id: dresseurId },
+          { dresseur_concerne_id: dresseurId }
+        ]});
+      })
+      .then(echanges => {
+        const echangesId = echanges.map(echange => echange._id);
+        Promise.all([
+          Message.deleteMany({ dresseur_id: dresseurId }),
+          Echange.deleteMany({$or: [
+            { dresseur_cree_id: dresseurId },
+            { dresseur_concerne_id: dresseurId }
+          ]}),
+          EchangeConcerneCarte.deleteMany({ echange_id: { $in: echangesId } }),
+          Carte.deleteMany({ dresseur_id: dresseurId })
+        ])
+        .then(() => {
+          res.sendStatus(204);
+        })
+        .catch(next);
+      })
+      .catch(next);
   }
 );
 
@@ -116,60 +180,6 @@ router.get("/:dresseurId",
   loadRessourceFromParams('Dresseur'),
   function (req, res, next) {
     res.status(200).send(req.dresseur);
-  }
-);
-
-// Modifie le dresseur
-router.patch("/:dresseurId",
-  requireJson,
-  authenticate,
-  loadRessourceFromParams('Dresseur'),
-  editPermission('req.params.dresseurId'),
-  supChamps(['_id', '__v', 'en_ligne', 'createdAt', 'updatedAt']),
-  function (req, res, next) {
-    const dresseur = req.dresseur;
-    const dresseurMaj = req.body;
-
-    // ajoute le champ mot de passe si il a été modifié
-    const { mot_de_passe } = req.body;
-    if (mot_de_passe || modifications(dresseur, dresseurMaj)) {
-      // Si il y a eu un changement 
-      dresseur.updatedAt = new Date();
-      if (mot_de_passe) {
-        bcrypt.hash(mot_de_passe, bcryptCostFactor)
-          .then(mdpHashe => {
-            dresseur.mot_de_passe = mdpHashe;
-            return dresseur.save();
-          })
-          .then(dresseurSauve => {   
-            res.status(200).send(dresseurSauve);
-          })
-          .catch(next);
-      } else {
-        dresseur.save().then(dresseurSauve => {   
-          res.status(200).send(dresseurSauve);
-        })
-        .catch(next);
-      }
-    } else {
-      return res.status(304).send("Le dresseur n'a pas été modifié car aucun changement n'a été détecté");
-    }
-  }
-);
-
-// Supprime le dresseur
-router.delete("/:dresseurId",
-  authenticate,
-  loadRessourceFromParams('Dresseur'),
-  editPermission('req.params.dresseurId'),
-  function (req, res, next) {
-    Dresseur.deleteOne({ _id: req.dresseur.id })
-      .exec()
-      .then((valid) => {
-        if (valid.deletedCount === 0) return res.status(404).send("Dresseur non trouvée");
-        res.sendStatus(204);
-      })
-      .catch(next);
   }
 );
 

@@ -9,10 +9,13 @@ import {
   authenticate, 
   loadRessourceFromParams, 
   supChamps, 
-  editPermission, 
-  loadQuery, 
-  modifications,
-  loadCartesFromBody
+  editPermission,
+  modificationsObject,
+  loadCartesFromBody,
+  loadCompletedEchange,
+  loadEchangeCartesId,
+  editPermissionEchange,
+  modificationsArray
 } from "./utils.js";
 
 const debug = debugFactory('poketroc:echanges');
@@ -22,14 +25,11 @@ const router = express.Router();
 router.post("/",
   requireJson,
   authenticate,
-  supChamps(['dresseur_cree_id', 'etat', 'createdAt', 'updatedAt']),
+  supChamps(['dresseur_cree_id', 'etat_dresseur_cree', 'etat_dresseur_concerne', 'createdAt', 'updatedAt']),
   loadCartesFromBody('cartes_id'),
   loadCartesFromBody('cartes_id_dresseur_concerne'),
   function (req, res, next) {
-    const cartesDresseurAuth = req.cartesDresseurAuth;
-    const cartesIdDresseurAuth = req.cartesIdDresseurAuth;
-    const cartesDresseurConcerne = req.cartesDresseurConcerne;
-    const cartesIdDresseurConcerne = req.cartesIdDresseurConcerne;
+    const { cartesDresseurAuth, cartesIdDresseurAuth, cartesDresseurConcerne, cartesIdDresseurConcerne } = req;
     const dresseurAuthId = req.currentUserId;
     const dresseurConcerneId = cartesDresseurConcerne ? cartesDresseurConcerne[0].dresseur_id : '';
     
@@ -40,10 +40,10 @@ router.post("/",
       .then(echange => {
         if (!echange) return res.status(400).send(`L'échange n'a pas pu être créé.`);
         const echangeId = echange._id;
-
-        // Création dans la table intermédiaire
+        // liste de tous les id des cartes
         const allCartesId = [...cartesIdDresseurAuth];
         if (cartesIdDresseurConcerne) { allCartesId.push(...cartesIdDresseurConcerne) }
+        // Création dans la table intermédiaire
         const EchangeConcernepromises = allCartesId.map(carteId => {
           const nouvelEchangeConcerneCarte = new EchangeConcerneCarte({
             carte_id: carteId,
@@ -71,12 +71,42 @@ router.post("/",
   }
 );
 
+// Affiche tous les échange d'un dresseur
+router.get("/",
+  authenticate,
+  function (req, res, next) {
+    const dresseurAuthId = req.currentUserId;
+    Echange.find({
+      $or: [
+          { dresseur_cree_id: dresseurAuthId },
+          { dresseur_concerne_id: dresseurAuthId }
+      ]
+    })
+    .then(echanges => {
+      const completedEchangesPromises = [];
+      for (const echange of echanges) {
+        completedEchangesPromises.push(loadCompletedEchange(res, echange))
+      }
+      return Promise.all(completedEchangesPromises);
+    })
+    .then(completedEchanges => {
+      return res.status(200).send(completedEchanges);
+    })
+    .catch(next);
+  }
+);
+
 // Affiche un échange
 router.get("/:echangeId",
   authenticate,
   loadRessourceFromParams('Echange'),
+  editPermissionEchange,
   function (req, res, next) {
-    res.status(200).send(req.echange);
+    loadCompletedEchange(res, req.echange)
+      .then(completedEchange => {
+        res.status(200).send(completedEchange);
+      })
+      .catch(next); 
   }
 );
 
@@ -85,19 +115,58 @@ router.patch("/:echangeId",
   requireJson,
   authenticate,
   loadRessourceFromParams('Echange'),
-  editPermission('req.echange.dresseur_cree_id'),
+  editPermissionEchange,
+  loadEchangeCartesId,
   supChamps(['_id', '__v', 'dresseur_cree_id', 'createdAt', 'updatedAt']),
   function (req, res, next) {
     const echange = req.echange;
-    const echangeMaj = req.body;
+    const echangeMaj = modificationsObject(echange, req.body.echange)
+    
+    const cartesIdDresseurCreeMaj = req.cartesIdDresseurCree;
+    const cartesIdDresseurConcerneMaj = req.cartesIdDresseurConcerne;
+    const cartesIdDresseurCreeMajModif = modificationsArray(cartesIdDresseurCreeMaj, req.body.cartes_id_dresseur_cree);
+    const cartesIdDresseurConcerneMajModif = modificationsArray(cartesIdDresseurConcerneMaj, req.body.cartes_id_dresseur_concerne);
+    req.echangeModif = {};
 
-    if (modifications(echange, echangeMaj)) {
-      // Si il y a eu un changement 
+    if (echangeMaj || cartesIdDresseurCreeMajModif || cartesIdDresseurConcerneMajModif) {
+      
+      // FAIRE TOUTES LES VERIFICATIONS
+      
+      // Si il y a eu un changement
+      const completedEchangePromises = [];
+
       echange.updatedAt = new Date();
-      echange.save().then(echangeSauve => {
-        res.status(200).send(echangeSauve);
-      })
-      .catch(next);
+      completedEchangePromises.push(echange.save());
+
+      if (cartesIdDresseurCreeMajModif) {
+        req.echangeModif.cartes_id_dresseur_cree = [...cartesIdDresseurCreeMaj, ...cartesIdDresseurCreeMajModif];
+        for (const carteIdMaj of cartesIdDresseurCreeMajModif) {
+          completedEchangePromises.push(
+            new EchangeConcerneCarte({
+              echange_id: echange._id,
+              carte_id:  carteIdMaj
+            }).save()
+          );
+        }
+      }
+      if (cartesIdDresseurConcerneMajModif) {
+        req.echangeModif.cartes_id_dresseur_concerne = [...cartesIdDresseurConcerneMaj, ...cartesIdDresseurConcerneMajModif];
+        for (const carteIdMaj of cartesIdDresseurConcerneMajModif) {
+          completedEchangePromises.push(
+            new EchangeConcerneCarte({
+              echange_id: echange._id,
+              carte_id:  carteIdMaj
+            }).save()
+          );
+        }
+      }
+      
+      Promise.all(completedEchangePromises)
+        .then(echangeSauve => {
+          req.echangeModif.echange = echangeSauve[0];
+          res.status(200).send(req.echangeModif);
+        })
+        .catch(next);
     } else {
       return res.status(304).send("L'échange n'a pas été modifié car aucun changement n'a été détecté");
     }
@@ -117,39 +186,6 @@ router.delete("/:echangeId",
         res.sendStatus(204);
       })
       .catch(next);
-  }
-);
-
-// Affiche un échange
-router.get("/dresseur/:dresseurId",
-  authenticate,
-  loadRessourceFromParams('Dresseur'),
-  loadQuery({etat: false}),
-  function (req, res, next) {
-    const etat = req.etat;
-    
-    if (etat) {
-      if (etat !== "accepte" && etat !== "attente" && etat !== "refuse") return res.status(400).send("Le statut des cartes à afficher n'est pas égal à accepte, attente ou refuse");
-      Echange.find()
-      .where("dresseur_cree_id")
-      .equals(req.currentUserId)
-      .where("etat")
-      .equals(etat)
-      .exec()
-      .then((echange) => {
-        res.status(200).send(echange);
-      })
-      .catch(next)
-    } else {
-      Echange.find()
-      .where("dresseur_cree_id")
-      .equals(req.currentUserId)
-      .exec()
-      .then((echange) => {
-        res.status(200).send(echange);
-      })
-      .catch(next)
-    }  
   }
 );
 

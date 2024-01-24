@@ -142,16 +142,28 @@ export function supChamps(tabChamps) {
   }
 }
 
-export function modifications(ressource, ressourceMaj) {
-  let modification = false;
-  Object.keys(ressourceMaj).forEach((cle) => {
-    if (ressource[cle] !== ressourceMaj[cle]) {
+export function modificationsObject(ressource, ressourceMaj) {
+  if (typeof ressourceMaj !== 'object') return false;
+  let modifications = false;
+  Object.keys(ressource.toObject()).forEach((cle) => {
+    if (ressource[cle] !== ressourceMaj[cle] && ressourceMaj[cle] !== undefined) {
       // si la valeur n'est pas la même qu'avant alors on la change
       ressource[cle] = ressourceMaj[cle];
-      if (!modification) modification = true;
+      if (!modifications) modifications = true;
     }
   });
-  return modification;
+  return modifications;
+}
+
+export function modificationsArray(ressource, ressourceMaj) {
+  if (!Array.isArray(ressourceMaj) || ressourceMaj?.length <= 0) return false;
+  const modifications = [];
+  for (const iteration of ressourceMaj) {
+    if (!ressource.includes(iteration)) {
+      modifications.push(iteration)
+    }
+  }
+  return modifications.length > 0 ? modifications : false;
 }
 
 export function loadDresseurFromQuery(req, res, next) {
@@ -177,15 +189,15 @@ export function loadDresseurFromQuery(req, res, next) {
 
 export function loadCartesFromBody(cartesAppartenance) {
   return (req, res, next) => {
-    let tabCartesId = "";
+    let tabCartesId = [];
     if (cartesAppartenance === 'cartes_id') {
       tabCartesId = req.body.cartes_id;
       if (!tabCartesId) return res.status(400).send("Il manque La propriété 'cartes_id'.");
     } else if (cartesAppartenance === 'cartes_id_dresseur_concerne') {
       tabCartesId = req.body.cartes_id_dresseur_concerne;
+      // si cartes_id_dresseur_concerne est vide on peut passer au prochain middleware
+      if (tabCartesId === undefined) return next();
     }
-    
-    if (!tabCartesId) return next();
     // Vérification si c'est un tableau rempli
     if (!Array.isArray(tabCartesId)) return res.status(400).send(`Le tableau '${cartesAppartenance}' n'est pas valide.`);
     if (tabCartesId.length === 0) return res.status(400).send(`Le tableau '${cartesAppartenance}' doit contenir au moins un id de carte.`);
@@ -204,7 +216,6 @@ export function loadCartesFromBody(cartesAppartenance) {
         // vérfie que le statut ne soit pas souhaitee
         if (carte.statut === 'souhaitee') return res.status(400).send(`La carte avec l'id ${carte._id} ne peut pas être échangée car son statut est 'souhaitee' et non 'collectee'.`);
         // vérfie que toutes les cartes appartiennent au même dresseur
-        
         if (dresseurConcerneId) {
           if (dresseurConcerneId.toString() !== carte.dresseur_id.toString()) return res.status(400).send(`La carte avec l'id ${carte._id} n'a pas le même propriétaire que la carte précédente.`);
         } else {
@@ -219,19 +230,12 @@ export function loadCartesFromBody(cartesAppartenance) {
           if (carte.dresseur_id.toString() === dresseurAuthId) return res.status(400).send(`Un dresseur ne peut pas échanger des cartes avec lui-même.`)
         }
       }
-      // Vérifie si la carte ne se trouve pas déjà dans un échange en attente
+      // Vérifie si la carte ne se trouve pas déjà dans un échange
       EchangeConcerneCarte.find({ 
         carte_id: { $in: tabCartesId } 
       })
-      .populate({
-        path: 'echange_id',
-        match: { etat: 'attente' }
-      })
-      .then(cartesEnAttente => {
-        // on a la liste de tous les echange concerne mais ceux qui match etat attente n'ont pas id d'échange null
-        for (const carteEnAttente of cartesEnAttente) {
-          if (carteEnAttente.echange_id !== null) return res.status(400).send(`La carte avec l'id ${carteEnAttente.carte_id} est déjà liées à un échange en attente.`);
-        }
+      .then(cartesDansEchange => {
+        if (cartesDansEchange.length > 0) return res.status(400).send(`Le tableau ${cartesAppartenance} contient un ou plusieurs id de carte qui sont déjà liées à un échange : ${cartesDansEchange.map(echangeCarte => echangeCarte.carte_id).join(', ')}`);
         
         if (cartesAppartenance === 'cartes_id') {
           req.cartesDresseurAuth = tabCartes;
@@ -246,4 +250,68 @@ export function loadCartesFromBody(cartesAppartenance) {
     })
     .catch(next);
   }
+}
+
+export function loadCompletedEchange(res, echange) {
+  return new Promise((resolve, reject) => {
+    if (!echange) return res.status(400).send("Il n'y a pas d'échange à chargé.")
+    
+    const cartes_dresseur_cree = [];
+    const cartes_dresseur_concerne = [];
+    
+    EchangeConcerneCarte.find({ echange_id: echange._id })
+      .populate("carte_id")
+      .then(echangesConcerneCartes => {
+        for (const echangeConcerneCartes of echangesConcerneCartes) {
+          const carte = echangeConcerneCartes.carte_id;
+          if (echange.dresseur_concerne_id === null && carte.dresseur_id.toString() !== echange.dresseur_cree_id.toString()) return res.status(400).send(`Il n'y a pas de dresseur concerné dans l'échange avec l'id ${echange._id} mais une carte est possédée par un autre dresseur que celui qui à créé cet échange. Id du dresseur qui a créé l'échange ${echange.dresseur_cree_id}. Id du dresseur qui n'a pas créé l'échange ${carte.dresseur_id}.`)
+          if (carte.dresseur_id.toString() === echange.dresseur_cree_id.toString()) {
+            cartes_dresseur_cree.push(carte);
+          } else {
+            cartes_dresseur_concerne.push(carte);
+          }
+        }
+        resolve({ 
+          echange,
+          cartes_dresseur_cree,
+          cartes_dresseur_concerne
+        });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+}
+
+export function loadEchangeCartesId(req, res, next) {
+  const echange = req.echange;
+  if (!echange) return res.status(400).send("Il n'y a pas d'échange à chargé.")
+    
+  const cartes_id_dresseur_cree = [];
+  const cartes_id_dresseur_concerne = [];
+  
+  EchangeConcerneCarte.find({ echange_id: echange._id })
+    .populate('carte_id')
+    .then(echangesConcerneCartes => {
+      for (const echangeConcerneCartes of echangesConcerneCartes) {
+        const carte = echangeConcerneCartes.carte_id;
+        if (carte.dresseur_id.toString() === echange.dresseur_cree_id.toString()) {
+          cartes_id_dresseur_cree.push(carte._id);
+        } else {
+          cartes_id_dresseur_concerne.push(carte._id);
+        }
+      }
+      req.cartesIdDresseurCree = cartes_id_dresseur_cree;
+      req.cartesIdDresseurConcerne = cartes_id_dresseur_concerne;
+      next();
+    })
+    .catch(next);
+}
+
+export function editPermissionEchange(req, res, next) {
+  // il faut que la personne qui est chargée soit la même que celle authentifiée
+  if (req.currentUserId !== req.echange.dresseur_cree_id.toString() && req.currentUserId !== req.echange.dresseur_concerne_id?.toString()) {
+    return res.status(403).send(`Vous n'avez pas les autorisations de modification ou de visualisation.`);
+  }
+  next();
 }
