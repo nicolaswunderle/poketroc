@@ -59,20 +59,27 @@ app.use("/api", function (err, req, res, next) {
   // lors d'une erreur 11000 de mongoose
   if (err.code === 11000) {
     err.status = 409;
-    switch (req.path) {
-      case "/dresseurs":
-        err.message = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
-        break;
-      case "/messages":
-        err.message = `Deux messages ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_id et echange_id`;
-        break;
-      case "/cartes":
-        err.message = `Deux cartes ne peuvent pas avoir la même valeur pour les champs id_api, etat, desc_etat, type et dresseur_id.`;
-        break;
-      case "/echanges":
-        err.message = `Deux échanges ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_cree_id et dresseur_concerne_id`;
-        break;
+    const routesAcceptees = ['dresseurs', 'messages', 'cartes', 'echanges'];
+    for (const routeAccepte of routesAcceptees) {
+      const regex = new RegExp(`^\\/${routeAccepte}\\/[a-fA-F0-9]+$`);
+      if (regex.test(req.path)) {
+        switch (routeAccepte) {
+          case "dresseurs":
+            err.message = `Le dresseur avec le pseudo ${req.body.pseudo} existe déjà.`;
+            break;
+          case "messages":
+            err.message = `Deux messages ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_id et echange_id`;
+            break;
+          case "cartes":
+            err.message = `Deux cartes ne peuvent pas avoir la même valeur pour les champs id_api, etat, desc_etat, type et dresseur_id.`;
+            break;
+          case "echanges":
+            err.message = `Deux échanges ne peuvent pas avoir la même valeur pour les champs createdAt, dresseur_cree_id et dresseur_concerne_id et ne peuvent pas contenir deux fois la même carte.`;
+            break;
+        }
+      }
     }
+    
   }
 
   // lors d'une erreur 16755 de mongoose

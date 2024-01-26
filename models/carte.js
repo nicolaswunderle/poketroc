@@ -65,7 +65,7 @@ const carteSchema = new Schema({
 });
 
 // Crée une contrainte d'unicité sur plusieurs champs
-carteSchema.index({ id_api: 1, etat: 1, desc_etat: 1, type: 1, dresseur_id: 1 }, { unique: true });
+carteSchema.index({ id_api: 1, etat: 1, desc_etat: 1, type: 1, statut: 1, dresseur_id: 1 }, { unique: true });
 
 carteSchema.set("toJSON", {
     transform: transformJson

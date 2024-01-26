@@ -184,7 +184,7 @@ router.patch("/:carteId",
       })
       .catch(next);
     } else {
-      return res.status(304).send("La carte n'a pas été modifiée car aucun changement n'a été détecté");
+      return res.sendStatus(204);
     }
   }
 );
