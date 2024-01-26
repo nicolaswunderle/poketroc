@@ -76,7 +76,7 @@ router.patch("/",
         .catch(next);
       }
     } else {
-      return res.status(304).send("Le dresseur n'a pas été modifié car aucun changement n'a été détecté");
+      return res.sendStatus(204);
     }
   }
 );
@@ -144,7 +144,7 @@ router.post("/connexion",
               dresseur.save().then(dresseurSauve => {
                 if (!dresseurSauve) return res.status(400).send("Le dresseur n'a pas pu être modifié.");
                 broadcastDresseur({nouveauDresseur: dresseurSauve})
-                res.status(201).send({ 
+                res.status(200).send({ 
                   token,
                   dresseur: dresseurSauve
                 });

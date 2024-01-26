@@ -155,17 +155,6 @@ export function modificationsObject(ressource, ressourceMaj) {
   return modifications;
 }
 
-export function modificationsArray(ressource, ressourceMaj) {
-  if (!Array.isArray(ressourceMaj) || ressourceMaj?.length <= 0) return false;
-  const modifications = [];
-  for (const iteration of ressourceMaj) {
-    if (!ressource.includes(iteration)) {
-      modifications.push(iteration)
-    }
-  }
-  return modifications.length > 0 ? modifications : false;
-}
-
 export function loadDresseurFromQuery(req, res, next) {
   const dresseurId = req.dresseurId;
   // Si aucun id n'est donné alors par défaut c'est celui du dresseur connecté qui est utilisé
@@ -309,9 +298,24 @@ export function loadEchangeCartesId(req, res, next) {
 }
 
 export function editPermissionEchange(req, res, next) {
-  // il faut que la personne qui est chargée soit la même que celle authentifiée
-  if (req.currentUserId !== req.echange.dresseur_cree_id.toString() && req.currentUserId !== req.echange.dresseur_concerne_id?.toString()) {
-    return res.status(403).send(`Vous n'avez pas les autorisations de modification ou de visualisation.`);
+  // Si dresseur_cree_id et dresseur_concerne_id alors c'est seulement ces deux personnes qui peuvent modifier un échange
+  if (req.echange.dresseur_concerne_id !== null) {
+    if (req.currentUserId !== req.echange.dresseur_cree_id.toString() && req.currentUserId !== req.echange.dresseur_concerne_id.toString()) {
+      return res.status(403).send(`Vous n'avez pas les autorisations de modification ou de visualisation.`);
+    }
   }
   next();
+}
+
+export function verifTabCartesId(cartesId) {
+  if (cartesId !== undefined) {
+    if (!Array.isArray(cartesId)) return { error: 'Les paramêtres "supression" et "ajout" dans le body doivent être des tableaux.' };
+    if (cartesId.length <= 0) return { error: 'Les tableaux "supression" et "ajout" doivent avoir au moins un id de carte.' };
+    for (const carteId of cartesId) {
+      if (!mongoose.Types.ObjectId.isValid(carteId)) return { error: `L'id de la carte ${carteId} est invalide.` };
+    }
+    return cartesId;
+  } else {
+    return false;
+  }
 }
