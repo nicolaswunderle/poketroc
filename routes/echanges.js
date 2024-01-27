@@ -106,7 +106,7 @@ router.get("/",
     .then(echanges => {
       const completedEchangesPromises = [];
       for (const echange of echanges) {
-        completedEchangesPromises.push(loadCompletedEchange(res, echange))
+        completedEchangesPromises.push(loadCompletedEchange(req, res, echange))
       }
       return Promise.all(completedEchangesPromises);
     })
@@ -123,7 +123,7 @@ router.get("/:echangeId",
   loadRessourceFromParams('Echange'),
   editPermissionEchange,
   function (req, res, next) {
-    loadCompletedEchange(res, req.echange)
+    loadCompletedEchange(req, res, req.echange)
       .then(completedEchange => {
         res.status(200).send(completedEchange);
       })
