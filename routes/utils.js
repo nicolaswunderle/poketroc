@@ -246,52 +246,88 @@ export function loadCompletedEchange(req, res, echangeRecu) {
     const echange = echangeRecu.toObject();
     if (!echange) return res.status(400).send("Il n'y a pas d'échange à chargé.")
     
-    const cartes_dresseur = [];
-    const cartes_autre_dresseur = [];
-    let autreDresseurId = "";
-    if (req.currentUserId === echange.dresseur_cree_id.toString()) {
-      autreDresseurId = echange.dresseur_concerne_id;
-      echange.etat_dresseur = echange.etat_dresseur_cree;
-      echange.etat_autre_dresseur = echange.etat_dresseur_concerne;
-    } else {
-      autreDresseurId = echange.dresseur_cree_id;
-      echange.etat_dresseur = echange.etat_dresseur_concerne;
-      echange.etat_autre_dresseur = echange.etat_dresseur_cree;
-    }
-    
-    EchangeConcerneCarte.find({ echange_id: echange._id })
-      .populate("carte_id")
-      .then(echangesConcerneCartes => {
-        for (const echangeConcerneCartes of echangesConcerneCartes) {
-          const carte = echangeConcerneCartes.carte_id;
-          if (echange.dresseur_concerne_id === null && carte.dresseur_id.toString() !== echange.dresseur_cree_id.toString()) return res.status(400).send(`Il n'y a pas de dresseur concerné dans l'échange avec l'id ${echange._id} mais une carte est possédée par un autre dresseur que celui qui à créé cet échange. Id du dresseur qui a créé l'échange ${echange.dresseur_cree_id}. Id du dresseur qui n'a pas créé l'échange ${carte.dresseur_id}.`)
-          if (carte.dresseur_id.toString() === req.currentUserId) {
-            cartes_dresseur.push(carte);
-          } else {
-            cartes_autre_dresseur.push(carte);
+    if (echange.dresseur_concerne_id !== null) {
+      const cartes_dresseur = [];
+      const cartes_autre_dresseur = [];
+      let autreDresseurId = "";
+      if (req.currentUserId === echange.dresseur_cree_id.toString()) {
+        autreDresseurId = echange.dresseur_concerne_id;
+        echange.etat_dresseur = echange.etat_dresseur_cree;
+        echange.etat_autre_dresseur = echange.etat_dresseur_concerne;
+      } else {
+        autreDresseurId = echange.dresseur_cree_id;
+        echange.etat_dresseur = echange.etat_dresseur_concerne;
+        echange.etat_autre_dresseur = echange.etat_dresseur_cree;
+      }
+      
+      EchangeConcerneCarte.find({ echange_id: echange._id })
+        .populate("carte_id")
+        .then(echangesConcerneCartes => {
+          for (const echangeConcerneCartes of echangesConcerneCartes) {
+            const carte = echangeConcerneCartes.carte_id;
+            if (echange.dresseur_concerne_id === null && carte.dresseur_id.toString() !== echange.dresseur_cree_id.toString()) return res.status(400).send(`Il n'y a pas de dresseur concerné dans l'échange avec l'id ${echange._id} mais une carte est possédée par un autre dresseur que celui qui à créé cet échange. Id du dresseur qui a créé l'échange ${echange.dresseur_cree_id}. Id du dresseur qui n'a pas créé l'échange ${carte.dresseur_id}.`)
+            if (carte.dresseur_id.toString() === req.currentUserId) {
+              cartes_dresseur.push(carte);
+            } else {
+              cartes_autre_dresseur.push(carte);
+            }
           }
-        }
-        return Dresseur.findById(autreDresseurId);
-      })
-      .then(autre_dresseur => {
-        if (!autre_dresseur) return res.status(404).send(`Le dresseur avec l'id ${autreDresseurId} n'a pas été trouvé dans la base de données.`)
-        delete echange.dresseur_cree_id;
-        delete echange.dresseur_concerne_id;
-        delete echange.etat_dresseur_cree;
-        delete echange.etat_dresseur_concerne;
-        delete echange.__v;
-        delete echange.updatedAt;
-        
-        resolve({ 
-          echange,
-          autre_dresseur,
-          cartes_dresseur,
-          cartes_autre_dresseur
+          return Dresseur.findById(autreDresseurId);
+        })
+        .then(autre_dresseur => {
+          if (!autre_dresseur) return res.status(404).send(`Le dresseur avec l'id ${autreDresseurId} n'a pas été trouvé dans la base de données.`)
+          delete echange.dresseur_cree_id;
+          delete echange.dresseur_concerne_id;
+          delete echange.etat_dresseur_cree;
+          delete echange.etat_dresseur_concerne;
+          delete echange.__v;
+          delete echange.updatedAt;
+          
+          resolve({
+            _id: echange._id,
+            createdAt: echange.createdAt,
+            etat_dresseur: echange.etat_dresseur,
+            etat_autre_dresseur: echange.etat_autre_dresseur,
+            autre_dresseur,
+            cartes_dresseur,
+            cartes_autre_dresseur
+          });
+        })
+        .catch(error => {
+          reject(error);
         });
-      })
-      .catch(error => {
-        reject(error);
-      });
+    } else {
+      const cartes = []
+
+      EchangeConcerneCarte.find({ echange_id: echange._id })
+        .populate("carte_id")
+        .then(echangesConcerneCartes => {
+          for (const echangeConcerneCartes of echangesConcerneCartes) {
+            cartes.push(echangeConcerneCartes.carte_id);
+          }
+          if (req.currentUserId === echange.dresseur_cree_id.toString()) {
+            resolve({ 
+              _id: echange._id,
+              createdAt: echange.createdAt,
+              cartes
+            });
+          }
+          return Dresseur.findById(echange.dresseur_cree_id);
+        })
+        .then(dresseur => {
+          if (!dresseur) return res.status(404).send(`Le dresseur avec l'id ${dresseur} n'a pas été trouvé dans la base de données.`)
+          
+          resolve({ 
+            _id: echange._id,
+            createdAt: echange.createdAt,
+            dresseur,
+            cartes
+          });
+        })
+        .catch(error => {
+          reject(error);
+        });
+    }
   });
 }
 
