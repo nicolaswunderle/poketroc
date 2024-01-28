@@ -63,7 +63,7 @@ export function createWebSocketServer(httpServer) {
 
 export function broadcastDresseur(nouveauDresseur) {
   Object.keys(clients).forEach((client) => {
-    client.send(JSON.stringify(nouveauDresseur))
+    client[ws].send(JSON.stringify(nouveauDresseur))
   });
 }
 
