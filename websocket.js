@@ -61,11 +61,20 @@ export function createWebSocketServer(httpServer) {
   });
 }
 
-export function broadcastDresseur(nouveauDresseur) {
+export function broadcast(objet) {
   // si d'autres personnes sont connectées en websocket
   if (Object.keys(clients).length > 0) {
     Object.keys(clients).forEach((ws) => {
-      clients[ws].send(JSON.stringify(nouveauDresseur))
+      clients[ws].send(JSON.stringify(objet))
+    });
+  }
+}
+
+export function broadcastMessage(echange) {
+  // si d'autres personnes sont connectées en websocket
+  if (Object.keys(clients).length > 0) {
+    Object.keys(clients).forEach((ws) => {
+      clients[ws].send(JSON.stringify(echange))
     });
   }
 }
@@ -94,7 +103,7 @@ function onMessageReceived(ws, message) {
       if (handler) {
         handler(message, dresseur)
         .then(result => {
-          return ws.send(JSON.stringify({result}));
+          return ws.send(JSON.stringify({ [type]: result}));
         })
         .catch(error => {
           return ws.send(JSON.stringify({ error: error.message }));
@@ -103,66 +112,4 @@ function onMessageReceived(ws, message) {
         ws.send(JSON.stringify({ error: 'La propriété "type" ne correspond à aucune action.' }));
       }
     })
-
-  // const {type, token, localisation, echangeId} = message;
-
-  // if (type === 'getDresseurAProximite') {
-  //   let dresseurId;
-
-  //   // Vérifier le token
-  //   if (!token) return ws.send(JSON.stringify({ error: 'Il manque le token.' }));
-  //   verifyJwt(token, jwtSecret)
-  //     .then(payload => {
-  //       if (!mongoose.Types.ObjectId.isValid(payload.sub)) return ws.send(JSON.stringify({ error: "L'id du dresseur dans le JWT est invalide." }));
-  //       dresseurId = payload.sub;
-  //       // Check if the Dresseur ID exists in the database.
-  //       return Dresseur.findById(dresseurId);
-  //     })
-  //     .then(dresseur => {
-  //       if (!dresseur) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} ne correspond à aucun dresseur`}));
-  //       return getDresseurAProximite(localisation);
-  //     })
-  //     .then(dresseursProches => {
-  //       return ws.send(JSON.stringify({dresseursProches}));
-  //     })
-  //     .catch(error => {
-  //       return ws.send(JSON.stringify({ error: error.message }));
-  //     });
-  // } else if (type === 'getMessagesOfEchange') {
-  //   let dresseurId;
-  //   if (!token) return ws.send(JSON.stringify({ error: 'Il manque le token' }));
-  //   verifyJwt(token, jwtSecret)
-  //     .then(payload => {
-  //       if (!mongoose.Types.ObjectId.isValid(payload.sub)) return ws.send(JSON.stringify({ error: "L'id du dresseur dans le JWT est invalide." }));
-  //       dresseurId = payload.sub;
-  //       // Check if the Dresseur ID exists in the database.
-  //       return Dresseur.findById(dresseurId);
-  //     })
-  //     .then(dresseur => {
-  //       if(!dresseur) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} ne correspond à aucun dresseur`}));
-  //       if(!echangeId) return ws.send(JSON.stringify({ error: 'Il manque le champs echangeId' }));
-  //       if (!mongoose.Types.ObjectId.isValid(echangeId)) return ws.send(JSON.stringify({ error: "L'id de l'échange est invalide." }));
-  //       return Echange.findById(echangeId);
-  //     })
-  //     .then(echange => {
-  //       if(!echange) return ws.send(JSON.stringify({ error: `L'id ${echangeId} ne correspond à aucun échange`}));
-  //       return echange.dresseur_cree_id == dresseurId;
-  //     })
-  //     .then(echangeValid => {
-  //       if(!echangeValid) return ws.send(JSON.stringify({ error: `Le dresseur n'a pas créé cet échange`}));
-  //       return Message.find()
-  //         .where("dresseur_id")
-  //         .equals(dresseurId)
-  //         .where("echange_id")
-  //         .equals(echangeId)
-  //     })
-  //     .then(messages => {
-  //       return ws.send(JSON.stringify({messages}));
-  //     })
-  //     .catch(error => {
-  //       return ws.send(JSON.stringify({ error: error.message }));
-  //     });
-  // }
-  
-  
 }

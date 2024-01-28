@@ -17,7 +17,7 @@ import {
   requireJson,
   modificationsObject
 } from "./utils.js";
-import { broadcastDresseur } from '../websocket.js';
+import { broadcast } from '../websocket.js';
 
 const debug = debugFactory('poketroc:dresseurs');
 const router = express.Router();
@@ -143,7 +143,7 @@ router.post("/connexion",
               dresseur.en_ligne = true;
               dresseur.save().then(dresseurSauve => {
                 if (!dresseurSauve) return res.status(400).send("Le dresseur n'a pas pu être modifié.");
-                broadcastDresseur({nouveauDresseur: dresseurSauve})
+                broadcast({dresseurConnecte: dresseurSauve})
                 res.status(200).send({ 
                   token,
                   dresseur: dresseurSauve
@@ -168,6 +168,7 @@ router.delete("/connexion",
     dresseur.en_ligne = false;
     dresseur.save().then(dresseurSauve => {
       if (!dresseurSauve) return res.status(400).send("Le dresseur n'a pas pu être modifié.");
+      broadcast({dresseurDeconnecte: dresseurSauve})
       res.sendStatus(204);
     })
     .catch(next);
