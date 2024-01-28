@@ -62,9 +62,11 @@ export function createWebSocketServer(httpServer) {
 }
 
 export function broadcastDresseur(nouveauDresseur) {
-  Object.keys(clients).forEach((client) => {
-    client[ws].send(JSON.stringify(nouveauDresseur))
-  });
+  if (Object.keys(clients).length > 0) {
+    Object.keys(clients).forEach((client) => {
+      client[ws].send(JSON.stringify(nouveauDresseur))
+    });
+  }
 }
 
 function onMessageReceived(ws, message) {
