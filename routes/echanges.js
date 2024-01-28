@@ -16,6 +16,7 @@ import {
   editPermissionEchange,
   verifTabCartesId
 } from "./utils.js";
+import { broadcast } from '../websocket.js';
 
 const debug = debugFactory('poketroc:echanges');
 const router = express.Router();
@@ -84,6 +85,7 @@ router.post("/",
             if (cartesDresseurConcerne) {
               echangeEntier.cartes_dresseur_concerne = cartesDresseurConcerne;
             }
+            broadcast({nouvelEchange: echangeEntier});
             res.status(201).send(echangeEntier);
           })
           .catch(next);
@@ -282,6 +284,11 @@ router.patch("/:echangeId",
         return next(error);
       }
       
+      // Si c'est un échange où le dresseur_concerne est null alors on l'envoie en websocket
+      if (echange.dresseur_concerne_id === null) {
+        
+      }
+
       // si les changments ont réussi
       res.status(200).send({
         echange,
@@ -302,9 +309,11 @@ router.delete("/:echangeId",
   async function (req, res, next) {
     const echange = req.echange;
     
-    if (echange.dresseur_concerne_id === null && echange.dresseur_cree_id !== req.currentUserId) return res.status(403).send(`Vous n'avez pas les autorisations pour supprimer cet échange.`);
-    if (echange.etat_dresseur_cree === 'attente' || echange.etat_dresseur_concerne === 'attente') return res.status(400).send(`Un des deux dresseurs n'a pas accepté ou refusé l'échange.`);
-    if (echange.etat_dresseur_cree !== echange.etat_dresseur_concerne) return res.status(400).send(`Les deux dresseurs n'ont pas fait le même choix entre accepter ou refuser l'échange.`);
+    // Des première vérifications sont faites dans editPermissionsEchange
+    if (echange.dresseur_concerne_id === null && echange.dresseur_cree_id.toString() !== req.currentUserId) return res.status(403).send(`Vous n'avez pas les autorisations pour supprimer cet échange.`);
+    
+    if (echange.dresseur_concerne_id !== null && (echange.etat_dresseur_cree === 'attente' || echange.etat_dresseur_concerne === 'attente')) return res.status(400).send(`Un des deux dresseurs n'a pas accepté ou refusé l'échange.`);
+    if (echange.dresseur_concerne_id !== null && echange.etat_dresseur_cree !== echange.etat_dresseur_concerne) return res.status(400).send(`Les deux dresseurs n'ont pas fait le même choix entre accepter ou refuser l'échange.`);
     
     const etat = echange.etat_dresseur_cree;
 
@@ -312,11 +321,11 @@ router.delete("/:echangeId",
     const validEchange = await Echange.deleteOne({ _id: echange._id });
     if (validEchange.deletedCount <= 0) return res.status(400).send("L'échange n'a pas pu être supprimé.");
 
-    if (etat === 'refuse') {
+    if (etat === 'refuse' || echange.dresseur_concerne_id === null) {
       
       const validEchangeConcerneCarte = await EchangeConcerneCarte.deleteMany({echange_id : echange._id});
       if (validEchangeConcerneCarte.deletedCount <= 0) return res.status(400).send("Echange qui concerne les cartes n'ont pas pu être supprimé.");
-          
+      if (echange.dresseur_concerne_id === null) broadcast({echangeSupprime: echange._id});
       return res.sendStatus(204);
 
     } else if (etat === 'accepte') {
