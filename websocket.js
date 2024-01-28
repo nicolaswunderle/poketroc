@@ -62,10 +62,10 @@ export function createWebSocketServer(httpServer) {
 }
 
 export function broadcastDresseur(nouveauDresseur) {
-  // console.log(Object.keys(clients).length > 0);
+  // si d'autres personnes sont connectées en websocket
   if (Object.keys(clients).length > 0) {
-    Object.keys(clients).forEach((client) => {
-      client[ws].send(JSON.stringify(nouveauDresseur))
+    Object.keys(clients).forEach((ws) => {
+      clients[ws].send(JSON.stringify(nouveauDresseur))
     });
   }
 }
