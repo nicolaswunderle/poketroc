@@ -286,7 +286,10 @@ router.patch("/:echangeId",
       
       // Si c'est un échange où le dresseur_concerne est null alors on l'envoie en websocket
       if (echange.dresseur_concerne_id === null) {
-        
+        broadcast({modifeEchange: {
+          echange,
+          cartes
+        }});
       }
 
       // si les changments ont réussi
