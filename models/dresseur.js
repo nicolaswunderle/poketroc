@@ -59,7 +59,7 @@ const dresseurSchema = new Schema({
     },
     url_image_profil: {
         type: String,
-        default: 'asset/image_profil_defaut.jpeg',
+        default: 'assets/image_profil_defaut.png',
         trim: true
     },
     en_ligne: {
