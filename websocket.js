@@ -7,19 +7,19 @@ import { jwtSecret } from "./config.js";
 import Dresseur from "./models/dresseur.js";
 import { getDresseurAProximite } from './services/dresseurService.js';
 import { getEchangesProposes } from './services/echangeService.js';
-import { getMessagesOfEchange } from './services/messageService.js';
+import { getMessagesOfEchange, sendMessageInEchange } from './services/messageService.js';
 
 const verifyJwt = promisify(jwt.verify);
 
 const debug = createDebugger('express-api:websocket');
 
-// const clients = [];
-const clients = {};
+const clients = [];
 
 const messageHandlers = {
   'getDresseurAProximite': getDresseurAProximite,
   'getEchangesProposes': getEchangesProposes,
-  'getMessagesOfEchange': getMessagesOfEchange
+  'getMessagesOfEchange': getMessagesOfEchange,
+  'sendMessageInEchange': sendMessageInEchange
 };
 
 export function createWebSocketServer(httpServer) {
@@ -33,8 +33,7 @@ export function createWebSocketServer(httpServer) {
     debug('New WebSocket client connected');
 
     // Keep track of clients.
-    // clients.push(ws);
-    clients[ws] = ws;
+    clients.push(ws);
 
     // Listen for messages sent by clients.
     ws.on('message', (message) => {
@@ -53,8 +52,7 @@ export function createWebSocketServer(httpServer) {
 
     // Clean up disconnected clients.
     ws.on('close', () => {
-      // clients.splice(clients.indexOf(ws), 1);
-      delete clients[ws];
+      clients.splice(clients.indexOf(ws), 1);
       debug('WebSocket client disconnected');
     });
 
@@ -63,24 +61,15 @@ export function createWebSocketServer(httpServer) {
 
 export function broadcast(objet) {
   // si d'autres personnes sont connectées en websocket
-  if (Object.keys(clients).length > 0) {
-    Object.keys(clients).forEach((ws) => {
-      clients[ws].send(JSON.stringify(objet))
-    });
-  }
-}
-
-export function broadcastMessage(echange) {
-  // si d'autres personnes sont connectées en websocket
-  if (Object.keys(clients).length > 0) {
-    Object.keys(clients).forEach((ws) => {
-      clients[ws].send(JSON.stringify(echange))
+  if (clients.length > 0) {
+    clients.forEach(ws => {
+      ws.send(JSON.stringify(objet))
     });
   }
 }
 
 function onMessageReceived(ws, message) {
-  const token = clients[ws].token ? clients[ws].token : message.token;
+  const token = ws.token ? ws.token : message.token;
   const { type } = message;
   let dresseurId;
   
@@ -91,17 +80,18 @@ function onMessageReceived(ws, message) {
       if (!mongoose.Types.ObjectId.isValid(payload.sub)) return ws.send(JSON.stringify({ error: "L'id du dresseur dans le JWT est invalide." }));
       dresseurId = payload.sub;
 
-      clients[ws].token = token;
+      ws.token = token;
 
       return Dresseur.findById(dresseurId);
     })
     .then(dresseur => {
       if (!dresseur) return ws.send(JSON.stringify({ error: `L'id ${dresseurId} ne correspond à aucun dresseur`}));
       
-      const handler = messageHandlers[type];
+      ws.dresseurId = dresseur._id;
 
+      const handler = messageHandlers[type];
       if (handler) {
-        handler(message, dresseur)
+        handler(message, dresseur, clients)
         .then(result => {
           return ws.send(JSON.stringify({ [type]: result}));
         })
