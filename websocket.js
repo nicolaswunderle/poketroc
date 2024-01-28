@@ -18,7 +18,7 @@ const clients = {};
 
 const messageHandlers = {
   'getDresseurAProximite': getDresseurAProximite,
-  // 'getEchangesProposes': getEchangesProposes,
+  'getEchangesProposes': getEchangesProposes,
   'getMessagesOfEchange': getMessagesOfEchange
 };
 
@@ -62,6 +62,7 @@ export function createWebSocketServer(httpServer) {
 }
 
 export function broadcastDresseur(nouveauDresseur) {
+  // console.log(Object.keys(clients).length > 0);
   if (Object.keys(clients).length > 0) {
     Object.keys(clients).forEach((client) => {
       client[ws].send(JSON.stringify(nouveauDresseur))
